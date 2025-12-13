@@ -1,0 +1,38 @@
+{
+  "name": "@kiro/db",
+  "version": "1.0.0",
+  "description": "Kiro Database",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev"
+  },
+  "author": "aeonzz",
+  "license": "MIT",
+  "devDependencies": {
+    "prisma": "^7.1.0",
+    "tsdown": "^0.17.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.1.0",
+    "@prisma/client": "^7.1.0",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  }
+}

@@ -1,0 +1,26 @@
+# dependencies
+node_modules
+
+# Turbo
+.turbo
+
+# output
+out
+dist
+*.tgz
+
+# logs
+logs
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+/generated/prisma
