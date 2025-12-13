@@ -71,6 +71,9 @@ importers:
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.0
+      zod:
+        specifier: 'catalog:'
+        version: 4.1.13
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4.1.15
