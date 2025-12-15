@@ -1,15 +1,14 @@
-import { auth } from "@/lib/auth";
-import { redirect } from "@tanstack/react-router";
+import { getSessionFn } from "@/services/auth";
 import { createMiddleware } from "@tanstack/react-start";
 
-export const authMiddleware = createMiddleware().server(
-  async ({ next, request }) => {
-    const session = await auth.api.getSession({ headers: request.headers });
-
-    if (!session) {
-      throw redirect({ to: "/login" });
+const authMiddleware = createMiddleware({ type: "function" }).server(
+  async ({ next }) => {
+    const session = await getSessionFn();
+    if (!session?.user) {
+      throw new Error("Unauthorized");
     }
-
-    return await next();
+    return next({ context: { session } });
   }
 );
+
+export default authMiddleware;

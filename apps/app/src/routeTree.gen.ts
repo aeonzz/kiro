@@ -14,19 +14,23 @@ import { Route as DeferredRouteImport } from './routes/deferred'
 import { Route as PathlessLayoutRouteImport } from './routes/_pathlessLayout'
 import { Route as UsersRouteRouteImport } from './routes/users.route'
 import { Route as PostsRouteRouteImport } from './routes/posts.route'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as UsersIndexRouteImport } from './routes/users.index'
 import { Route as PostsIndexRouteImport } from './routes/posts.index'
 import { Route as UsersUserIdRouteImport } from './routes/users.$userId'
 import { Route as PostsPostIdRouteImport } from './routes/posts.$postId'
 import { Route as ApiUsersRouteImport } from './routes/api/users'
 import { Route as PathlessLayoutNestedLayoutRouteImport } from './routes/_pathlessLayout/_nested-layout'
-import { Route as authLoginRouteRouteImport } from './routes/(auth)/login/route'
+import { Route as AppJoinRouteImport } from './routes/_app/join'
+import { Route as AuthLoginRouteRouteImport } from './routes/_auth/login/route'
+import { Route as AppWorkspaceRouteRouteImport } from './routes/_app/$workspace/route'
 import { Route as PostsPostIdDeepRouteImport } from './routes/posts_.$postId.deep'
 import { Route as ApiUsersIdRouteImport } from './routes/api/users.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as PathlessLayoutNestedLayoutRouteBRouteImport } from './routes/_pathlessLayout/_nested-layout/route-b'
 import { Route as PathlessLayoutNestedLayoutRouteARouteImport } from './routes/_pathlessLayout/_nested-layout/route-a'
+import { Route as AppWorkspaceIssuesRouteImport } from './routes/_app/$workspace/issues'
+import { Route as AppWorkspaceInboxRouteImport } from './routes/_app/$workspace/inbox'
 
 const RedirectRoute = RedirectRouteImport.update({
   id: '/redirect',
@@ -52,9 +56,8 @@ const PostsRouteRoute = PostsRouteRouteImport.update({
   path: '/posts',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AppRouteRoute = AppRouteRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UsersIndexRoute = UsersIndexRouteImport.update({
@@ -87,10 +90,20 @@ const PathlessLayoutNestedLayoutRoute =
     id: '/_nested-layout',
     getParentRoute: () => PathlessLayoutRoute,
   } as any)
-const authLoginRouteRoute = authLoginRouteRouteImport.update({
-  id: '/(auth)/login',
+const AppJoinRoute = AppJoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AuthLoginRouteRoute = AuthLoginRouteRouteImport.update({
+  id: '/_auth/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppWorkspaceRouteRoute = AppWorkspaceRouteRouteImport.update({
+  id: '/$workspace',
+  path: '/$workspace',
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const PostsPostIdDeepRoute = PostsPostIdDeepRouteImport.update({
   id: '/posts_/$postId/deep',
@@ -119,19 +132,32 @@ const PathlessLayoutNestedLayoutRouteARoute =
     path: '/route-a',
     getParentRoute: () => PathlessLayoutNestedLayoutRoute,
   } as any)
+const AppWorkspaceIssuesRoute = AppWorkspaceIssuesRouteImport.update({
+  id: '/issues',
+  path: '/issues',
+  getParentRoute: () => AppWorkspaceRouteRoute,
+} as any)
+const AppWorkspaceInboxRoute = AppWorkspaceInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AppWorkspaceRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/posts': typeof PostsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/deferred': typeof DeferredRoute
   '/redirect': typeof RedirectRoute
-  '/login': typeof authLoginRouteRoute
+  '/$workspace': typeof AppWorkspaceRouteRouteWithChildren
+  '/login': typeof AuthLoginRouteRoute
+  '/join': typeof AppJoinRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts/': typeof PostsIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/$workspace/inbox': typeof AppWorkspaceInboxRoute
+  '/$workspace/issues': typeof AppWorkspaceIssuesRoute
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -139,15 +165,18 @@ export interface FileRoutesByFullPath {
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/deferred': typeof DeferredRoute
   '/redirect': typeof RedirectRoute
-  '/login': typeof authLoginRouteRoute
+  '/$workspace': typeof AppWorkspaceRouteRouteWithChildren
+  '/login': typeof AuthLoginRouteRoute
+  '/join': typeof AppJoinRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts': typeof PostsIndexRoute
   '/users': typeof UsersIndexRoute
+  '/$workspace/inbox': typeof AppWorkspaceInboxRoute
+  '/$workspace/issues': typeof AppWorkspaceIssuesRoute
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -156,19 +185,23 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteRouteWithChildren
   '/posts': typeof PostsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/_pathlessLayout': typeof PathlessLayoutRouteWithChildren
   '/deferred': typeof DeferredRoute
   '/redirect': typeof RedirectRoute
-  '/(auth)/login': typeof authLoginRouteRoute
+  '/_app/$workspace': typeof AppWorkspaceRouteRouteWithChildren
+  '/_auth/login': typeof AuthLoginRouteRoute
+  '/_app/join': typeof AppJoinRoute
   '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/posts/': typeof PostsIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/_app/$workspace/inbox': typeof AppWorkspaceInboxRoute
+  '/_app/$workspace/issues': typeof AppWorkspaceIssuesRoute
   '/_pathlessLayout/_nested-layout/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/_pathlessLayout/_nested-layout/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -178,17 +211,20 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/posts'
     | '/users'
     | '/deferred'
     | '/redirect'
+    | '/$workspace'
     | '/login'
+    | '/join'
     | '/api/users'
     | '/posts/$postId'
     | '/users/$userId'
     | '/posts/'
     | '/users/'
+    | '/$workspace/inbox'
+    | '/$workspace/issues'
     | '/route-a'
     | '/route-b'
     | '/api/auth/$'
@@ -196,15 +232,18 @@ export interface FileRouteTypes {
     | '/posts/$postId/deep'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/deferred'
     | '/redirect'
+    | '/$workspace'
     | '/login'
+    | '/join'
     | '/api/users'
     | '/posts/$postId'
     | '/users/$userId'
     | '/posts'
     | '/users'
+    | '/$workspace/inbox'
+    | '/$workspace/issues'
     | '/route-a'
     | '/route-b'
     | '/api/auth/$'
@@ -212,19 +251,23 @@ export interface FileRouteTypes {
     | '/posts/$postId/deep'
   id:
     | '__root__'
-    | '/'
+    | '/_app'
     | '/posts'
     | '/users'
     | '/_pathlessLayout'
     | '/deferred'
     | '/redirect'
-    | '/(auth)/login'
+    | '/_app/$workspace'
+    | '/_auth/login'
+    | '/_app/join'
     | '/_pathlessLayout/_nested-layout'
     | '/api/users'
     | '/posts/$postId'
     | '/users/$userId'
     | '/posts/'
     | '/users/'
+    | '/_app/$workspace/inbox'
+    | '/_app/$workspace/issues'
     | '/_pathlessLayout/_nested-layout/route-a'
     | '/_pathlessLayout/_nested-layout/route-b'
     | '/api/auth/$'
@@ -233,13 +276,13 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRouteRoute: typeof AppRouteRouteWithChildren
   PostsRouteRoute: typeof PostsRouteRouteWithChildren
   UsersRouteRoute: typeof UsersRouteRouteWithChildren
   PathlessLayoutRoute: typeof PathlessLayoutRouteWithChildren
   DeferredRoute: typeof DeferredRoute
   RedirectRoute: typeof RedirectRoute
-  authLoginRouteRoute: typeof authLoginRouteRoute
+  AuthLoginRouteRoute: typeof AuthLoginRouteRoute
   ApiUsersRoute: typeof ApiUsersRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   PostsPostIdDeepRoute: typeof PostsPostIdDeepRoute
@@ -282,11 +325,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/users/': {
@@ -331,12 +374,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteImport
       parentRoute: typeof PathlessLayoutRoute
     }
-    '/(auth)/login': {
-      id: '/(auth)/login'
+    '/_app/join': {
+      id: '/_app/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof AppJoinRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_auth/login': {
+      id: '/_auth/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof authLoginRouteRouteImport
+      preLoaderRoute: typeof AuthLoginRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/$workspace': {
+      id: '/_app/$workspace'
+      path: '/$workspace'
+      fullPath: '/$workspace'
+      preLoaderRoute: typeof AppWorkspaceRouteRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/posts_/$postId/deep': {
       id: '/posts_/$postId/deep'
@@ -373,8 +430,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteARouteImport
       parentRoute: typeof PathlessLayoutNestedLayoutRoute
     }
+    '/_app/$workspace/issues': {
+      id: '/_app/$workspace/issues'
+      path: '/issues'
+      fullPath: '/$workspace/issues'
+      preLoaderRoute: typeof AppWorkspaceIssuesRouteImport
+      parentRoute: typeof AppWorkspaceRouteRoute
+    }
+    '/_app/$workspace/inbox': {
+      id: '/_app/$workspace/inbox'
+      path: '/inbox'
+      fullPath: '/$workspace/inbox'
+      preLoaderRoute: typeof AppWorkspaceInboxRouteImport
+      parentRoute: typeof AppWorkspaceRouteRoute
+    }
   }
 }
+
+interface AppWorkspaceRouteRouteChildren {
+  AppWorkspaceInboxRoute: typeof AppWorkspaceInboxRoute
+  AppWorkspaceIssuesRoute: typeof AppWorkspaceIssuesRoute
+}
+
+const AppWorkspaceRouteRouteChildren: AppWorkspaceRouteRouteChildren = {
+  AppWorkspaceInboxRoute: AppWorkspaceInboxRoute,
+  AppWorkspaceIssuesRoute: AppWorkspaceIssuesRoute,
+}
+
+const AppWorkspaceRouteRouteWithChildren =
+  AppWorkspaceRouteRoute._addFileChildren(AppWorkspaceRouteRouteChildren)
+
+interface AppRouteRouteChildren {
+  AppWorkspaceRouteRoute: typeof AppWorkspaceRouteRouteWithChildren
+  AppJoinRoute: typeof AppJoinRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppWorkspaceRouteRoute: AppWorkspaceRouteRouteWithChildren,
+  AppJoinRoute: AppJoinRoute,
+}
+
+const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
+  AppRouteRouteChildren,
+)
 
 interface PostsRouteRouteChildren {
   PostsPostIdRoute: typeof PostsPostIdRoute
@@ -447,13 +545,13 @@ const ApiUsersRouteWithChildren = ApiUsersRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRouteRoute: AppRouteRouteWithChildren,
   PostsRouteRoute: PostsRouteRouteWithChildren,
   UsersRouteRoute: UsersRouteRouteWithChildren,
   PathlessLayoutRoute: PathlessLayoutRouteWithChildren,
   DeferredRoute: DeferredRoute,
   RedirectRoute: RedirectRoute,
-  authLoginRouteRoute: authLoginRouteRoute,
+  AuthLoginRouteRoute: AuthLoginRouteRoute,
   ApiUsersRoute: ApiUsersRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   PostsPostIdDeepRoute: PostsPostIdDeepRoute,
