@@ -14,7 +14,7 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
-import { NotFound } from "@/components/NotFound";
+import { NotFound } from "@/components/not-found";
 import Providers from "@/components/providers";
 import appCss from "@/styles/app.css?url";
 
