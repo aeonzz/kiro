@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RedirectRouteImport } from './routes/redirect'
+import { Route as JoinRouteImport } from './routes/join'
 import { Route as DeferredRouteImport } from './routes/deferred'
 import { Route as PathlessLayoutRouteImport } from './routes/_pathlessLayout'
 import { Route as UsersRouteRouteImport } from './routes/users.route'
@@ -17,24 +18,34 @@ import { Route as PostsRouteRouteImport } from './routes/posts.route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as UsersIndexRouteImport } from './routes/users.index'
 import { Route as PostsIndexRouteImport } from './routes/posts.index'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as UsersUserIdRouteImport } from './routes/users.$userId'
 import { Route as PostsPostIdRouteImport } from './routes/posts.$postId'
 import { Route as ApiUsersRouteImport } from './routes/api/users'
 import { Route as PathlessLayoutNestedLayoutRouteImport } from './routes/_pathlessLayout/_nested-layout'
-import { Route as AppJoinRouteImport } from './routes/_app/join'
 import { Route as AuthLoginRouteRouteImport } from './routes/_auth/login/route'
-import { Route as AppWorkspaceRouteRouteImport } from './routes/_app/$workspace/route'
+import { Route as AppOrganizationIndexRouteImport } from './routes/_app/$organization/index'
 import { Route as PostsPostIdDeepRouteImport } from './routes/posts_.$postId.deep'
 import { Route as ApiUsersIdRouteImport } from './routes/api/users.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as PathlessLayoutNestedLayoutRouteBRouteImport } from './routes/_pathlessLayout/_nested-layout/route-b'
 import { Route as PathlessLayoutNestedLayoutRouteARouteImport } from './routes/_pathlessLayout/_nested-layout/route-a'
-import { Route as AppWorkspaceIssuesRouteImport } from './routes/_app/$workspace/issues'
-import { Route as AppWorkspaceInboxRouteImport } from './routes/_app/$workspace/inbox'
+import { Route as AppOrganizationNewTeamRouteImport } from './routes/_app/$organization/new-team'
+import { Route as AppOrganizationIssuesRouteImport } from './routes/_app/$organization/issues'
+import { Route as AppOrganizationInboxRouteImport } from './routes/_app/$organization/inbox'
+import { Route as AppOrganizationViewsIndexRouteImport } from './routes/_app/$organization/views/index'
+import { Route as AppOrganizationProjectsIndexRouteImport } from './routes/_app/$organization/projects/index'
+import { Route as AppOrganizationViewsIssuesRouteImport } from './routes/_app/$organization/views/issues'
+import { Route as AppOrganizationProjectsAllRouteImport } from './routes/_app/$organization/projects/all'
 
 const RedirectRoute = RedirectRouteImport.update({
   id: '/redirect',
   path: '/redirect',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeferredRoute = DeferredRouteImport.update({
@@ -70,6 +81,11 @@ const PostsIndexRoute = PostsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PostsRouteRoute,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const UsersUserIdRoute = UsersUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -90,19 +106,14 @@ const PathlessLayoutNestedLayoutRoute =
     id: '/_nested-layout',
     getParentRoute: () => PathlessLayoutRoute,
   } as any)
-const AppJoinRoute = AppJoinRouteImport.update({
-  id: '/join',
-  path: '/join',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const AuthLoginRouteRoute = AuthLoginRouteRouteImport.update({
   id: '/_auth/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppWorkspaceRouteRoute = AppWorkspaceRouteRouteImport.update({
-  id: '/$workspace',
-  path: '/$workspace',
+const AppOrganizationIndexRoute = AppOrganizationIndexRouteImport.update({
+  id: '/$organization/',
+  path: '/$organization/',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const PostsPostIdDeepRoute = PostsPostIdDeepRouteImport.update({
@@ -132,56 +143,97 @@ const PathlessLayoutNestedLayoutRouteARoute =
     path: '/route-a',
     getParentRoute: () => PathlessLayoutNestedLayoutRoute,
   } as any)
-const AppWorkspaceIssuesRoute = AppWorkspaceIssuesRouteImport.update({
-  id: '/issues',
-  path: '/issues',
-  getParentRoute: () => AppWorkspaceRouteRoute,
+const AppOrganizationNewTeamRoute = AppOrganizationNewTeamRouteImport.update({
+  id: '/$organization/new-team',
+  path: '/$organization/new-team',
+  getParentRoute: () => AppRouteRoute,
 } as any)
-const AppWorkspaceInboxRoute = AppWorkspaceInboxRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
-  getParentRoute: () => AppWorkspaceRouteRoute,
+const AppOrganizationIssuesRoute = AppOrganizationIssuesRouteImport.update({
+  id: '/$organization/issues',
+  path: '/$organization/issues',
+  getParentRoute: () => AppRouteRoute,
 } as any)
+const AppOrganizationInboxRoute = AppOrganizationInboxRouteImport.update({
+  id: '/$organization/inbox',
+  path: '/$organization/inbox',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppOrganizationViewsIndexRoute =
+  AppOrganizationViewsIndexRouteImport.update({
+    id: '/$organization/views/',
+    path: '/$organization/views/',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
+const AppOrganizationProjectsIndexRoute =
+  AppOrganizationProjectsIndexRouteImport.update({
+    id: '/$organization/projects/',
+    path: '/$organization/projects/',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
+const AppOrganizationViewsIssuesRoute =
+  AppOrganizationViewsIssuesRouteImport.update({
+    id: '/$organization/views/issues',
+    path: '/$organization/views/issues',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
+const AppOrganizationProjectsAllRoute =
+  AppOrganizationProjectsAllRouteImport.update({
+    id: '/$organization/projects/all',
+    path: '/$organization/projects/all',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/posts': typeof PostsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/deferred': typeof DeferredRoute
+  '/join': typeof JoinRoute
   '/redirect': typeof RedirectRoute
-  '/$workspace': typeof AppWorkspaceRouteRouteWithChildren
   '/login': typeof AuthLoginRouteRoute
-  '/join': typeof AppJoinRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/': typeof AppIndexRoute
   '/posts/': typeof PostsIndexRoute
   '/users/': typeof UsersIndexRoute
-  '/$workspace/inbox': typeof AppWorkspaceInboxRoute
-  '/$workspace/issues': typeof AppWorkspaceIssuesRoute
+  '/$organization/inbox': typeof AppOrganizationInboxRoute
+  '/$organization/issues': typeof AppOrganizationIssuesRoute
+  '/$organization/new-team': typeof AppOrganizationNewTeamRoute
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/users/$id': typeof ApiUsersIdRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
+  '/$organization': typeof AppOrganizationIndexRoute
+  '/$organization/projects/all': typeof AppOrganizationProjectsAllRoute
+  '/$organization/views/issues': typeof AppOrganizationViewsIssuesRoute
+  '/$organization/projects': typeof AppOrganizationProjectsIndexRoute
+  '/$organization/views': typeof AppOrganizationViewsIndexRoute
 }
 export interface FileRoutesByTo {
   '/deferred': typeof DeferredRoute
+  '/join': typeof JoinRoute
   '/redirect': typeof RedirectRoute
-  '/$workspace': typeof AppWorkspaceRouteRouteWithChildren
   '/login': typeof AuthLoginRouteRoute
-  '/join': typeof AppJoinRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/': typeof AppIndexRoute
   '/posts': typeof PostsIndexRoute
   '/users': typeof UsersIndexRoute
-  '/$workspace/inbox': typeof AppWorkspaceInboxRoute
-  '/$workspace/issues': typeof AppWorkspaceIssuesRoute
+  '/$organization/inbox': typeof AppOrganizationInboxRoute
+  '/$organization/issues': typeof AppOrganizationIssuesRoute
+  '/$organization/new-team': typeof AppOrganizationNewTeamRoute
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/users/$id': typeof ApiUsersIdRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
+  '/$organization': typeof AppOrganizationIndexRoute
+  '/$organization/projects/all': typeof AppOrganizationProjectsAllRoute
+  '/$organization/views/issues': typeof AppOrganizationViewsIssuesRoute
+  '/$organization/projects': typeof AppOrganizationProjectsIndexRoute
+  '/$organization/views': typeof AppOrganizationViewsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -190,23 +242,29 @@ export interface FileRoutesById {
   '/users': typeof UsersRouteRouteWithChildren
   '/_pathlessLayout': typeof PathlessLayoutRouteWithChildren
   '/deferred': typeof DeferredRoute
+  '/join': typeof JoinRoute
   '/redirect': typeof RedirectRoute
-  '/_app/$workspace': typeof AppWorkspaceRouteRouteWithChildren
   '/_auth/login': typeof AuthLoginRouteRoute
-  '/_app/join': typeof AppJoinRoute
   '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
   '/api/users': typeof ApiUsersRouteWithChildren
   '/posts/$postId': typeof PostsPostIdRoute
   '/users/$userId': typeof UsersUserIdRoute
+  '/_app/': typeof AppIndexRoute
   '/posts/': typeof PostsIndexRoute
   '/users/': typeof UsersIndexRoute
-  '/_app/$workspace/inbox': typeof AppWorkspaceInboxRoute
-  '/_app/$workspace/issues': typeof AppWorkspaceIssuesRoute
+  '/_app/$organization/inbox': typeof AppOrganizationInboxRoute
+  '/_app/$organization/issues': typeof AppOrganizationIssuesRoute
+  '/_app/$organization/new-team': typeof AppOrganizationNewTeamRoute
   '/_pathlessLayout/_nested-layout/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/_pathlessLayout/_nested-layout/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/users/$id': typeof ApiUsersIdRoute
   '/posts_/$postId/deep': typeof PostsPostIdDeepRoute
+  '/_app/$organization/': typeof AppOrganizationIndexRoute
+  '/_app/$organization/projects/all': typeof AppOrganizationProjectsAllRoute
+  '/_app/$organization/views/issues': typeof AppOrganizationViewsIssuesRoute
+  '/_app/$organization/projects/': typeof AppOrganizationProjectsIndexRoute
+  '/_app/$organization/views/': typeof AppOrganizationViewsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -214,41 +272,53 @@ export interface FileRouteTypes {
     | '/posts'
     | '/users'
     | '/deferred'
-    | '/redirect'
-    | '/$workspace'
-    | '/login'
     | '/join'
+    | '/redirect'
+    | '/login'
     | '/api/users'
     | '/posts/$postId'
     | '/users/$userId'
+    | '/'
     | '/posts/'
     | '/users/'
-    | '/$workspace/inbox'
-    | '/$workspace/issues'
+    | '/$organization/inbox'
+    | '/$organization/issues'
+    | '/$organization/new-team'
     | '/route-a'
     | '/route-b'
     | '/api/auth/$'
     | '/api/users/$id'
     | '/posts/$postId/deep'
+    | '/$organization'
+    | '/$organization/projects/all'
+    | '/$organization/views/issues'
+    | '/$organization/projects'
+    | '/$organization/views'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/deferred'
-    | '/redirect'
-    | '/$workspace'
-    | '/login'
     | '/join'
+    | '/redirect'
+    | '/login'
     | '/api/users'
     | '/posts/$postId'
     | '/users/$userId'
+    | '/'
     | '/posts'
     | '/users'
-    | '/$workspace/inbox'
-    | '/$workspace/issues'
+    | '/$organization/inbox'
+    | '/$organization/issues'
+    | '/$organization/new-team'
     | '/route-a'
     | '/route-b'
     | '/api/auth/$'
     | '/api/users/$id'
     | '/posts/$postId/deep'
+    | '/$organization'
+    | '/$organization/projects/all'
+    | '/$organization/views/issues'
+    | '/$organization/projects'
+    | '/$organization/views'
   id:
     | '__root__'
     | '/_app'
@@ -256,23 +326,29 @@ export interface FileRouteTypes {
     | '/users'
     | '/_pathlessLayout'
     | '/deferred'
+    | '/join'
     | '/redirect'
-    | '/_app/$workspace'
     | '/_auth/login'
-    | '/_app/join'
     | '/_pathlessLayout/_nested-layout'
     | '/api/users'
     | '/posts/$postId'
     | '/users/$userId'
+    | '/_app/'
     | '/posts/'
     | '/users/'
-    | '/_app/$workspace/inbox'
-    | '/_app/$workspace/issues'
+    | '/_app/$organization/inbox'
+    | '/_app/$organization/issues'
+    | '/_app/$organization/new-team'
     | '/_pathlessLayout/_nested-layout/route-a'
     | '/_pathlessLayout/_nested-layout/route-b'
     | '/api/auth/$'
     | '/api/users/$id'
     | '/posts_/$postId/deep'
+    | '/_app/$organization/'
+    | '/_app/$organization/projects/all'
+    | '/_app/$organization/views/issues'
+    | '/_app/$organization/projects/'
+    | '/_app/$organization/views/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -281,6 +357,7 @@ export interface RootRouteChildren {
   UsersRouteRoute: typeof UsersRouteRouteWithChildren
   PathlessLayoutRoute: typeof PathlessLayoutRouteWithChildren
   DeferredRoute: typeof DeferredRoute
+  JoinRoute: typeof JoinRoute
   RedirectRoute: typeof RedirectRoute
   AuthLoginRouteRoute: typeof AuthLoginRouteRoute
   ApiUsersRoute: typeof ApiUsersRouteWithChildren
@@ -295,6 +372,13 @@ declare module '@tanstack/react-router' {
       path: '/redirect'
       fullPath: '/redirect'
       preLoaderRoute: typeof RedirectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deferred': {
@@ -346,6 +430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostsIndexRouteImport
       parentRoute: typeof PostsRouteRoute
     }
+    '/_app/': {
+      id: '/_app/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/users/$userId': {
       id: '/users/$userId'
       path: '/$userId'
@@ -374,13 +465,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteImport
       parentRoute: typeof PathlessLayoutRoute
     }
-    '/_app/join': {
-      id: '/_app/join'
-      path: '/join'
-      fullPath: '/join'
-      preLoaderRoute: typeof AppJoinRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/_auth/login': {
       id: '/_auth/login'
       path: '/login'
@@ -388,11 +472,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/$workspace': {
-      id: '/_app/$workspace'
-      path: '/$workspace'
-      fullPath: '/$workspace'
-      preLoaderRoute: typeof AppWorkspaceRouteRouteImport
+    '/_app/$organization/': {
+      id: '/_app/$organization/'
+      path: '/$organization'
+      fullPath: '/$organization'
+      preLoaderRoute: typeof AppOrganizationIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/posts_/$postId/deep': {
@@ -430,44 +514,80 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteARouteImport
       parentRoute: typeof PathlessLayoutNestedLayoutRoute
     }
-    '/_app/$workspace/issues': {
-      id: '/_app/$workspace/issues'
-      path: '/issues'
-      fullPath: '/$workspace/issues'
-      preLoaderRoute: typeof AppWorkspaceIssuesRouteImport
-      parentRoute: typeof AppWorkspaceRouteRoute
+    '/_app/$organization/new-team': {
+      id: '/_app/$organization/new-team'
+      path: '/$organization/new-team'
+      fullPath: '/$organization/new-team'
+      preLoaderRoute: typeof AppOrganizationNewTeamRouteImport
+      parentRoute: typeof AppRouteRoute
     }
-    '/_app/$workspace/inbox': {
-      id: '/_app/$workspace/inbox'
-      path: '/inbox'
-      fullPath: '/$workspace/inbox'
-      preLoaderRoute: typeof AppWorkspaceInboxRouteImport
-      parentRoute: typeof AppWorkspaceRouteRoute
+    '/_app/$organization/issues': {
+      id: '/_app/$organization/issues'
+      path: '/$organization/issues'
+      fullPath: '/$organization/issues'
+      preLoaderRoute: typeof AppOrganizationIssuesRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/$organization/inbox': {
+      id: '/_app/$organization/inbox'
+      path: '/$organization/inbox'
+      fullPath: '/$organization/inbox'
+      preLoaderRoute: typeof AppOrganizationInboxRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/$organization/views/': {
+      id: '/_app/$organization/views/'
+      path: '/$organization/views'
+      fullPath: '/$organization/views'
+      preLoaderRoute: typeof AppOrganizationViewsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/$organization/projects/': {
+      id: '/_app/$organization/projects/'
+      path: '/$organization/projects'
+      fullPath: '/$organization/projects'
+      preLoaderRoute: typeof AppOrganizationProjectsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/$organization/views/issues': {
+      id: '/_app/$organization/views/issues'
+      path: '/$organization/views/issues'
+      fullPath: '/$organization/views/issues'
+      preLoaderRoute: typeof AppOrganizationViewsIssuesRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/$organization/projects/all': {
+      id: '/_app/$organization/projects/all'
+      path: '/$organization/projects/all'
+      fullPath: '/$organization/projects/all'
+      preLoaderRoute: typeof AppOrganizationProjectsAllRouteImport
+      parentRoute: typeof AppRouteRoute
     }
   }
 }
 
-interface AppWorkspaceRouteRouteChildren {
-  AppWorkspaceInboxRoute: typeof AppWorkspaceInboxRoute
-  AppWorkspaceIssuesRoute: typeof AppWorkspaceIssuesRoute
-}
-
-const AppWorkspaceRouteRouteChildren: AppWorkspaceRouteRouteChildren = {
-  AppWorkspaceInboxRoute: AppWorkspaceInboxRoute,
-  AppWorkspaceIssuesRoute: AppWorkspaceIssuesRoute,
-}
-
-const AppWorkspaceRouteRouteWithChildren =
-  AppWorkspaceRouteRoute._addFileChildren(AppWorkspaceRouteRouteChildren)
-
 interface AppRouteRouteChildren {
-  AppWorkspaceRouteRoute: typeof AppWorkspaceRouteRouteWithChildren
-  AppJoinRoute: typeof AppJoinRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppOrganizationInboxRoute: typeof AppOrganizationInboxRoute
+  AppOrganizationIssuesRoute: typeof AppOrganizationIssuesRoute
+  AppOrganizationNewTeamRoute: typeof AppOrganizationNewTeamRoute
+  AppOrganizationIndexRoute: typeof AppOrganizationIndexRoute
+  AppOrganizationProjectsAllRoute: typeof AppOrganizationProjectsAllRoute
+  AppOrganizationViewsIssuesRoute: typeof AppOrganizationViewsIssuesRoute
+  AppOrganizationProjectsIndexRoute: typeof AppOrganizationProjectsIndexRoute
+  AppOrganizationViewsIndexRoute: typeof AppOrganizationViewsIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
-  AppWorkspaceRouteRoute: AppWorkspaceRouteRouteWithChildren,
-  AppJoinRoute: AppJoinRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppOrganizationInboxRoute: AppOrganizationInboxRoute,
+  AppOrganizationIssuesRoute: AppOrganizationIssuesRoute,
+  AppOrganizationNewTeamRoute: AppOrganizationNewTeamRoute,
+  AppOrganizationIndexRoute: AppOrganizationIndexRoute,
+  AppOrganizationProjectsAllRoute: AppOrganizationProjectsAllRoute,
+  AppOrganizationViewsIssuesRoute: AppOrganizationViewsIssuesRoute,
+  AppOrganizationProjectsIndexRoute: AppOrganizationProjectsIndexRoute,
+  AppOrganizationViewsIndexRoute: AppOrganizationViewsIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
@@ -550,6 +670,7 @@ const rootRouteChildren: RootRouteChildren = {
   UsersRouteRoute: UsersRouteRouteWithChildren,
   PathlessLayoutRoute: PathlessLayoutRouteWithChildren,
   DeferredRoute: DeferredRoute,
+  JoinRoute: JoinRoute,
   RedirectRoute: RedirectRoute,
   AuthLoginRouteRoute: AuthLoginRouteRoute,
   ApiUsersRoute: ApiUsersRouteWithChildren,
