@@ -1,10 +1,7 @@
 import * as React from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 
-import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
-import { useAuthenticatedSession } from "@/hooks/use-session";
 
 import { useOrganization } from "../organization-context";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -21,51 +18,31 @@ interface OrganizationListProps extends React.ComponentProps<
 }
 
 export function OrganizationList({ setOpen }: OrganizationListProps) {
-  const session = useAuthenticatedSession();
-  const { organizations } = useOrganization();
+  const { organizations, activeOrganization } = useOrganization();
   const navigate = useNavigate();
-  const [switching, setSwitching] = React.useState(false);
 
-  async function switchOrganization(value: string) {
+  function switchOrganization(value: string) {
     const org = organizations?.find((o) => o.id === value);
-    if (!org || org.id === session.session.activeOrganizationId) return;
+    if (!org || org.id === activeOrganization?.id) return;
 
-    await authClient.organization.setActive(
-      {
-        organizationId: org.id,
-        organizationSlug: org.slug,
-      },
-      {
-        onRequest: () => {
-          setOpen(false);
-          setSwitching(true);
-        },
-        onSuccess: () => {
-          navigate({
-            to: `/${org.slug}/inbox`,
-            reloadDocument: true,
-            replace: true,
-          });
-          setSwitching(false);
-        },
-        onError: () => {
-          setSwitching(false);
-          toast.error("Failed to switch organization");
-        },
-      }
-    );
+    setOpen(false);
+    navigate({
+      to: `/${org.slug}/inbox`,
+      reloadDocument: true,
+      replace: true,
+    });
   }
 
   return (
     <DropdownMenuRadioGroup
-      value={session.session.activeOrganizationId}
+      value={activeOrganization?.id}
       onValueChange={switchOrganization}
     >
       {organizations?.map((organization) => (
         <DropdownMenuRadioItem
           key={organization.id}
           value={organization.id}
-          className={cn("py-1.5", switching && "cursor-wait")}
+          className={cn("py-1.5")}
         >
           <Avatar className="size-5 after:rounded-sm">
             <AvatarImage

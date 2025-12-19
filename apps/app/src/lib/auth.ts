@@ -8,53 +8,7 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
-  databaseHooks: {
-    session: {
-      create: {
-        before: async (session, ctx) => {
-          const activeOrgFromCookie = ctx?.getCookie("active_org");
 
-          if (activeOrgFromCookie) {
-            const membership = await prisma.member.findFirst({
-              where: {
-                userId: session.userId,
-                organizationId: activeOrgFromCookie,
-              },
-            });
-
-            if (membership) {
-              return {
-                data: {
-                  ...session,
-                  activeOrganizationId: activeOrgFromCookie,
-                },
-              };
-            }
-          }
-
-          const firstOrg = await prisma.organization.findFirst({
-            where: {
-              members: {
-                some: { userId: session.userId },
-              },
-            },
-            orderBy: { createdAt: "asc" },
-          });
-
-          if (firstOrg) {
-            return {
-              data: {
-                ...session,
-                activeOrganizationId: firstOrg.id,
-              },
-            };
-          }
-
-          return { data: session };
-        },
-      },
-    },
-  },
   session: {
     cookieCache: {
       enabled: true,

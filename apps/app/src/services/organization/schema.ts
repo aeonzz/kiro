@@ -8,3 +8,9 @@ export const organizationInputSchema = z.object({
 });
 
 export type OrganizationInput = z.infer<typeof organizationInputSchema>;
+
+export const getUserOrganizationSchema = z.object({
+  slug: z.string(),
+});
+
+export type GetUserOrganization = z.infer<typeof getUserOrganizationSchema>;
