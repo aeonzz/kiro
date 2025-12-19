@@ -56,8 +56,8 @@ export function TeamNav({
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
-          <Collapsible open={open} onOpenChange={onOpenChange}>
-            <SidebarMenuItem className="group/menu-header">
+          <SidebarMenuItem className="group/menu-header">
+            <Collapsible open={open} onOpenChange={onOpenChange}>
               <CollapsibleTrigger
                 data-sidebar="menu-button"
                 data-size="sm"
@@ -88,89 +88,94 @@ export function TeamNav({
                 <span className="sr-only">Create a team</span>
               </SidebarMenuAction>
               <CollapsibleContent>
-                {teams.map((team) => (
-                  <Collapsible key={team.id}>
-                    <SidebarMenuItem className="ease-out-expo transition-opacity duration-300 group-data-closed:opacity-0 group-data-open:opacity-100">
-                      <CollapsibleTrigger
-                        data-sidebar="menu-button"
-                        data-size="sm"
-                        className="[&_svg]:text-muted-foreground peer/menu-button w-full justify-start pr-8 text-sm font-medium aria-expanded:bg-transparent data-panel-open:[&>svg]:rotate-0"
-                        render={<Button variant="ghost" size="sm" />}
-                      >
-                        <div className="bg-muted mr-1 rounded-sm p-0.5">
-                          <HugeiconsIcon
-                            icon={User02FreeIcons}
-                            strokeWidth={2}
-                          />
-                        </div>
-                        <span>{team.name}</span>
-                        <HugeiconsIcon
-                          icon={ArrowDown01Icon}
-                          strokeWidth={2}
-                          className="ease-out-expo -rotate-90 transition-all"
-                        />
-                      </CollapsibleTrigger>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          render={<SidebarMenuAction showOnHover />}
+                <SidebarMenuSub>
+                  {teams.map((team) => (
+                    <SidebarMenuSubItem
+                      key={team.id}
+                      className="ease-out-expo transition-opacity duration-300 group-data-closed:opacity-0 group-data-open:opacity-100"
+                    >
+                      <Collapsible>
+                        <CollapsibleTrigger
+                          data-sidebar="menu-button"
+                          data-size="sm"
+                          className="[&_svg]:text-muted-foreground peer/menu-button w-full justify-start pr-8 text-sm font-medium aria-expanded:bg-transparent data-panel-open:[&>svg]:rotate-0"
+                          render={<Button variant="ghost" size="sm" />}
                         >
+                          <div className="bg-muted mr-1 rounded-sm p-0.5">
+                            <HugeiconsIcon
+                              icon={User02FreeIcons}
+                              strokeWidth={2}
+                            />
+                          </div>
+                          <span>{team.name}</span>
                           <HugeiconsIcon
-                            icon={MoreHorizontalIcon}
+                            icon={ArrowDown01Icon}
                             strokeWidth={2}
+                            className="ease-out-expo -rotate-90 transition-all"
                           />
-                          <span className="sr-only">Options</span>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-52">
-                          <DropdownMenuGroup>
-                            {sidebarTeamOptions.map((item) => (
-                              <DropdownMenuItem key={item.title}>
-                                <HugeiconsIcon
-                                  icon={item.icon}
-                                  strokeWidth={2}
-                                />
-                                <span>{item.title}</span>
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {sidebarTeamItems.map((item) => (
-                            <SidebarMenuSubItem key={item.title}>
-                              <SidebarMenuButton
-                                isActive={isNavLinkActive(
-                                  pathname,
-                                  item.url,
-                                  activeOrganizationSlug
-                                )}
-                                size="sm"
-                                className="pl-6"
-                                render={
-                                  <Link
-                                    to={resolveOrgUrl(
-                                      item.url,
-                                      activeOrganizationSlug
-                                    )}
+                        </CollapsibleTrigger>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            render={<SidebarMenuAction showOnHover />}
+                          >
+                            <HugeiconsIcon
+                              icon={MoreHorizontalIcon}
+                              strokeWidth={2}
+                            />
+                            <span className="sr-only">Options</span>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-52">
+                            <DropdownMenuGroup>
+                              {sidebarTeamOptions.map((item) => (
+                                <DropdownMenuItem key={item.title}>
+                                  <HugeiconsIcon
+                                    icon={item.icon}
+                                    strokeWidth={2}
                                   />
-                                }
-                              >
-                                <HugeiconsIcon
-                                  icon={item.icon}
-                                  strokeWidth={2}
-                                />
-                                <span>{item.title}</span>
-                              </SidebarMenuButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
-                ))}
+                                  <span>{item.title}</span>
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuGroup>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {sidebarTeamItems.map((item) => (
+                              <SidebarMenuSubItem key={item.title}>
+                                <SidebarMenuButton
+                                  isActive={isNavLinkActive(
+                                    pathname,
+                                    item.url,
+                                    activeOrganizationSlug
+                                  )}
+                                  size="sm"
+                                  className="pl-6"
+                                  render={
+                                    <Link
+                                      to={resolveOrgUrl(
+                                        item.url,
+                                        activeOrganizationSlug
+                                      )}
+                                    />
+                                  }
+                                >
+                                  <HugeiconsIcon
+                                    icon={item.icon}
+                                    strokeWidth={2}
+                                  />
+                                  <span>{item.title}</span>
+                                </SidebarMenuButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </SidebarMenuSubItem>
+                  ))}
+                </SidebarMenuSub>
               </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
+            </Collapsible>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

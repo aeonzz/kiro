@@ -40,8 +40,8 @@ export function WorkspaceNav({
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
-          <Collapsible open={open} onOpenChange={onOpenChange}>
-            <SidebarMenuItem className="group/menu-header">
+          <SidebarMenuItem className="group/menu-header">
+            <Collapsible open={open} onOpenChange={onOpenChange}>
               <CollapsibleTrigger
                 data-sidebar="menu-button"
                 data-size="sm"
@@ -79,8 +79,8 @@ export function WorkspaceNav({
                   ))}
                 </SidebarMenuSub>
               </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
+            </Collapsible>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
