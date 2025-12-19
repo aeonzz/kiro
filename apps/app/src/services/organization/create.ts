@@ -1,4 +1,4 @@
-import authMiddleware from "@/middleware/auth";
+import authMiddleware from "@/middlewares/auth";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 

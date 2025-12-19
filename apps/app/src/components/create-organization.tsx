@@ -1,6 +1,6 @@
 import * as React from "react";
-import { createOrganizationFn } from "@/features/organization/create";
-import { OrganizationInput } from "@/features/organization/schema";
+import { createOrganizationFn } from "@/services/organization/create";
+import { OrganizationInput } from "@/services/organization/schema";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
