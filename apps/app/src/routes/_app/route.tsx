@@ -6,29 +6,27 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { useOrganization } from "@/components/organization-context";
 
 export const Route = createFileRoute("/_app")({
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, serverContext }) => {
     if (!context.session?.user) {
       throw redirect({ to: "/login" });
     }
-    return { session: context.session };
+    return {
+      sidebarState: serverContext?.sidebarState,
+      session: context.session,
+    };
   },
   component: () => {
-    const defaultOpen =
-      document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("sidebar_state="))
-        ?.split("=")[1] === "true";
-
-    return <RouteComponent defaultOpen={defaultOpen} />;
+    return <RouteComponent />;
   },
 });
 
-function RouteComponent({ defaultOpen }: { defaultOpen: boolean }) {
+function RouteComponent() {
+  const { sidebarState } = Route.useRouteContext();
   const { isPending } = useOrganization();
 
   return (
     <SidebarProvider
-      defaultOpen={defaultOpen}
+      defaultOpen={sidebarState}
       className="h-svh min-h-0! overflow-hidden"
     >
       <AppSidebar isPending={isPending} />
