@@ -63,7 +63,16 @@ export function UserMenu() {
             align="start"
             alignOffset={0}
           >
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              render={
+                <Link
+                  to="/$organization/settings/account/preferences"
+                  params={{
+                    organization: activeOrganization?.slug ?? "",
+                  }}
+                />
+              }
+            >
               <span>Settings</span>
               <DropdownMenuShortcut>⌘,</DropdownMenuShortcut>
             </DropdownMenuItem>

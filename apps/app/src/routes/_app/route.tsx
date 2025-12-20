@@ -1,9 +1,15 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+  useLocation,
+} from "@tanstack/react-router";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Spinner } from "@/components/ui/spinner";
 import { AppSidebar } from "@/components/app-sidebar";
 import { useOrganization } from "@/components/organization-context";
+import { SettingsSidebar } from "@/components/settings-sidebar";
 
 export const Route = createFileRoute("/_app")({
   beforeLoad: async ({ context, serverContext }) => {
@@ -23,13 +29,21 @@ export const Route = createFileRoute("/_app")({
 function RouteComponent() {
   const { sidebarState } = Route.useRouteContext();
   const { isPending } = useOrganization();
+  const location = useLocation();
+
+  const pathSegments = location.pathname.split("/").filter(Boolean);
+  const isSettings = pathSegments[1] === "settings";
 
   return (
     <SidebarProvider
       defaultOpen={sidebarState}
       className="h-svh min-h-0! overflow-hidden"
     >
-      <AppSidebar isPending={isPending} />
+      {isSettings ? (
+        <SettingsSidebar isPending={isPending} />
+      ) : (
+        <AppSidebar isPending={isPending} />
+      )}
       <SidebarInset className="min-h-0 overflow-hidden">
         {isPending ? (
           <div className="flex h-full items-center justify-center">

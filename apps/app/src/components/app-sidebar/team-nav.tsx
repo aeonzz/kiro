@@ -73,11 +73,10 @@ export function TeamNav({
               </CollapsibleTrigger>
               <SidebarMenuAction
                 showOnHover
-                // tooltip="Create a team"
                 className="group-hover/menu-header:opacity-100 md:group-hover/menu-header:opacity-100"
                 render={
                   <Link
-                    to="/$organization/new-team"
+                    to="/$organization/settings/administration/teams/new-team"
                     params={{
                       organization: activeOrganizationSlug ?? "",
                     }}
@@ -98,7 +97,7 @@ export function TeamNav({
                         <CollapsibleTrigger
                           data-sidebar="menu-button"
                           data-size="sm"
-                          className="[&_svg]:text-muted-foreground peer/menu-button w-full justify-start pr-8 text-sm font-medium aria-expanded:bg-transparent data-panel-open:[&>svg]:rotate-0"
+                          className="[&_svg]:text-muted-foreground peer/menu-button w-full justify-start pr-8 font-semibold aria-expanded:bg-transparent data-panel-open:[&>svg]:rotate-0"
                           render={<Button variant="ghost" size="sm" />}
                         >
                           <div className="bg-muted mr-1 rounded-sm p-0.5">
