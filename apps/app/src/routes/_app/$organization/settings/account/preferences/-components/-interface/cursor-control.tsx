@@ -3,9 +3,12 @@ import { SetUserPreferencesInput } from "@/services/user/schema";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
+import { usePreferencesStore } from "@/hooks/use-preference-store";
 import { Switch } from "@/components/ui/switch";
 
 export function CursorControl() {
+  const cursorPointer = usePreferencesStore((s) => s.cursorPointer);
+  const setCursorPointer = usePreferencesStore((s) => s.setCursorPointer);
   const setUserPreferences = useServerFn(setUserPreferencesFn);
 
   const { mutateAsync } = useMutation({
@@ -13,10 +16,9 @@ export function CursorControl() {
   });
 
   function handleToggle(value: boolean) {
-    mutateAsync({
-      cursorPointer: value,
-    });
+    setCursorPointer(value);
+    mutateAsync({ cursorPointer: value });
   }
 
-  return <Switch onCheckedChange={handleToggle} />;
+  return <Switch onCheckedChange={handleToggle} checked={cursorPointer} />;
 }

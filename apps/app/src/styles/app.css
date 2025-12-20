@@ -211,10 +211,6 @@
   body {
     @apply bg-background text-foreground;
   }
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
-  }
   ::-webkit-scrollbar {
     width: 5px;
   }
@@ -228,5 +224,17 @@
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
+  }
+  html[data-cursor-pointer="false"] a,
+  html[data-cursor-pointer="false"] button,
+  html[data-cursor-pointer="false"] [role="button"],
+  html[data-cursor-pointer="false"] [role="switch"] {
+    cursor: default;
+  }
+  html[data-cursor-pointer="true"] button,
+  html[data-cursor-pointer="true"] a,
+  html[data-cursor-pointer="true"] [role="switch"],
+  html[data-cursor-pointer="true"] [role="button"] {
+    cursor: pointer;
   }
 }
