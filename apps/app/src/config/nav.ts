@@ -1,23 +1,36 @@
 import {
+  AccessIcon,
+  Building02Icon,
   Folder01Icon,
   GridViewIcon,
   InboxIcon,
   Link01Icon,
   Logout01Icon,
   MoreHorizontalIcon,
+  NotificationSquareIcon,
   Pen01Icon,
+  SecurityIcon,
   Settings01Icon,
+  SlidersHorizontalIcon,
   TaskDaily01Icon,
+  UserGroupIcon,
+  UserIcon,
+  UserSquareIcon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 
 import { RoutePath } from "@/types/route-type";
 
-interface NavItem {
+type NavItem = {
   title: string;
   url: RoutePath | "action";
   icon: IconSvgElement;
-}
+};
+
+type GroupItem = {
+  title: string;
+  items: NavItem[];
+};
 
 export const sidebarMenuItems: NavItem[] = [
   {
@@ -101,5 +114,58 @@ export const sidebarTeamOptions: NavItem[] = [
     title: "Leave team",
     url: "/",
     icon: Logout01Icon,
+  },
+];
+
+export const settingsNavItems: GroupItem[] = [
+  {
+    title: "Account",
+    items: [
+      {
+        title: "Preferences",
+        url: "/$organization/settings/account/preferences",
+        icon: SlidersHorizontalIcon,
+      },
+      {
+        title: "Profile",
+        url: "/$organization/settings/account/profile",
+        icon: UserIcon,
+      },
+      {
+        title: "Notifications",
+        url: "/$organization/settings/account/notifications",
+        icon: NotificationSquareIcon,
+      },
+      {
+        title: "Security and access",
+        url: "/$organization/settings/account/security",
+        icon: AccessIcon,
+      },
+    ],
+  },
+  {
+    title: "Administration",
+    items: [
+      {
+        title: "Workspace",
+        url: "/$organization/settings/administration/workspace",
+        icon: Building02Icon,
+      },
+      {
+        title: "Teams",
+        url: "/$organization/settings/administration/teams",
+        icon: UserSquareIcon,
+      },
+      {
+        title: "Members",
+        url: "/$organization/settings/administration/members",
+        icon: UserGroupIcon,
+      },
+      {
+        title: "Security",
+        url: "/$organization/settings/administration/security",
+        icon: SecurityIcon,
+      },
+    ],
   },
 ];
