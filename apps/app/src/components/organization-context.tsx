@@ -40,14 +40,34 @@ export function OrganizationProvider({
   const slug = pathSegments[0];
   const isReserved = RESERVED_SLUGS.includes(slug);
 
+  const effectiveSlug = React.useMemo(() => {
+    if (slug && !isReserved) return slug;
+
+    if (typeof document === "undefined") return null;
+
+    const cookieMatch = document.cookie.match(/active_org=([^;]+)/);
+    const cookieOrgId = cookieMatch ? cookieMatch[1] : null;
+
+    if (cookieOrgId && userOrganizations) {
+      const cookieOrg = userOrganizations.find((o) => o.id === cookieOrgId);
+      if (cookieOrg) return cookieOrg.slug;
+    }
+
+    if (userOrganizations && userOrganizations.length > 0) {
+      return userOrganizations[0].slug;
+    }
+
+    return null;
+  }, [slug, isReserved, userOrganizations]);
+
   const {
     data: organization,
     isPending,
     isError,
   } = useQuery({
-    queryKey: ["get_organization", slug],
-    queryFn: () => getOrganization({ data: { slug } }),
-    enabled: !!slug && !isReserved,
+    queryKey: ["get_organization", effectiveSlug],
+    queryFn: () => getOrganization({ data: { slug: effectiveSlug! } }),
+    enabled: !!effectiveSlug,
   });
 
   if (!isPending && slug && !isReserved && !organization) {
@@ -61,14 +81,8 @@ export function OrganizationProvider({
     } else if (pathSegments.length === 0) {
       if (userOrganizationsPending) return;
 
-      const cookieMatch = document.cookie.match(/active_org=([^;]+)/);
-      const cookieOrgId = cookieMatch ? cookieMatch[1] : null;
-      const cookieOrg = userOrganizations?.find((o) => o.id === cookieOrgId);
-
-      if (cookieOrg) {
-        navigate({ to: `/${cookieOrg.slug}/inbox` });
-      } else if (userOrganizations && userOrganizations.length > 0) {
-        navigate({ to: `/${userOrganizations[0].slug}/inbox` });
+      if (effectiveSlug) {
+        navigate({ to: `/${effectiveSlug}/inbox` });
       } else if (userOrganizations && userOrganizations.length === 0) {
         navigate({ to: "/join" });
       }
@@ -82,6 +96,7 @@ export function OrganizationProvider({
     slug,
     isReserved,
     pathSegments.length,
+    effectiveSlug,
   ]);
 
   const value = React.useMemo(() => {
