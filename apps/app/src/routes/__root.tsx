@@ -13,7 +13,6 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
-import { usePreferencesStore } from "@/hooks/use-preference-store";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/not-found";
 import Providers from "@/components/providers";
@@ -94,13 +93,6 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const cursorPointer = usePreferencesStore((s) => s.cursorPointer);
-
-  React.useEffect(() => {
-    document.documentElement.dataset.cursorPointer = cursorPointer
-      ? "true"
-      : "false";
-  }, [cursorPointer]);
   return (
     <html suppressHydrationWarning>
       <head>

@@ -8,6 +8,30 @@ import {
 } from "react";
 import { ScriptOnce } from "@tanstack/react-router";
 
+const disableTransitions = () => {
+  const css = document.createElement("style");
+  css.appendChild(
+    document.createTextNode(
+      `*, *::before, *::after {
+         -webkit-transition: none !important;
+         -moz-transition: none !important;
+         -o-transition: none !important;
+         -ms-transition: none !important;
+         transition: none !important;
+      }`
+    )
+  );
+  document.head.appendChild(css);
+
+  return () => {
+    (() => window.getComputedStyle(document.body))();
+
+    requestAnimationFrame(() => {
+      document.head.removeChild(css);
+    });
+  };
+};
+
 export const themes = [
   { label: "System", value: "system" },
   { label: "Light", value: "light" },
@@ -64,8 +88,10 @@ export function ThemeProvider({
       const root = window.document.documentElement;
       const targetTheme = e.matches ? "dark" : "light";
       if (!root.classList.contains(targetTheme)) {
+        const cleanup = disableTransitions();
         root.classList.remove("light", "dark");
         root.classList.add(targetTheme);
+        cleanup();
       }
     },
     [theme.value]
@@ -96,8 +122,10 @@ export function ThemeProvider({
 
     // Only update if the target theme is not already applied
     if (!root.classList.contains(targetTheme)) {
+      const cleanup = disableTransitions();
       root.classList.remove("light", "dark");
       root.classList.add(targetTheme);
+      cleanup();
     }
   }, [theme.value, storageKey]);
 

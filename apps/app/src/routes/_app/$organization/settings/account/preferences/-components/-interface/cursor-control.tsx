@@ -17,7 +17,9 @@ export function CursorControl() {
 
   function handleToggle(value: boolean) {
     setCursorPointer(value);
-    mutateAsync({ cursorPointer: value });
+    try {
+      mutateAsync({ cursorPointer: value });
+    } catch {}
   }
 
   return <Switch onCheckedChange={handleToggle} checked={cursorPointer} />;
