@@ -1,23 +1,8 @@
 import * as React from "react";
 import { getUserPreferencesFn } from "@/services/user/get";
-import {
-  createFileRoute,
-  Outlet,
-  redirect,
-  useLocation,
-} from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
 import { usePreferencesStore } from "@/hooks/use-preference-store";
-import {
-  SidebarInset,
-  SidebarMenuItemMenu,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
-import { Spinner } from "@/components/ui/spinner";
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarControl } from "@/components/app-sidebar/sidebar-control";
-import { useOrganization } from "@/components/organization-context";
-import { SettingsSidebar } from "@/components/settings-sidebar";
 
 export const Route = createFileRoute("/_app")({
   beforeLoad: async ({ context, serverContext }) => {
@@ -30,7 +15,7 @@ export const Route = createFileRoute("/_app")({
       session: context.session,
     };
   },
-  loader: async ({}) => {
+  loader: async () => {
     const prefs = await getUserPreferencesFn();
 
     return { preferences: prefs };
@@ -41,10 +26,7 @@ export const Route = createFileRoute("/_app")({
 });
 
 function RouteComponent() {
-  const { sidebarState } = Route.useRouteContext();
   const { preferences } = Route.useLoaderData();
-  const { isPending } = useOrganization();
-  const location = useLocation();
 
   React.useEffect(() => {
     if (preferences) {
@@ -52,32 +34,5 @@ function RouteComponent() {
     }
   }, [preferences]);
 
-  const pathSegments = location.pathname.split("/").filter(Boolean);
-  const isSettings = pathSegments[1] === "settings";
-
-  return (
-    <React.Fragment>
-      <SidebarProvider
-        defaultOpen={sidebarState}
-        className="h-svh min-h-0! overflow-hidden"
-      >
-        {isSettings ? (
-          <SettingsSidebar isPending={isPending} />
-        ) : (
-          <AppSidebar isPending={isPending} />
-        )}
-        <SidebarInset className="min-h-0 overflow-hidden">
-          {isPending ? (
-            <div className="flex h-full items-center justify-center">
-              <Spinner />
-            </div>
-          ) : (
-            <Outlet />
-          )}
-        </SidebarInset>
-      </SidebarProvider>
-      <SidebarControl />
-      <SidebarMenuItemMenu />
-    </React.Fragment>
-  );
+  return <Outlet />;
 }

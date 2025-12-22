@@ -9,11 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as JoinRouteImport } from './routes/join'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as ApiUsersRouteImport } from './routes/api/users'
+import { Route as AppJoinRouteImport } from './routes/_app/join'
 import { Route as AuthLoginRouteRouteImport } from './routes/_auth/login/route'
+import { Route as AppOrganizationRouteRouteImport } from './routes/_app/$organization/route'
 import { Route as AppOrganizationIndexRouteImport } from './routes/_app/$organization/index'
 import { Route as ApiUsersIdRouteImport } from './routes/api/users.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -39,11 +40,6 @@ import { Route as AppOrganizationSettingsAccountPreferencesIndexRouteImport } fr
 import { Route as AppOrganizationSettingsAdministrationTeamsNewTeamRouteImport } from './routes/_app/$organization/settings/administration/teams/new-team'
 import { Route as AppOrganizationSettingsAdministrationTeamsNameIndexRouteImport } from './routes/_app/$organization/settings/administration/teams/$name/index'
 
-const JoinRoute = JoinRouteImport.update({
-  id: '/join',
-  path: '/join',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -58,15 +54,25 @@ const ApiUsersRoute = ApiUsersRouteImport.update({
   path: '/api/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppJoinRoute = AppJoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AuthLoginRouteRoute = AuthLoginRouteRouteImport.update({
   id: '/_auth/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppOrganizationIndexRoute = AppOrganizationIndexRouteImport.update({
-  id: '/$organization/',
-  path: '/$organization/',
+const AppOrganizationRouteRoute = AppOrganizationRouteRouteImport.update({
+  id: '/$organization',
+  path: '/$organization',
   getParentRoute: () => AppRouteRoute,
+} as any)
+const AppOrganizationIndexRoute = AppOrganizationIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppOrganizationRouteRoute,
 } as any)
 const ApiUsersIdRoute = ApiUsersIdRouteImport.update({
   id: '/$id',
@@ -79,140 +85,141 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppOrganizationIssuesRoute = AppOrganizationIssuesRouteImport.update({
-  id: '/$organization/issues',
-  path: '/$organization/issues',
-  getParentRoute: () => AppRouteRoute,
+  id: '/issues',
+  path: '/issues',
+  getParentRoute: () => AppOrganizationRouteRoute,
 } as any)
 const AppOrganizationInboxRoute = AppOrganizationInboxRouteImport.update({
-  id: '/$organization/inbox',
-  path: '/$organization/inbox',
-  getParentRoute: () => AppRouteRoute,
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AppOrganizationRouteRoute,
 } as any)
 const AppOrganizationViewsIndexRoute =
   AppOrganizationViewsIndexRouteImport.update({
-    id: '/$organization/views/',
-    path: '/$organization/views/',
-    getParentRoute: () => AppRouteRoute,
+    id: '/views/',
+    path: '/views/',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationTeamsIndexRoute =
   AppOrganizationTeamsIndexRouteImport.update({
-    id: '/$organization/teams/',
-    path: '/$organization/teams/',
-    getParentRoute: () => AppRouteRoute,
+    id: '/teams/',
+    path: '/teams/',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsIndexRoute =
   AppOrganizationSettingsIndexRouteImport.update({
-    id: '/$organization/settings/',
-    path: '/$organization/settings/',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationProjectsIndexRoute =
   AppOrganizationProjectsIndexRouteImport.update({
-    id: '/$organization/projects/',
-    path: '/$organization/projects/',
-    getParentRoute: () => AppRouteRoute,
+    id: '/projects/',
+    path: '/projects/',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationMembersIndexRoute =
   AppOrganizationMembersIndexRouteImport.update({
-    id: '/$organization/members/',
-    path: '/$organization/members/',
-    getParentRoute: () => AppRouteRoute,
+    id: '/members/',
+    path: '/members/',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationViewsIssuesRoute =
   AppOrganizationViewsIssuesRouteImport.update({
-    id: '/$organization/views/issues',
-    path: '/$organization/views/issues',
-    getParentRoute: () => AppRouteRoute,
+    id: '/views/issues',
+    path: '/views/issues',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationProjectsAllRoute =
   AppOrganizationProjectsAllRouteImport.update({
-    id: '/$organization/projects/all',
-    path: '/$organization/projects/all',
-    getParentRoute: () => AppRouteRoute,
+    id: '/projects/all',
+    path: '/projects/all',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsAdministrationIndexRoute =
   AppOrganizationSettingsAdministrationIndexRouteImport.update({
-    id: '/$organization/settings/administration/',
-    path: '/$organization/settings/administration/',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/administration/',
+    path: '/settings/administration/',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsAccountIndexRoute =
   AppOrganizationSettingsAccountIndexRouteImport.update({
-    id: '/$organization/settings/account/',
-    path: '/$organization/settings/account/',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/account/',
+    path: '/settings/account/',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsAdministrationWorkspaceRoute =
   AppOrganizationSettingsAdministrationWorkspaceRouteImport.update({
-    id: '/$organization/settings/administration/workspace',
-    path: '/$organization/settings/administration/workspace',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/administration/workspace',
+    path: '/settings/administration/workspace',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsAdministrationSecurityRoute =
   AppOrganizationSettingsAdministrationSecurityRouteImport.update({
-    id: '/$organization/settings/administration/security',
-    path: '/$organization/settings/administration/security',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/administration/security',
+    path: '/settings/administration/security',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsAdministrationMembersRoute =
   AppOrganizationSettingsAdministrationMembersRouteImport.update({
-    id: '/$organization/settings/administration/members',
-    path: '/$organization/settings/administration/members',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/administration/members',
+    path: '/settings/administration/members',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsAccountSecurityRoute =
   AppOrganizationSettingsAccountSecurityRouteImport.update({
-    id: '/$organization/settings/account/security',
-    path: '/$organization/settings/account/security',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/account/security',
+    path: '/settings/account/security',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsAccountProfileRoute =
   AppOrganizationSettingsAccountProfileRouteImport.update({
-    id: '/$organization/settings/account/profile',
-    path: '/$organization/settings/account/profile',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/account/profile',
+    path: '/settings/account/profile',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsAccountNotificationsRoute =
   AppOrganizationSettingsAccountNotificationsRouteImport.update({
-    id: '/$organization/settings/account/notifications',
-    path: '/$organization/settings/account/notifications',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/account/notifications',
+    path: '/settings/account/notifications',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsAdministrationTeamsIndexRoute =
   AppOrganizationSettingsAdministrationTeamsIndexRouteImport.update({
-    id: '/$organization/settings/administration/teams/',
-    path: '/$organization/settings/administration/teams/',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/administration/teams/',
+    path: '/settings/administration/teams/',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsAccountPreferencesIndexRoute =
   AppOrganizationSettingsAccountPreferencesIndexRouteImport.update({
-    id: '/$organization/settings/account/preferences/',
-    path: '/$organization/settings/account/preferences/',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/account/preferences/',
+    path: '/settings/account/preferences/',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsAdministrationTeamsNewTeamRoute =
   AppOrganizationSettingsAdministrationTeamsNewTeamRouteImport.update({
-    id: '/$organization/settings/administration/teams/new-team',
-    path: '/$organization/settings/administration/teams/new-team',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/administration/teams/new-team',
+    path: '/settings/administration/teams/new-team',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationSettingsAdministrationTeamsNameIndexRoute =
   AppOrganizationSettingsAdministrationTeamsNameIndexRouteImport.update({
-    id: '/$organization/settings/administration/teams/$name/',
-    path: '/$organization/settings/administration/teams/$name/',
-    getParentRoute: () => AppRouteRoute,
+    id: '/settings/administration/teams/$name/',
+    path: '/settings/administration/teams/$name/',
+    getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/join': typeof JoinRoute
+  '/$organization': typeof AppOrganizationRouteRouteWithChildren
   '/login': typeof AuthLoginRouteRoute
+  '/join': typeof AppJoinRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/': typeof AppIndexRoute
   '/$organization/inbox': typeof AppOrganizationInboxRoute
   '/$organization/issues': typeof AppOrganizationIssuesRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/users/$id': typeof ApiUsersIdRoute
-  '/$organization': typeof AppOrganizationIndexRoute
+  '/$organization/': typeof AppOrganizationIndexRoute
   '/$organization/projects/all': typeof AppOrganizationProjectsAllRoute
   '/$organization/views/issues': typeof AppOrganizationViewsIssuesRoute
   '/$organization/members': typeof AppOrganizationMembersIndexRoute
@@ -234,8 +241,8 @@ export interface FileRoutesByFullPath {
   '/$organization/settings/administration/teams/$name': typeof AppOrganizationSettingsAdministrationTeamsNameIndexRoute
 }
 export interface FileRoutesByTo {
-  '/join': typeof JoinRoute
   '/login': typeof AuthLoginRouteRoute
+  '/join': typeof AppJoinRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/': typeof AppIndexRoute
   '/$organization/inbox': typeof AppOrganizationInboxRoute
@@ -266,8 +273,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteRouteWithChildren
-  '/join': typeof JoinRoute
+  '/_app/$organization': typeof AppOrganizationRouteRouteWithChildren
   '/_auth/login': typeof AuthLoginRouteRoute
+  '/_app/join': typeof AppJoinRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/_app/': typeof AppIndexRoute
   '/_app/$organization/inbox': typeof AppOrganizationInboxRoute
@@ -298,15 +306,16 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/join'
+    | '/$organization'
     | '/login'
+    | '/join'
     | '/api/users'
     | '/'
     | '/$organization/inbox'
     | '/$organization/issues'
     | '/api/auth/$'
     | '/api/users/$id'
-    | '/$organization'
+    | '/$organization/'
     | '/$organization/projects/all'
     | '/$organization/views/issues'
     | '/$organization/members'
@@ -328,8 +337,8 @@ export interface FileRouteTypes {
     | '/$organization/settings/administration/teams/$name'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/join'
     | '/login'
+    | '/join'
     | '/api/users'
     | '/'
     | '/$organization/inbox'
@@ -359,8 +368,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_app'
-    | '/join'
+    | '/_app/$organization'
     | '/_auth/login'
+    | '/_app/join'
     | '/api/users'
     | '/_app/'
     | '/_app/$organization/inbox'
@@ -391,7 +401,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
-  JoinRoute: typeof JoinRoute
   AuthLoginRouteRoute: typeof AuthLoginRouteRoute
   ApiUsersRoute: typeof ApiUsersRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -399,13 +408,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/join': {
-      id: '/join'
-      path: '/join'
-      fullPath: '/join'
-      preLoaderRoute: typeof JoinRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -427,6 +429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/join': {
+      id: '/_app/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof AppJoinRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_auth/login': {
       id: '/_auth/login'
       path: '/login'
@@ -434,12 +443,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/$organization/': {
-      id: '/_app/$organization/'
+    '/_app/$organization': {
+      id: '/_app/$organization'
       path: '/$organization'
       fullPath: '/$organization'
-      preLoaderRoute: typeof AppOrganizationIndexRouteImport
+      preLoaderRoute: typeof AppOrganizationRouteRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/_app/$organization/': {
+      id: '/_app/$organization/'
+      path: '/'
+      fullPath: '/$organization/'
+      preLoaderRoute: typeof AppOrganizationIndexRouteImport
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/api/users/$id': {
       id: '/api/users/$id'
@@ -457,156 +473,155 @@ declare module '@tanstack/react-router' {
     }
     '/_app/$organization/issues': {
       id: '/_app/$organization/issues'
-      path: '/$organization/issues'
+      path: '/issues'
       fullPath: '/$organization/issues'
       preLoaderRoute: typeof AppOrganizationIssuesRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/inbox': {
       id: '/_app/$organization/inbox'
-      path: '/$organization/inbox'
+      path: '/inbox'
       fullPath: '/$organization/inbox'
       preLoaderRoute: typeof AppOrganizationInboxRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/views/': {
       id: '/_app/$organization/views/'
-      path: '/$organization/views'
+      path: '/views'
       fullPath: '/$organization/views'
       preLoaderRoute: typeof AppOrganizationViewsIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/teams/': {
       id: '/_app/$organization/teams/'
-      path: '/$organization/teams'
+      path: '/teams'
       fullPath: '/$organization/teams'
       preLoaderRoute: typeof AppOrganizationTeamsIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/': {
       id: '/_app/$organization/settings/'
-      path: '/$organization/settings'
+      path: '/settings'
       fullPath: '/$organization/settings'
       preLoaderRoute: typeof AppOrganizationSettingsIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/projects/': {
       id: '/_app/$organization/projects/'
-      path: '/$organization/projects'
+      path: '/projects'
       fullPath: '/$organization/projects'
       preLoaderRoute: typeof AppOrganizationProjectsIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/members/': {
       id: '/_app/$organization/members/'
-      path: '/$organization/members'
+      path: '/members'
       fullPath: '/$organization/members'
       preLoaderRoute: typeof AppOrganizationMembersIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/views/issues': {
       id: '/_app/$organization/views/issues'
-      path: '/$organization/views/issues'
+      path: '/views/issues'
       fullPath: '/$organization/views/issues'
       preLoaderRoute: typeof AppOrganizationViewsIssuesRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/projects/all': {
       id: '/_app/$organization/projects/all'
-      path: '/$organization/projects/all'
+      path: '/projects/all'
       fullPath: '/$organization/projects/all'
       preLoaderRoute: typeof AppOrganizationProjectsAllRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/administration/': {
       id: '/_app/$organization/settings/administration/'
-      path: '/$organization/settings/administration'
+      path: '/settings/administration'
       fullPath: '/$organization/settings/administration'
       preLoaderRoute: typeof AppOrganizationSettingsAdministrationIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/account/': {
       id: '/_app/$organization/settings/account/'
-      path: '/$organization/settings/account'
+      path: '/settings/account'
       fullPath: '/$organization/settings/account'
       preLoaderRoute: typeof AppOrganizationSettingsAccountIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/administration/workspace': {
       id: '/_app/$organization/settings/administration/workspace'
-      path: '/$organization/settings/administration/workspace'
+      path: '/settings/administration/workspace'
       fullPath: '/$organization/settings/administration/workspace'
       preLoaderRoute: typeof AppOrganizationSettingsAdministrationWorkspaceRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/administration/security': {
       id: '/_app/$organization/settings/administration/security'
-      path: '/$organization/settings/administration/security'
+      path: '/settings/administration/security'
       fullPath: '/$organization/settings/administration/security'
       preLoaderRoute: typeof AppOrganizationSettingsAdministrationSecurityRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/administration/members': {
       id: '/_app/$organization/settings/administration/members'
-      path: '/$organization/settings/administration/members'
+      path: '/settings/administration/members'
       fullPath: '/$organization/settings/administration/members'
       preLoaderRoute: typeof AppOrganizationSettingsAdministrationMembersRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/account/security': {
       id: '/_app/$organization/settings/account/security'
-      path: '/$organization/settings/account/security'
+      path: '/settings/account/security'
       fullPath: '/$organization/settings/account/security'
       preLoaderRoute: typeof AppOrganizationSettingsAccountSecurityRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/account/profile': {
       id: '/_app/$organization/settings/account/profile'
-      path: '/$organization/settings/account/profile'
+      path: '/settings/account/profile'
       fullPath: '/$organization/settings/account/profile'
       preLoaderRoute: typeof AppOrganizationSettingsAccountProfileRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/account/notifications': {
       id: '/_app/$organization/settings/account/notifications'
-      path: '/$organization/settings/account/notifications'
+      path: '/settings/account/notifications'
       fullPath: '/$organization/settings/account/notifications'
       preLoaderRoute: typeof AppOrganizationSettingsAccountNotificationsRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/administration/teams/': {
       id: '/_app/$organization/settings/administration/teams/'
-      path: '/$organization/settings/administration/teams'
+      path: '/settings/administration/teams'
       fullPath: '/$organization/settings/administration/teams'
       preLoaderRoute: typeof AppOrganizationSettingsAdministrationTeamsIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/account/preferences/': {
       id: '/_app/$organization/settings/account/preferences/'
-      path: '/$organization/settings/account/preferences'
+      path: '/settings/account/preferences'
       fullPath: '/$organization/settings/account/preferences'
       preLoaderRoute: typeof AppOrganizationSettingsAccountPreferencesIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/administration/teams/new-team': {
       id: '/_app/$organization/settings/administration/teams/new-team'
-      path: '/$organization/settings/administration/teams/new-team'
+      path: '/settings/administration/teams/new-team'
       fullPath: '/$organization/settings/administration/teams/new-team'
       preLoaderRoute: typeof AppOrganizationSettingsAdministrationTeamsNewTeamRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/settings/administration/teams/$name/': {
       id: '/_app/$organization/settings/administration/teams/$name/'
-      path: '/$organization/settings/administration/teams/$name'
+      path: '/settings/administration/teams/$name'
       fullPath: '/$organization/settings/administration/teams/$name'
       preLoaderRoute: typeof AppOrganizationSettingsAdministrationTeamsNameIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppOrganizationRouteRoute
     }
   }
 }
 
-interface AppRouteRouteChildren {
-  AppIndexRoute: typeof AppIndexRoute
+interface AppOrganizationRouteRouteChildren {
   AppOrganizationInboxRoute: typeof AppOrganizationInboxRoute
   AppOrganizationIssuesRoute: typeof AppOrganizationIssuesRoute
   AppOrganizationIndexRoute: typeof AppOrganizationIndexRoute
@@ -631,8 +646,7 @@ interface AppRouteRouteChildren {
   AppOrganizationSettingsAdministrationTeamsNameIndexRoute: typeof AppOrganizationSettingsAdministrationTeamsNameIndexRoute
 }
 
-const AppRouteRouteChildren: AppRouteRouteChildren = {
-  AppIndexRoute: AppIndexRoute,
+const AppOrganizationRouteRouteChildren: AppOrganizationRouteRouteChildren = {
   AppOrganizationInboxRoute: AppOrganizationInboxRoute,
   AppOrganizationIssuesRoute: AppOrganizationIssuesRoute,
   AppOrganizationIndexRoute: AppOrganizationIndexRoute,
@@ -669,6 +683,21 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
     AppOrganizationSettingsAdministrationTeamsNameIndexRoute,
 }
 
+const AppOrganizationRouteRouteWithChildren =
+  AppOrganizationRouteRoute._addFileChildren(AppOrganizationRouteRouteChildren)
+
+interface AppRouteRouteChildren {
+  AppOrganizationRouteRoute: typeof AppOrganizationRouteRouteWithChildren
+  AppJoinRoute: typeof AppJoinRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppOrganizationRouteRoute: AppOrganizationRouteRouteWithChildren,
+  AppJoinRoute: AppJoinRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
   AppRouteRouteChildren,
 )
@@ -687,7 +716,6 @@ const ApiUsersRouteWithChildren = ApiUsersRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
-  JoinRoute: JoinRoute,
   AuthLoginRouteRoute: AuthLoginRouteRoute,
   ApiUsersRoute: ApiUsersRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
