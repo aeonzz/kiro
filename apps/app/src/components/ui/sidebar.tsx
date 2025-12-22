@@ -807,6 +807,7 @@ function SidebarMenuItemMenu({
           </ContextMenuSub>
           <ContextMenuItem
             nativeButton
+            className="w-full"
             render={<DialogTrigger handle={sidebarCustomizationHandle} />}
           >
             <HugeiconsIcon icon={TabletPenIcon} strokeWidth={2} />

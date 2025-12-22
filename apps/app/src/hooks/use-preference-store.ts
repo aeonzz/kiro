@@ -9,10 +9,14 @@ interface PreferencesState {
   cursorPointer: boolean;
   fontSize: FontSizeValue;
   sidebarConfig: Record<string, NavItemVisibility>;
+  workspaceOpen: boolean;
+  teamsOpen: boolean;
   setTheme: (theme: "light" | "dark") => void;
   setCursorPointer: (value: boolean) => void;
   setFontSize: (value: FontSizeValue) => void;
   setSidebarConfig: (title: string, visibility: NavItemVisibility) => void;
+  setWorkspaceOpen: (open: boolean) => void;
+  setTeamsOpen: (open: boolean) => void;
 }
 
 export const usePreferencesStore = create<PreferencesState>()(
@@ -22,6 +26,8 @@ export const usePreferencesStore = create<PreferencesState>()(
       cursorPointer: false,
       fontSize: FontSizeValue.DEFAULT,
       sidebarConfig: {},
+      workspaceOpen: true,
+      teamsOpen: true,
       setTheme: (theme) => set(() => ({ theme })),
       setCursorPointer: (value) => set(() => ({ cursorPointer: value })),
       setFontSize: (value) => set(() => ({ fontSize: value })),
@@ -32,6 +38,8 @@ export const usePreferencesStore = create<PreferencesState>()(
             [title]: visibility,
           },
         })),
+      setWorkspaceOpen: (open) => set(() => ({ workspaceOpen: open })),
+      setTeamsOpen: (open) => set(() => ({ teamsOpen: open })),
     }),
     {
       name: "preferences-storage",

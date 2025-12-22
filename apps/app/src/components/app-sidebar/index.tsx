@@ -10,6 +10,7 @@ import {
 } from "@/config/nav";
 import { isNavLinkActive, resolveOrgUrl } from "@/lib/utils";
 import { usePreferencesStore } from "@/hooks/use-preference-store";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -52,37 +53,27 @@ export function AppSidebar({
   });
   const { teams, activeOrganization } = useOrganization();
   const sidebarConfig = usePreferencesStore((state) => state.sidebarConfig);
+  const workspaceOpen = usePreferencesStore((state) => state.workspaceOpen);
+  const teamsOpen = usePreferencesStore((state) => state.teamsOpen);
+  const setWorkspaceOpenStore = usePreferencesStore(
+    (state) => state.setWorkspaceOpen
+  );
+  const setTeamsOpenStore = usePreferencesStore((state) => state.setTeamsOpen);
+  const { mutateAsync } = useUserPreferences();
 
-  const [sidebarState, setSidebarState] = React.useState(() => {
+  const setWorkspaceOpen = (open: boolean) => {
+    setWorkspaceOpenStore(open);
     try {
-      const saved = localStorage.getItem("userSettings");
-      return saved
-        ? JSON.parse(saved)
-        : { workspaceOpen: true, teamsOpen: true };
-    } catch {
-      return { workspaceOpen: true, teamsOpen: true };
-    }
-  });
+      mutateAsync({ workspaceOpen: open });
+    } catch {}
+  };
 
-  React.useEffect(() => {
-    localStorage.setItem("userSettings", JSON.stringify(sidebarState));
-  }, [sidebarState]);
-
-  const { workspaceOpen, teamsOpen } = sidebarState;
-
-  const setWorkspaceOpen = React.useCallback((open: boolean) => {
-    setSidebarState((prev: { workspaceOpen: boolean; teamsOpen: boolean }) => ({
-      ...prev,
-      workspaceOpen: open,
-    }));
-  }, []);
-
-  const setTeamsOpen = React.useCallback((open: boolean) => {
-    setSidebarState((prev: { workspaceOpen: boolean; teamsOpen: boolean }) => ({
-      ...prev,
-      teamsOpen: open,
-    }));
-  }, []);
+  const setTeamsOpen = (open: boolean) => {
+    setTeamsOpenStore(open);
+    try {
+      mutateAsync({ teamsOpen: open });
+    } catch {}
+  };
 
   const hiddenItems = React.useMemo(() => {
     return [...sidebarMenuItems, ...sidebarWorkspaceItems].filter((item) => {
@@ -128,11 +119,9 @@ export function AppSidebar({
                             activeOrganization?.slug
                           );
                           return (
-                            <SidebarMenuItem 
-                                className="data-open:bg-red-500!" key={item.title}>
+                            <SidebarMenuItem key={item.title}>
                               <SidebarMenuItemMenu item={item}>
                                 <SidebarMenuButton
-                                className="data-open:bg-red-500!"
                                   size="sm"
                                   isActive={isNavLinkActive(
                                     pathname,
