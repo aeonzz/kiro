@@ -29,13 +29,12 @@ function DropdownMenuContent({
     MenuPrimitive.Positioner.Props,
     "align" | "alignOffset" | "side" | "sideOffset"
   >) {
-  const defaultAlignOffset = align !== "center" ? -4 : undefined;
   return (
     <MenuPrimitive.Portal>
       <MenuPrimitive.Positioner
         className="isolate z-50 outline-none"
         align={align}
-        alignOffset={alignOffset ?? defaultAlignOffset}
+        alignOffset={alignOffset}
         side={side}
         sideOffset={sideOffset}
       >

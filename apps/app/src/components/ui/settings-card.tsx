@@ -72,7 +72,7 @@ function SettingsItemContent({
   return (
     <FieldContent
       data-slot="settings-item-content"
-      className={cn("gap-0.5", className)}
+      className={cn("gap-1.5", className)}
       {...props}
     />
   );
@@ -85,7 +85,7 @@ function SettingsItemTitle({
   return (
     <FieldTitle
       data-slot="settings-item-title"
-      className={cn("text-sm font-medium", className)}
+      className={cn("text-sm font-medium leading-none", className)}
       {...props}
     />
   );
@@ -98,7 +98,7 @@ function SettingsItemDescription({
   return (
     <FieldDescription
       data-slot="settings-item-description"
-      className={cn("text-muted-foreground text-xs", className)}
+      className={cn("text-muted-foreground text-xs leading-none", className)}
       {...props}
     />
   );

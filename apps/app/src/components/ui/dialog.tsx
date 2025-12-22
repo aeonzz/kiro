@@ -30,7 +30,7 @@ function DialogOverlay({
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-50 bg-black/10 duration-150 ease-out data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs",
+        "ease-out-expo fixed inset-0 isolate bg-black/10 duration-450 data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs",
         className
       )}
       {...props}
@@ -46,7 +46,7 @@ function DialogViewport({
     <DialogPrimitive.Viewport
       data-slot="dialog-viewport"
       className={cn(
-        "fixed inset-0 z-50 flex items-center justify-center overflow-hidden p-4",
+        "fixed inset-0 flex items-center justify-center overflow-hidden p-4",
         className
       )}
       {...props}
@@ -69,7 +69,7 @@ function DialogContent({
         <DialogPrimitive.Popup
           data-slot="dialog-content"
           className={cn(
-            "bg-background ring-foreground/10 fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl p-4 text-sm ring-1 transition-all duration-150 ease-out outline-none sm:max-w-sm",
+            "bg-background shadow-border ease-out-expo fixed top-1/2 left-1/2 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl p-4 text-sm transition-all duration-450 outline-none sm:max-w-sm",
             "top-[calc(50%+1rem*var(--nested-dialogs))] scale-[calc(1-0.05*var(--nested-dialogs))] data-ending-style:top-[50.25%] data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:top-[50.25%] data-starting-style:scale-95 data-starting-style:opacity-0",
             className
           )}
