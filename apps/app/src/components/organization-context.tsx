@@ -5,7 +5,9 @@ import { useLocation, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { Organization, Team } from "better-auth/plugins";
 
+import { HomeViewValue } from "@/config/preferences";
 import { authClient } from "@/lib/auth-client";
+import { usePreferencesStore } from "@/hooks/use-preference-store";
 import { NotFound } from "@/components/not-found";
 
 interface OrganizationContextValue {
@@ -35,6 +37,7 @@ export function OrganizationProvider({
   const getOrganization = useServerFn(getOrganizationFn);
   const navigate = useNavigate();
   const location = useLocation();
+  const homeView = usePreferencesStore((s) => s.homeView);
 
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const slug = pathSegments[0];
@@ -82,7 +85,14 @@ export function OrganizationProvider({
       if (userOrganizationsPending) return;
 
       if (effectiveSlug) {
-        navigate({ to: `/${effectiveSlug}/inbox` });
+        // Map homeView preference to route
+        const homeViewRoutes: Record<HomeViewValue, string> = {
+          [HomeViewValue.ASSIGNED_ISSUES]: "my-issues/assigned",
+          [HomeViewValue.INBOX]: "inbox",
+          [HomeViewValue.PROJECTS]: "projects/all",
+        };
+        const route = homeViewRoutes[homeView] || "inbox";
+        navigate({ to: `/${effectiveSlug}/${route}` });
       } else if (userOrganizations && userOrganizations.length === 0) {
         navigate({ to: "/join" });
       }
@@ -97,6 +107,7 @@ export function OrganizationProvider({
     isReserved,
     pathSegments.length,
     effectiveSlug,
+    homeView,
   ]);
 
   const value = React.useMemo(() => {

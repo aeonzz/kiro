@@ -1,5 +1,5 @@
-import { FontSize } from "@/types/preferences";
-import { fontSizes } from "@/config/preferences";
+import { HomeView } from "@/types/preferences";
+import { homeViewOptions } from "@/config/preferences";
 import { usePreferencesStore } from "@/hooks/use-preference-store";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
 import {
@@ -11,36 +11,36 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export function FontControl() {
-  const setFontSize = usePreferencesStore((s) => s.setFontSize);
-  const fontSize = usePreferencesStore((s) => s.fontSize);
+export function ViewControl() {
+  const setHomeView = usePreferencesStore((s) => s.setHomeView);
+  const homeView = usePreferencesStore((s) => s.homeView);
 
   const { mutateAsync } = useUserPreferences();
 
-  const selectedFontSize = fontSizes.find((f) => f.value === fontSize);
+  const selectedHomeView = homeViewOptions.find((f) => f.value === homeView);
 
-  const handleFontSizeChange = (value: FontSize | null) => {
+  const handleHomeViewChange = (value: HomeView | null) => {
     if (!value) return;
-    setFontSize(value.value);
+    setHomeView(value.value);
     try {
-      mutateAsync({ fontSize: value.value });
+      mutateAsync({ homeView: value.value });
     } catch {}
   };
 
   return (
     <Select
-      value={selectedFontSize}
+      value={selectedHomeView}
       itemToStringValue={(item) => item.value}
-      onValueChange={handleFontSizeChange}
+      onValueChange={handleHomeViewChange}
     >
       <SelectTrigger className="min-w-[120px]">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {fontSizes.map((fontSize) => (
-            <SelectItem key={fontSize.value} value={fontSize}>
-              {fontSize.label}
+          {homeViewOptions.map((view) => (
+            <SelectItem key={view.value} value={view}>
+              {view.label}
             </SelectItem>
           ))}
         </SelectGroup>

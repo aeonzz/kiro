@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { FontSizeValue } from "@/types/font";
 import { NavItemVisibility } from "@/config/nav";
+import { FontSizeValue, HomeViewValue } from "@/config/preferences";
 
 interface PreferencesState {
   theme: "light" | "dark";
@@ -11,12 +11,14 @@ interface PreferencesState {
   sidebarConfig: Record<string, NavItemVisibility>;
   workspaceOpen: boolean;
   teamsOpen: boolean;
+  homeView: HomeViewValue;
   setTheme: (theme: "light" | "dark") => void;
   setCursorPointer: (value: boolean) => void;
   setFontSize: (value: FontSizeValue) => void;
   setSidebarConfig: (title: string, visibility: NavItemVisibility) => void;
   setWorkspaceOpen: (open: boolean) => void;
   setTeamsOpen: (open: boolean) => void;
+  setHomeView: (view: HomeViewValue) => void;
 }
 
 export const usePreferencesStore = create<PreferencesState>()(
@@ -28,6 +30,7 @@ export const usePreferencesStore = create<PreferencesState>()(
       sidebarConfig: {},
       workspaceOpen: true,
       teamsOpen: true,
+      homeView: HomeViewValue.INBOX,
       setTheme: (theme) => set(() => ({ theme })),
       setCursorPointer: (value) => set(() => ({ cursorPointer: value })),
       setFontSize: (value) => set(() => ({ fontSize: value })),
@@ -40,6 +43,7 @@ export const usePreferencesStore = create<PreferencesState>()(
         })),
       setWorkspaceOpen: (open) => set(() => ({ workspaceOpen: open })),
       setTeamsOpen: (open) => set(() => ({ teamsOpen: open })),
+      setHomeView: (view) => set(() => ({ homeView: view })),
     }),
     {
       name: "preferences-storage",

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import SettingsContainer from "@/components/settings-container";
 
-import { General } from "./-components/general";
+import { General } from "./-components/-general";
 import { Interface } from "./-components/-interface";
 
 export const Route = createFileRoute(

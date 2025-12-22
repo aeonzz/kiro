@@ -52,7 +52,7 @@ export const sidebarMenuItems: NavItem[] = [
   },
   {
     title: "My Issues",
-    url: "/$organization/issues",
+    url: "/$organization/my-issues/assigned",
     icon: CenterFocusIcon,
     disabledVisibilityOptions: [NavItemVisibility.Auto],
   },

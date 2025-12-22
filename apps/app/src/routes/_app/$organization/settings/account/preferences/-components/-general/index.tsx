@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -20,9 +19,11 @@ import {
 } from "@/components/ui/settings-card";
 import { Switch } from "@/components/ui/switch";
 
-interface GeneralProps extends React.ComponentProps<typeof SettingsGroup> {}
+import { ViewControl } from "./view-control";
 
-export function General({ ...props }: GeneralProps) {
+export function General({
+  ...props
+}: React.ComponentProps<typeof SettingsGroup>) {
   return (
     <SettingsGroup {...props}>
       <SettingsGroupTitle>General</SettingsGroupTitle>
@@ -35,15 +36,7 @@ export function General({ ...props }: GeneralProps) {
             </SettingsItemDescription>
           </SettingsItemContent>
           <SettingsItemControl>
-            <Select defaultValue="active">
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Active issues</SelectItem>
-                <SelectItem value="all">All issues</SelectItem>
-              </SelectContent>
-            </Select>
+            <ViewControl />
           </SettingsItemControl>
         </SettingsItem>
         <SettingsItem>
