@@ -1,9 +1,12 @@
 import {
   AccessIcon,
   Building02Icon,
+  CenterFocusIcon,
+  CopyIcon,
   Folder01Icon,
   GridViewIcon,
   InboxIcon,
+  LayerIcon,
   Link01Icon,
   Logout01Icon,
   NotificationSquareIcon,
@@ -50,7 +53,7 @@ export const sidebarMenuItems: NavItem[] = [
   {
     title: "My Issues",
     url: "/$organization/issues",
-    icon: Pen01Icon,
+    icon: CenterFocusIcon,
     disabledVisibilityOptions: [NavItemVisibility.Auto],
   },
 ];
@@ -59,17 +62,17 @@ export const sidebarTeamItems = [
   {
     title: "Issues",
     url: "/#",
-    icon: InboxIcon,
+    icon: CopyIcon,
   },
   {
     title: "Projects",
     url: "/#",
-    icon: TaskDaily01Icon,
+    icon: Folder01Icon,
   },
   {
     title: "Views",
     url: "/#",
-    icon: GridViewIcon,
+    icon: LayerIcon,
   },
 ];
 
@@ -82,7 +85,7 @@ export const sidebarWorkspaceItems: NavItem[] = [
   {
     title: "Views",
     url: "/$organization/views/issues",
-    icon: GridViewIcon,
+    icon: LayerIcon,
   },
   {
     title: "Members",
