@@ -1,10 +1,6 @@
-import { setUserPreferencesFn } from "@/services/user/create";
-import type { SetUserPreferencesInput } from "@/services/user/schema";
-import { useMutation } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-
 import { FontSize, fontSizes } from "@/types/font";
 import { usePreferencesStore } from "@/hooks/use-preference-store";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
 import {
   Select,
   SelectContent,
@@ -17,11 +13,8 @@ import {
 export function FontControl() {
   const setFontSize = usePreferencesStore((s) => s.setFontSize);
   const fontSize = usePreferencesStore((s) => s.fontSize);
-  const setUserPreferences = useServerFn(setUserPreferencesFn);
 
-  const { mutateAsync } = useMutation({
-    mutationFn: (data: SetUserPreferencesInput) => setUserPreferences({ data }),
-  });
+  const { mutateAsync } = useUserPreferences();
 
   const selectedFontSize = fontSizes.find((f) => f.value === fontSize);
 
@@ -36,7 +29,7 @@ export function FontControl() {
   return (
     <Select
       value={selectedFontSize}
-      itemToStringValue={(item) => item.value}  
+      itemToStringValue={(item) => item.value}
       onValueChange={handleFontSizeChange}
     >
       <SelectTrigger className="min-w-[120px]">

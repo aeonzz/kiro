@@ -6,7 +6,6 @@ import {
   InboxIcon,
   Link01Icon,
   Logout01Icon,
-  MoreHorizontalIcon,
   NotificationSquareIcon,
   Pen01Icon,
   SecurityIcon,
@@ -17,31 +16,42 @@ import {
   UserIcon,
   UserSquareIcon,
 } from "@hugeicons/core-free-icons";
-import type { IconSvgElement } from "@hugeicons/react";
 
-import { RoutePath } from "@/types/route-type";
+import { GroupItem, NavItem, VisibilityOption } from "@/types/sidebar";
 
-type NavItem = {
-  title: string;
-  url: RoutePath | "action";
-  icon: IconSvgElement;
-};
+export enum NavItemVisibility {
+  Show = "show",
+  Hide = "hide",
+  Auto = "auto",
+}
 
-type GroupItem = {
-  title: string;
-  items: NavItem[];
-};
+export const visibilityOptions: VisibilityOption[] = [
+  {
+    value: "show",
+    label: "Always show",
+  },
+  {
+    value: "hide",
+    label: "Never show",
+  },
+  {
+    value: "auto",
+    label: "Hide in more menu",
+  },
+];
 
 export const sidebarMenuItems: NavItem[] = [
   {
     title: "Inbox",
     url: "/$organization/inbox",
     icon: InboxIcon,
+    disabledVisibilityOptions: [NavItemVisibility.Auto, NavItemVisibility.Hide],
   },
   {
     title: "My Issues",
     url: "/$organization/issues",
     icon: Pen01Icon,
+    disabledVisibilityOptions: [NavItemVisibility.Auto],
   },
 ];
 
@@ -75,9 +85,14 @@ export const sidebarWorkspaceItems: NavItem[] = [
     icon: GridViewIcon,
   },
   {
-    title: "More",
-    url: "action",
-    icon: MoreHorizontalIcon,
+    title: "Members",
+    url: "/$organization/members",
+    icon: UserGroupIcon,
+  },
+  {
+    title: "Teams",
+    url: "/$organization/teams",
+    icon: UserSquareIcon,
   },
 ];
 

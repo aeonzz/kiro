@@ -1,10 +1,16 @@
 import * as React from "react";
-import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import {
+  ArrowDown01Icon,
+  MoreHorizontalIcon,
+  TabletPenIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
 
-import { sidebarWorkspaceItems } from "@/config/nav";
+import { NavItemVisibility, sidebarWorkspaceItems } from "@/config/nav";
 import { isNavLinkActive, resolveOrgUrl } from "@/lib/utils";
+import { usePreferencesStore } from "@/hooks/use-preference-store";
+import { DialogTrigger } from "@/components/ui/dialog";
 
 import { Button } from "../ui/button";
 import {
@@ -13,14 +19,24 @@ import {
   CollapsibleTrigger,
 } from "../ui/collapsible";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuItemMenu,
   SidebarMenuSub,
   SidebarMenuSubItem,
 } from "../ui/sidebar";
+import { sidebarCustomizationHandle } from "./sidebar-control";
 
 interface WorkspaceNavProps extends React.ComponentProps<typeof SidebarGroup> {
   pathname: string;
@@ -36,6 +52,18 @@ export function WorkspaceNav({
   activeOrganizationSlug,
   ...props
 }: WorkspaceNavProps) {
+  const sidebarConfig = usePreferencesStore((state) => state.sidebarConfig);
+
+  const hasVisibleItems = sidebarWorkspaceItems.some((item) => {
+    const visibility =
+      sidebarConfig[item.title] ?? item.visibility ?? NavItemVisibility.Show;
+    return visibility !== NavItemVisibility.Hide;
+  });
+
+  if (!hasVisibleItems) {
+    return null;
+  }
+
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
@@ -57,26 +85,114 @@ export function WorkspaceNav({
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <SidebarMenuSub>
-                  {sidebarWorkspaceItems.map((item) => (
-                    <SidebarMenuSubItem key={item.title}>
-                      <SidebarMenuButton
-                        isActive={isNavLinkActive(
-                          pathname,
-                          item.url,
-                          activeOrganizationSlug
-                        )}
-                        size="sm"
-                        render={
-                          <Link
-                            to={resolveOrgUrl(item.url, activeOrganizationSlug)}
+                  {sidebarWorkspaceItems
+                    .filter((item) => {
+                      const visibility =
+                        sidebarConfig[item.title] ??
+                        item.visibility ??
+                        NavItemVisibility.Show;
+                      return (
+                        visibility !== NavItemVisibility.Hide &&
+                        visibility !== NavItemVisibility.Auto
+                      );
+                    })
+                    .map((item) => (
+                      <SidebarMenuSubItem key={item.title}>
+                        <SidebarMenuItemMenu item={item}>
+                          <SidebarMenuButton
+                            isActive={isNavLinkActive(
+                              pathname,
+                              item.url,
+                              activeOrganizationSlug
+                            )}
+                            size="sm"
+                            render={
+                              <Link
+                                to={resolveOrgUrl(
+                                  item.url,
+                                  activeOrganizationSlug
+                                )}
+                              />
+                            }
+                          >
+                            <HugeiconsIcon icon={item.icon} strokeWidth={2} />
+                            <span>{item.title}</span>
+                          </SidebarMenuButton>
+                        </SidebarMenuItemMenu>
+                      </SidebarMenuSubItem>
+                    ))}
+                  {sidebarWorkspaceItems.some((item) => {
+                    const visibility =
+                      sidebarConfig[item.title] ??
+                      item.visibility ??
+                      NavItemVisibility.Show;
+
+                    return visibility === NavItemVisibility.Auto;
+                  }) && (
+                    <SidebarMenuSubItem>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          className="data-popup-open:bg-sidebar-accent/60 data-popup-open:[&_svg]:text-accent-foreground!"
+                          render={<SidebarMenuButton size="sm" />}
+                        >
+                          <HugeiconsIcon
+                            icon={MoreHorizontalIcon}
+                            strokeWidth={2}
                           />
-                        }
-                      >
-                        <HugeiconsIcon icon={item.icon} strokeWidth={2} />
-                        <span>{item.title}</span>
-                      </SidebarMenuButton>
+                          <span>More</span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-48">
+                          <DropdownMenuGroup>
+                            {sidebarWorkspaceItems
+                              .filter((item) => {
+                                const visibility =
+                                  sidebarConfig[item.title] ??
+                                  item.visibility ??
+                                  NavItemVisibility.Show;
+                                return visibility === NavItemVisibility.Auto;
+                              })
+                              .map((item) => (
+                                <DropdownMenuItem
+                                  key={item.title}
+                                  render={
+                                    <Link
+                                      to={resolveOrgUrl(
+                                        item.url,
+                                        activeOrganizationSlug
+                                      )}
+                                    />
+                                  }
+                                >
+                                  <HugeiconsIcon
+                                    icon={item.icon}
+                                    strokeWidth={2}
+                                  />
+                                  <span>{item.title}</span>
+                                </DropdownMenuItem>
+                              ))}
+                          </DropdownMenuGroup>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem
+                              className="w-full"
+                              nativeButton
+                              render={
+                                <DialogTrigger
+                                  handle={sidebarCustomizationHandle}
+                                />
+                              }
+                            >
+                              <HugeiconsIcon
+                                icon={TabletPenIcon}
+                                strokeWidth={2}
+                              />
+                              <span>Customize sidebar</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </SidebarMenuSubItem>
-                  ))}
+                  )}
                 </SidebarMenuSub>
               </CollapsibleContent>
             </Collapsible>

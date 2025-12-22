@@ -94,7 +94,11 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html suppressHydrationWarning>
+    <html
+      suppressHydrationWarning
+      data-cursor-pointer="default"
+      data-font-size="default"
+    >
       <head>
         <HeadContent />
       </head>

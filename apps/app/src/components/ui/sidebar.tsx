@@ -3,13 +3,24 @@
 import * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
-import { SidebarLeftIcon } from "@hugeicons/core-free-icons";
+import {
+  Link04Icon,
+  SidebarLeftIcon,
+  TabletPenIcon,
+  ViewIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils";
+import { NavItem } from "@/types/sidebar";
+import { NavItemVisibility, visibilityOptions } from "@/config/nav";
+import { cn, resolveOrgUrl } from "@/lib/utils";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePreferencesStore } from "@/hooks/use-preference-store";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
 import { Button } from "@/components/ui/button";
+import { DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -26,6 +37,21 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import { sidebarCustomizationHandle } from "../app-sidebar/sidebar-control";
+import { useOrganization } from "../organization-context";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuGroup,
+  ContextMenuItem,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "./context-menu";
 import { Kbd } from "./kbd";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
@@ -708,6 +734,106 @@ function SidebarMenuSubButton({
   });
 }
 
+interface SidebarMenuItemMenuProps extends React.ComponentProps<
+  typeof ContextMenu
+> {
+  item?: NavItem;
+  children?: React.ReactElement;
+}
+
+function SidebarMenuItemMenu({
+  item,
+  children,
+  ...props
+}: SidebarMenuItemMenuProps) {
+  const { activeOrganization } = useOrganization();
+  const [copiedText, copy] = useCopyToClipboard();
+  const sidebarConfig = usePreferencesStore((state) => state.sidebarConfig);
+  const setSidebarConfig = usePreferencesStore(
+    (state) => state.setSidebarConfig
+  );
+
+  const { mutateAsync } = useUserPreferences();
+
+  const currentVisibility = item
+    ? (sidebarConfig[item.title] ?? item.visibility ?? NavItemVisibility.Show)
+    : NavItemVisibility.Show;
+
+  const handleVisibilityChange = (value: string) => {
+    if (item) {
+      setSidebarConfig(item.title, value as NavItemVisibility);
+      try {
+        mutateAsync({
+          sidebarConfig: {
+            [item.title]: value as NavItemVisibility,
+          },
+        });
+      } catch {}
+    }
+  };
+
+  return (
+    <ContextMenu {...props}>
+      <ContextMenuTrigger render={children} />
+      <ContextMenuContent className="w-44">
+        <ContextMenuGroup>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>
+              <HugeiconsIcon icon={ViewIcon} strokeWidth={2} />
+              <span>Visibility</span>
+            </ContextMenuSubTrigger>
+            <ContextMenuSubContent>
+              <ContextMenuRadioGroup
+                value={currentVisibility}
+                onValueChange={handleVisibilityChange}
+              >
+                {visibilityOptions
+                  .filter(
+                    (option) =>
+                      !item?.disabledVisibilityOptions?.includes(
+                        option.value as NavItemVisibility
+                      )
+                  )
+                  .map((option) => (
+                    <ContextMenuRadioItem
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </ContextMenuRadioItem>
+                  ))}
+              </ContextMenuRadioGroup>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+          <ContextMenuItem
+            nativeButton
+            render={<DialogTrigger handle={sidebarCustomizationHandle} />}
+          >
+            <HugeiconsIcon icon={TabletPenIcon} strokeWidth={2} />
+            <span>Customize sidebar</span>
+          </ContextMenuItem>
+        </ContextMenuGroup>
+        <ContextMenuSeparator />
+        <ContextMenuGroup>
+          <ContextMenuItem
+            onClick={() =>
+              copy(
+                `${window.location.origin}${resolveOrgUrl(
+                  item?.url ?? "",
+                  activeOrganization?.slug
+                )}`
+              )
+            }
+          >
+            <HugeiconsIcon icon={Link04Icon} strokeWidth={2} />
+            <span>Copy link</span>
+          </ContextMenuItem>
+        </ContextMenuGroup>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+
 export {
   Sidebar,
   SidebarContent,
@@ -732,5 +858,6 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
+  SidebarMenuItemMenu,
   useSidebar,
 };

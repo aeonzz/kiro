@@ -61,7 +61,6 @@ export function UserMenu() {
           <DropdownMenuContent
             className="w-[232px]"
             align="start"
-            alignOffset={0}
           >
             <DropdownMenuItem
               render={

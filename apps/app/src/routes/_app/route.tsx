@@ -8,9 +8,14 @@ import {
 } from "@tanstack/react-router";
 
 import { usePreferencesStore } from "@/hooks/use-preference-store";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import {
+  SidebarInset,
+  SidebarMenuItemMenu,
+  SidebarProvider,
+} from "@/components/ui/sidebar";
 import { Spinner } from "@/components/ui/spinner";
 import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarControl } from "@/components/app-sidebar/sidebar-control";
 import { useOrganization } from "@/components/organization-context";
 import { SettingsSidebar } from "@/components/settings-sidebar";
 
@@ -51,24 +56,28 @@ function RouteComponent() {
   const isSettings = pathSegments[1] === "settings";
 
   return (
-    <SidebarProvider
-      defaultOpen={sidebarState}
-      className="h-svh min-h-0! overflow-hidden"
-    >
-      {isSettings ? (
-        <SettingsSidebar isPending={isPending} />
-      ) : (
-        <AppSidebar isPending={isPending} />
-      )}
-      <SidebarInset className="min-h-0 overflow-hidden">
-        {isPending ? (
-          <div className="flex h-full items-center justify-center">
-            <Spinner />
-          </div>
+    <React.Fragment>
+      <SidebarProvider
+        defaultOpen={sidebarState}
+        className="h-svh min-h-0! overflow-hidden"
+      >
+        {isSettings ? (
+          <SettingsSidebar isPending={isPending} />
         ) : (
-          <Outlet />
+          <AppSidebar isPending={isPending} />
         )}
-      </SidebarInset>
-    </SidebarProvider>
+        <SidebarInset className="min-h-0 overflow-hidden">
+          {isPending ? (
+            <div className="flex h-full items-center justify-center">
+              <Spinner />
+            </div>
+          ) : (
+            <Outlet />
+          )}
+        </SidebarInset>
+      </SidebarProvider>
+      <SidebarControl />
+      <SidebarMenuItemMenu />
+    </React.Fragment>
   );
 }

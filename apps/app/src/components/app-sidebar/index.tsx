@@ -1,13 +1,27 @@
 import * as React from "react";
-import { Pen01Icon } from "@hugeicons/core-free-icons";
+import { Pen01Icon, TabletPenIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, useLocation } from "@tanstack/react-router";
 
-import { sidebarMenuItems } from "@/config/nav";
+import {
+  NavItemVisibility,
+  sidebarMenuItems,
+  sidebarWorkspaceItems,
+} from "@/config/nav";
 import { isNavLinkActive, resolveOrgUrl } from "@/lib/utils";
+import { usePreferencesStore } from "@/hooks/use-preference-store";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuGroup,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
 import { useOrganization } from "../organization-context";
 import { Button } from "../ui/button";
+import { DialogTrigger } from "../ui/dialog";
 import {
   Sidebar,
   SidebarContent,
@@ -17,8 +31,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuItemMenu,
 } from "../ui/sidebar";
 import { UserMenu } from "../user-menu";
+import { sidebarCustomizationHandle } from "./sidebar-control";
 import { TeamNav } from "./team-nav";
 import { WorkspaceNav } from "./workspace-nav";
 
@@ -35,6 +51,7 @@ export function AppSidebar({
     select: (location) => location.pathname,
   });
   const { teams, activeOrganization } = useOrganization();
+  const sidebarConfig = usePreferencesStore((state) => state.sidebarConfig);
 
   const [sidebarState, setSidebarState] = React.useState(() => {
     try {
@@ -67,6 +84,17 @@ export function AppSidebar({
     }));
   }, []);
 
+  const hiddenItems = React.useMemo(() => {
+    return [...sidebarMenuItems, ...sidebarWorkspaceItems].filter((item) => {
+      const visibility =
+        sidebarConfig[item.title] ?? item.visibility ?? NavItemVisibility.Show;
+      return (
+        visibility === NavItemVisibility.Hide ||
+        visibility === NavItemVisibility.Auto
+      );
+    });
+  }, [sidebarConfig]);
+
   return (
     <Sidebar variant={variant} {...props}>
       {!isPending && (
@@ -77,24 +105,89 @@ export function AppSidebar({
               <HugeiconsIcon icon={Pen01Icon} strokeWidth={2} />
             </Button>
           </SidebarHeader>
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {sidebarMenuItems.map((item) => {
-                    const itemUrl = resolveOrgUrl(
-                      item.url,
-                      activeOrganization?.slug
-                    );
-                    return (
-                      <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton
-                          size="sm"
-                          isActive={isNavLinkActive(
-                            pathname,
+          <ContextMenu>
+            <ContextMenuTrigger className="h-full">
+              <SidebarContent>
+                <SidebarGroup>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {sidebarMenuItems
+                        .filter((item) => {
+                          const visibility =
+                            sidebarConfig[item.title] ??
+                            item.visibility ??
+                            NavItemVisibility.Show;
+                          return (
+                            visibility !== NavItemVisibility.Hide &&
+                            visibility !== NavItemVisibility.Auto
+                          );
+                        })
+                        .map((item) => {
+                          const itemUrl = resolveOrgUrl(
                             item.url,
                             activeOrganization?.slug
-                          )}
+                          );
+                          return (
+                            <SidebarMenuItem 
+                                className="data-open:bg-red-500!" key={item.title}>
+                              <SidebarMenuItemMenu item={item}>
+                                <SidebarMenuButton
+                                className="data-open:bg-red-500!"
+                                  size="sm"
+                                  isActive={isNavLinkActive(
+                                    pathname,
+                                    item.url,
+                                    activeOrganization?.slug
+                                  )}
+                                  render={
+                                    <Link
+                                      to={itemUrl}
+                                      params={{
+                                        organization: activeOrganization?.slug,
+                                      }}
+                                    />
+                                  }
+                                >
+                                  <HugeiconsIcon
+                                    icon={item.icon}
+                                    strokeWidth={2}
+                                  />
+                                  <span>{item.title}</span>
+                                </SidebarMenuButton>
+                              </SidebarMenuItemMenu>
+                            </SidebarMenuItem>
+                          );
+                        })}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
+                <WorkspaceNav
+                  pathname={pathname}
+                  open={workspaceOpen}
+                  onOpenChange={setWorkspaceOpen}
+                  activeOrganizationSlug={activeOrganization?.slug}
+                />
+                <TeamNav
+                  teams={teams}
+                  pathname={pathname}
+                  open={teamsOpen}
+                  onOpenChange={setTeamsOpen}
+                  activeOrganizationSlug={activeOrganization?.slug}
+                />
+              </SidebarContent>
+            </ContextMenuTrigger>
+            <ContextMenuContent className="w-48">
+              {hiddenItems.length > 0 && (
+                <React.Fragment>
+                  <ContextMenuGroup>
+                    {hiddenItems.map((item) => {
+                      const itemUrl = resolveOrgUrl(
+                        item.url,
+                        activeOrganization?.slug
+                      );
+                      return (
+                        <ContextMenuItem
+                          key={item.title}
                           render={
                             <Link
                               to={itemUrl}
@@ -106,27 +199,25 @@ export function AppSidebar({
                         >
                           <HugeiconsIcon icon={item.icon} strokeWidth={2} />
                           <span>{item.title}</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-            <WorkspaceNav
-              pathname={pathname}
-              open={workspaceOpen}
-              onOpenChange={setWorkspaceOpen}
-              activeOrganizationSlug={activeOrganization?.slug}
-            />
-            <TeamNav
-              teams={teams}
-              pathname={pathname}
-              open={teamsOpen}
-              onOpenChange={setTeamsOpen}
-              activeOrganizationSlug={activeOrganization?.slug}
-            />
-          </SidebarContent>
+                        </ContextMenuItem>
+                      );
+                    })}
+                  </ContextMenuGroup>
+                  <ContextMenuSeparator />
+                </React.Fragment>
+              )}
+              <ContextMenuGroup>
+                <ContextMenuItem
+                  className="w-full"
+                  nativeButton
+                  render={<DialogTrigger handle={sidebarCustomizationHandle} />}
+                >
+                  <HugeiconsIcon icon={TabletPenIcon} strokeWidth={2} />
+                  <span>Customize sidebar</span>
+                </ContextMenuItem>
+              </ContextMenuGroup>
+            </ContextMenuContent>
+          </ContextMenu>
         </React.Fragment>
       )}
     </Sidebar>

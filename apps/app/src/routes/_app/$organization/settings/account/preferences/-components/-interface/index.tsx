@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { Button } from "@/components/ui/button";
+import { DialogTrigger } from "@/components/ui/dialog";
 import {
   SettingsCard,
   SettingsGroup,
@@ -11,9 +13,9 @@ import {
   SettingsItemTitle,
 } from "@/components/ui/settings-card";
 
+import { sidebarCustomizationHandle } from "../../../../../../../../components/app-sidebar/sidebar-control";
 import { CursorControl } from "./cursor-control";
 import { FontControl } from "./font-control";
-import { SidebarControl } from "./sidebar-control";
 import { ThemeControl } from "./theme-control";
 
 interface InterfaceProps extends React.ComponentProps<typeof SettingsGroup> {}
@@ -31,7 +33,12 @@ export function Interface({ ...props }: InterfaceProps) {
             </SettingsItemDescription>
           </SettingsItemContent>
           <SettingsItemControl>
-            <SidebarControl />
+            <DialogTrigger
+              handle={sidebarCustomizationHandle}
+              render={<Button variant="ghost" />}
+            >
+              Customize
+            </DialogTrigger>
           </SettingsItemControl>
         </SettingsItem>
         <SettingsItem>
