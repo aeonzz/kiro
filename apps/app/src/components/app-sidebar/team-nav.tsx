@@ -1,6 +1,7 @@
 import React from "react";
 import {
   ArrowDown01Icon,
+  Link04Icon,
   MoreHorizontalIcon,
   PlusSignIcon,
   User02FreeIcons,
@@ -11,7 +12,9 @@ import type { Team } from "better-auth/plugins";
 
 import { sidebarTeamItems, sidebarTeamOptions } from "@/config/nav";
 import { isNavLinkActive, resolveOrgUrl } from "@/lib/utils";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 
+import { useOrganization } from "../organization-context";
 import { Button } from "../ui/button";
 import {
   Collapsible,
@@ -23,6 +26,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import {
@@ -30,9 +34,9 @@ import {
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuAction,
-  SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
+  SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "../ui/sidebar";
 
@@ -52,6 +56,9 @@ export function TeamNav({
   activeOrganizationSlug,
   ...props
 }: TeamNavProps) {
+  const [, copy] = useCopyToClipboard();
+  const { activeOrganization } = useOrganization();
+
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
@@ -64,7 +71,7 @@ export function TeamNav({
                 className="text-muted-foreground hover:text-muted-foreground aria-expanded:text-muted-foreground peer/menu-button w-full justify-start aria-expanded:bg-transparent data-panel-open:[&>svg]:rotate-0"
                 render={<Button variant="ghost" size="sm" />}
               >
-                <span>Your Teams</span>
+                <span>Your teams</span>
                 <HugeiconsIcon
                   icon={ArrowDown01Icon}
                   strokeWidth={2}
@@ -134,6 +141,26 @@ export function TeamNav({
                                   <span>{item.title}</span>
                                 </DropdownMenuItem>
                               ))}
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  copy(
+                                    `${window.location.origin}${resolveOrgUrl(
+                                      "/$organization/teams",
+                                      activeOrganization?.slug
+                                    )}`
+                                  )
+                                }
+                              >
+                                <HugeiconsIcon
+                                  icon={Link04Icon}
+                                  strokeWidth={2}
+                                />
+                                <span>Copy link</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem>
+                                <span>Leave team</span>
+                              </DropdownMenuItem>
                             </DropdownMenuGroup>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -141,11 +168,13 @@ export function TeamNav({
                           <SidebarMenuSub>
                             {sidebarTeamItems.map((item) => (
                               <SidebarMenuSubItem key={item.title}>
-                                <SidebarMenuButton
+                                <SidebarMenuSubButton
+                                  item={item}
                                   isActive={isNavLinkActive(
                                     pathname,
                                     item.url,
-                                    activeOrganizationSlug
+                                    activeOrganizationSlug,
+                                    team.name
                                   )}
                                   size="sm"
                                   className="pl-6"
@@ -153,7 +182,8 @@ export function TeamNav({
                                     <Link
                                       to={resolveOrgUrl(
                                         item.url,
-                                        activeOrganizationSlug
+                                        activeOrganizationSlug,
+                                        team.name
                                       )}
                                     />
                                   }
@@ -163,7 +193,7 @@ export function TeamNav({
                                     strokeWidth={2}
                                   />
                                   <span>{item.title}</span>
-                                </SidebarMenuButton>
+                                </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
                             ))}
                           </SidebarMenuSub>

@@ -32,7 +32,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuItemMenu,
 } from "../ui/sidebar";
 import { UserMenu } from "../user-menu";
 import { sidebarCustomizationHandle } from "./sidebar-control";
@@ -79,12 +78,20 @@ export function AppSidebar({
     return [...sidebarMenuItems, ...sidebarWorkspaceItems].filter((item) => {
       const visibility =
         sidebarConfig[item.title] ?? item.visibility ?? NavItemVisibility.Show;
+
+      const isActive = isNavLinkActive(
+        pathname,
+        item.url,
+        activeOrganization?.slug
+      );
+
       return (
-        visibility === NavItemVisibility.Hide ||
-        visibility === NavItemVisibility.Auto
+        !isActive &&
+        (visibility === NavItemVisibility.Hide ||
+          visibility === NavItemVisibility.Auto)
       );
     });
-  }, [sidebarConfig]);
+  }, [sidebarConfig, pathname, activeOrganization?.slug]);
 
   return (
     <Sidebar variant={variant} {...props}>
@@ -108,9 +115,17 @@ export function AppSidebar({
                             sidebarConfig[item.title] ??
                             item.visibility ??
                             NavItemVisibility.Show;
+
+                          const isActive = isNavLinkActive(
+                            pathname,
+                            item.url,
+                            activeOrganization?.slug
+                          );
+
                           return (
-                            visibility !== NavItemVisibility.Hide &&
-                            visibility !== NavItemVisibility.Auto
+                            isActive ||
+                            (visibility !== NavItemVisibility.Hide &&
+                              visibility !== NavItemVisibility.Auto)
                           );
                         })
                         .map((item) => {
@@ -120,30 +135,29 @@ export function AppSidebar({
                           );
                           return (
                             <SidebarMenuItem key={item.title}>
-                              <SidebarMenuItemMenu item={item}>
-                                <SidebarMenuButton
-                                  size="sm"
-                                  isActive={isNavLinkActive(
-                                    pathname,
-                                    item.url,
-                                    activeOrganization?.slug
-                                  )}
-                                  render={
-                                    <Link
-                                      to={itemUrl}
-                                      params={{
-                                        organization: activeOrganization?.slug,
-                                      }}
-                                    />
-                                  }
-                                >
-                                  <HugeiconsIcon
-                                    icon={item.icon}
-                                    strokeWidth={2}
+                              <SidebarMenuButton
+                                item={item}
+                                size="sm"
+                                isActive={isNavLinkActive(
+                                  pathname,
+                                  item.url,
+                                  activeOrganization?.slug
+                                )}
+                                render={
+                                  <Link
+                                    to={itemUrl}
+                                    params={{
+                                      organization: activeOrganization?.slug,
+                                    }}
                                   />
-                                  <span>{item.title}</span>
-                                </SidebarMenuButton>
-                              </SidebarMenuItemMenu>
+                                }
+                              >
+                                <HugeiconsIcon
+                                  icon={item.icon}
+                                  strokeWidth={2}
+                                />
+                                <span>{item.title}</span>
+                              </SidebarMenuButton>
                             </SidebarMenuItem>
                           );
                         })}

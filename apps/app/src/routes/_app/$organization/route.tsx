@@ -1,11 +1,7 @@
 import * as React from "react";
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 
-import {
-  SidebarInset,
-  SidebarMenuItemMenu,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Spinner } from "@/components/ui/spinner";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarControl } from "@/components/app-sidebar/sidebar-control";
@@ -46,7 +42,6 @@ function RouteComponent() {
         </SidebarInset>
       </SidebarProvider>
       <SidebarControl />
-      <SidebarMenuItemMenu />
     </React.Fragment>
   );
 }

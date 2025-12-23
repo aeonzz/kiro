@@ -22,14 +22,24 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function resolveOrgUrl(url: string, organizationSlug?: string) {
-  return url.replace("$organization", organizationSlug || "");
+export function resolveOrgUrl(
+  url: string,
+  organizationSlug?: string,
+  teamSlug?: string
+) {
+  return url
+    .replace("$organization", organizationSlug || "")
+    .replace("$team", teamSlug || "");
 }
 
 export function isNavLinkActive(
   pathname: string,
   url: string,
-  organizationSlug?: string
+  organizationSlug?: string,
+  teamSlug?: string
 ) {
-  return decodeURIComponent(pathname) === resolveOrgUrl(url, organizationSlug);
+  return (
+    decodeURIComponent(pathname) ===
+    resolveOrgUrl(url, organizationSlug, teamSlug)
+  );
 }

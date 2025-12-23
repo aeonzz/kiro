@@ -513,14 +513,12 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "ring-sidebar-ring/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-open:hover:bg-sidebar-accent data-open:hover:text-sidebar-accent-foreground gap-2 rounded-md p-2 text-left transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! focus-visible:ring-1 data-active:shadow-border peer/menu-button flex w-full items-center overflow-hidden outline-hidden group/menu-button disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&_svg]:size-4 [&_svg]:shrink-0 [&>svg:first-child]:text-muted-foreground hover:[&>svg:first-child]:text-sidebar-accent-foreground data-active:[&>svg:first-child]:text-sidebar-accent-foreground text-xs-plus font-medium",
+  "ring-sidebar-ring/50 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-active:shadow-border peer/menu-button group/menu-button [&>svg:first-child]:text-muted-foreground hover:[&>svg:first-child]:text-sidebar-accent-foreground aria-expanded:[&>svg:first-child]:text-sidebar-accent-foreground text-xs-plus flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left font-medium outline-hidden transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate",
   {
     variants: {
       variant: {
         default:
-          "not-data-active:hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground aria-expanded:bg-sidebar-accent aria-expanded:text-sidebar-accent-foreground",
-        outline:
-          "bg-background hover:bg-sidebar-accent hover:text-sidebar-accent-foreground shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
+          "not-data-active:hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground aria-expanded:bg-sidebar-accent/60 aria-expanded:text-sidebar-accent-foreground",
       },
       size: {
         default: "h-8",
@@ -541,19 +539,30 @@ function SidebarMenuButton({
   variant = "default",
   size = "default",
   tooltip,
+  item,
   className,
   ...props
 }: useRender.ComponentProps<"button"> &
   React.ComponentProps<"button"> & {
     isActive?: boolean;
     tooltip?: string | React.ComponentProps<typeof TooltipContent>;
+    item?: NavItem;
   } & VariantProps<typeof sidebarMenuButtonVariants>) {
   const { isMobile, state } = useSidebar();
+  const sidebarConfig = usePreferencesStore((state) => state.sidebarConfig);
+  const setSidebarConfig = usePreferencesStore(
+    (state) => state.setSidebarConfig
+  );
+
+  const { mutateAsync } = useUserPreferences();
+  const [menuOpen, setMenuOpen] = React.useState(false);
+
   const comp = useRender({
     defaultTagName: "button",
     props: mergeProps<"button">(
       {
         className: cn(sidebarMenuButtonVariants({ variant, size }), className),
+        "aria-expanded": menuOpen || undefined,
       },
       props
     ),
@@ -566,27 +575,93 @@ function SidebarMenuButton({
     },
   });
 
-  if (!tooltip) {
-    return comp;
+  const currentVisibility = item
+    ? (sidebarConfig[item.title] ?? item.visibility ?? NavItemVisibility.Show)
+    : NavItemVisibility.Show;
+
+  const handleVisibilityChange = (value: string) => {
+    if (item) {
+      setSidebarConfig(item.title, value as NavItemVisibility);
+      try {
+        mutateAsync({
+          sidebarConfig: {
+            ...sidebarConfig,
+            [item.title]: value as NavItemVisibility,
+          },
+        });
+      } catch {}
+    }
+  };
+
+  let content = comp;
+
+  if (tooltip) {
+    if (typeof tooltip === "string") {
+      tooltip = {
+        children: tooltip,
+      };
+    }
+
+    content = (
+      <Tooltip>
+        {comp}
+        <TooltipContent
+          side="right"
+          align="center"
+          sideOffset={6}
+          hidden={state !== "collapsed" || isMobile}
+          {...tooltip}
+        />
+      </Tooltip>
+    );
   }
 
-  if (typeof tooltip === "string") {
-    tooltip = {
-      children: tooltip,
-    };
+  if (!item) {
+    return content;
   }
 
   return (
-    <Tooltip>
-      {comp}
-      <TooltipContent
-        side="right"
-        align="center"
-        sideOffset={6}
-        hidden={state !== "collapsed" || isMobile}
-        {...tooltip}
-      />
-    </Tooltip>
+    <SidebarMenuItemContext
+      item={item}
+      content={content}
+      onOpenChange={setMenuOpen}
+    >
+      <ContextMenuGroup className="peer/menu-context-group">
+        <ContextMenuSub>
+          <ContextMenuSubTrigger>
+            <HugeiconsIcon icon={ViewIcon} strokeWidth={2} />
+            <span>Visibility</span>
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <ContextMenuRadioGroup
+              value={currentVisibility}
+              onValueChange={handleVisibilityChange}
+            >
+              {visibilityOptions
+                .filter(
+                  (option) =>
+                    !item?.disabledVisibilityOptions?.includes(
+                      option.value as NavItemVisibility
+                    )
+                )
+                .map((option) => (
+                  <ContextMenuRadioItem key={option.value} value={option.value}>
+                    {option.label}
+                  </ContextMenuRadioItem>
+                ))}
+            </ContextMenuRadioGroup>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuItem
+          nativeButton
+          className="w-full"
+          render={<DialogTrigger handle={sidebarCustomizationHandle} />}
+        >
+          <HugeiconsIcon icon={TabletPenIcon} strokeWidth={2} />
+          <span>Customize sidebar</span>
+        </ContextMenuItem>
+      </ContextMenuGroup>
+    </SidebarMenuItemContext>
   );
 }
 function SidebarMenuAction({
@@ -706,25 +781,33 @@ function SidebarMenuSubButton({
   render,
   size = "md",
   isActive = false,
+  item,
+  tooltip,
   className,
   ...props
 }: useRender.ComponentProps<"a"> &
   React.ComponentProps<"a"> & {
     size?: "sm" | "md";
     isActive?: boolean;
+    item?: NavItem;
+    tooltip?: string | React.ComponentProps<typeof TooltipContent>;
   }) {
-  return useRender({
+  const { isMobile, state } = useSidebar();
+  const [menuOpen, setMenuOpen] = React.useState(false);
+
+  const comp = useRender({
     defaultTagName: "a",
     props: mergeProps<"a">(
       {
         className: cn(
-          "text-sidebar-foreground ring-sidebar-ring/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground [&>svg]:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground h-7 gap-2 rounded-md px-2 focus-visible:ring-1 data-[size=md]:text-sm data-[size=sm]:text-xs [&>svg]:size-4 flex min-w-0 -translate-x-px items-center overflow-hidden outline-hidden group-data-[collapsible=icon]:hidden disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:shrink-0",
+          "text-sidebar-foreground ring-sidebar-ring/50 [&>svg]:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-[size=sm]:text-xs-plus not-data-active:hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground aria-expanded:bg-sidebar-accent/60 aria-expanded:text-sidebar-accent-foreground data-active:shadow-border [&>svg:first-child]:text-muted-foreground hover:[&>svg:first-child]:text-sidebar-accent-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 font-medium outline-hidden group-data-[collapsible=icon]:hidden focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-sm [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate",
           className
         ),
+        "aria-expanded": menuOpen || undefined,
       },
       props
     ),
-    render,
+    render: !tooltip ? render : TooltipTrigger,
     state: {
       slot: "sidebar-menu-sub-button",
       sidebar: "menu-sub-button",
@@ -732,89 +815,65 @@ function SidebarMenuSubButton({
       active: isActive,
     },
   });
-}
 
-interface SidebarMenuItemMenuProps extends React.ComponentProps<
-  typeof ContextMenu
-> {
-  item?: NavItem;
-  children?: React.ReactElement;
-}
+  let content = comp;
 
-function SidebarMenuItemMenu({
-  item,
-  children,
-  ...props
-}: SidebarMenuItemMenuProps) {
-  const { activeOrganization } = useOrganization();
-  const [copiedText, copy] = useCopyToClipboard();
-  const sidebarConfig = usePreferencesStore((state) => state.sidebarConfig);
-  const setSidebarConfig = usePreferencesStore(
-    (state) => state.setSidebarConfig
-  );
-
-  const { mutateAsync } = useUserPreferences();
-
-  const currentVisibility = item
-    ? (sidebarConfig[item.title] ?? item.visibility ?? NavItemVisibility.Show)
-    : NavItemVisibility.Show;
-
-  const handleVisibilityChange = (value: string) => {
-    if (item) {
-      setSidebarConfig(item.title, value as NavItemVisibility);
-      try {
-        mutateAsync({
-          sidebarConfig: {
-            [item.title]: value as NavItemVisibility,
-          },
-        });
-      } catch {}
+  if (tooltip) {
+    if (typeof tooltip === "string") {
+      tooltip = {
+        children: tooltip,
+      };
     }
-  };
+
+    content = (
+      <Tooltip>
+        {comp}
+        <TooltipContent
+          side="right"
+          align="center"
+          sideOffset={6}
+          hidden={state !== "collapsed" || isMobile}
+          {...tooltip}
+        />
+      </Tooltip>
+    );
+  }
+
+  if (!item) {
+    return content;
+  }
+
+  return (
+    <SidebarMenuItemContext
+      item={item}
+      content={content}
+      onOpenChange={setMenuOpen}
+    />
+  );
+}
+
+function SidebarMenuItemContext({
+  children,
+  content,
+  item,
+  ...props
+}: React.ComponentProps<typeof ContextMenu> & {
+  children?: React.ReactNode;
+  item?: NavItem;
+  content: React.ReactElement<
+    unknown,
+    string | React.JSXElementConstructor<any>
+  >;
+}) {
+  const [, copy] = useCopyToClipboard();
+  const { activeOrganization } = useOrganization();
 
   return (
     <ContextMenu {...props}>
-      <ContextMenuTrigger render={children} />
+      <ContextMenuTrigger render={content} />
       <ContextMenuContent className="w-44">
-        <ContextMenuGroup>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger>
-              <HugeiconsIcon icon={ViewIcon} strokeWidth={2} />
-              <span>Visibility</span>
-            </ContextMenuSubTrigger>
-            <ContextMenuSubContent>
-              <ContextMenuRadioGroup
-                value={currentVisibility}
-                onValueChange={handleVisibilityChange}
-              >
-                {visibilityOptions
-                  .filter(
-                    (option) =>
-                      !item?.disabledVisibilityOptions?.includes(
-                        option.value as NavItemVisibility
-                      )
-                  )
-                  .map((option) => (
-                    <ContextMenuRadioItem
-                      key={option.value}
-                      value={option.value}
-                    >
-                      {option.label}
-                    </ContextMenuRadioItem>
-                  ))}
-              </ContextMenuRadioGroup>
-            </ContextMenuSubContent>
-          </ContextMenuSub>
-          <ContextMenuItem
-            nativeButton
-            className="w-full"
-            render={<DialogTrigger handle={sidebarCustomizationHandle} />}
-          >
-            <HugeiconsIcon icon={TabletPenIcon} strokeWidth={2} />
-            <span>Customize sidebar</span>
-          </ContextMenuItem>
-        </ContextMenuGroup>
-        <ContextMenuSeparator />
+        {children}
+        <ContextMenuSeparator className="hidden peer-data-[slot=context-menu-group]/menu-context-group:block" />
         <ContextMenuGroup>
           <ContextMenuItem
             onClick={() =>
@@ -859,6 +918,6 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
-  SidebarMenuItemMenu,
   useSidebar,
+  SidebarMenuItemContext,
 };

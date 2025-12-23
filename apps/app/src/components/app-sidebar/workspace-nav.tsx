@@ -32,7 +32,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuItemMenu,
   SidebarMenuSub,
   SidebarMenuSubItem,
 } from "../ui/sidebar";
@@ -91,34 +90,41 @@ export function WorkspaceNav({
                         sidebarConfig[item.title] ??
                         item.visibility ??
                         NavItemVisibility.Show;
+
+                      const isActive = isNavLinkActive(
+                        pathname,
+                        item.url,
+                        activeOrganizationSlug
+                      );
+
                       return (
-                        visibility !== NavItemVisibility.Hide &&
-                        visibility !== NavItemVisibility.Auto
+                        isActive ||
+                        (visibility !== NavItemVisibility.Hide &&
+                          visibility !== NavItemVisibility.Auto)
                       );
                     })
                     .map((item) => (
                       <SidebarMenuSubItem key={item.title}>
-                        <SidebarMenuItemMenu item={item}>
-                          <SidebarMenuButton
-                            isActive={isNavLinkActive(
-                              pathname,
-                              item.url,
-                              activeOrganizationSlug
-                            )}
-                            size="sm"
-                            render={
-                              <Link
-                                to={resolveOrgUrl(
-                                  item.url,
-                                  activeOrganizationSlug
-                                )}
-                              />
-                            }
-                          >
-                            <HugeiconsIcon icon={item.icon} strokeWidth={2} />
-                            <span>{item.title}</span>
-                          </SidebarMenuButton>
-                        </SidebarMenuItemMenu>
+                        <SidebarMenuButton
+                          item={item}
+                          isActive={isNavLinkActive(
+                            pathname,
+                            item.url,
+                            activeOrganizationSlug
+                          )}
+                          size="sm"
+                          render={
+                            <Link
+                              to={resolveOrgUrl(
+                                item.url,
+                                activeOrganizationSlug
+                              )}
+                            />
+                          }
+                        >
+                          <HugeiconsIcon icon={item.icon} strokeWidth={2} />
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
                       </SidebarMenuSubItem>
                     ))}
                   {sidebarWorkspaceItems.some((item) => {
@@ -128,71 +134,94 @@ export function WorkspaceNav({
                       NavItemVisibility.Show;
 
                     return visibility === NavItemVisibility.Auto;
-                  }) && (
-                    <SidebarMenuSubItem>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          className="data-popup-open:bg-sidebar-accent/60 data-popup-open:[&_svg]:text-accent-foreground!"
-                          render={<SidebarMenuButton size="sm" />}
-                        >
-                          <HugeiconsIcon
-                            icon={MoreHorizontalIcon}
-                            strokeWidth={2}
-                          />
-                          <span>More</span>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-48">
-                          <DropdownMenuGroup>
-                            {sidebarWorkspaceItems
-                              .filter((item) => {
-                                const visibility =
-                                  sidebarConfig[item.title] ??
-                                  item.visibility ??
-                                  NavItemVisibility.Show;
-                                return visibility === NavItemVisibility.Auto;
-                              })
-                              .map((item) => (
-                                <DropdownMenuItem
-                                  key={item.title}
-                                  render={
-                                    <Link
-                                      to={resolveOrgUrl(
-                                        item.url,
-                                        activeOrganizationSlug
-                                      )}
+                  }) &&
+                    sidebarWorkspaceItems.some((item) => {
+                      const visibility =
+                        sidebarConfig[item.title] ??
+                        item.visibility ??
+                        NavItemVisibility.Show;
+
+                      const isActive = isNavLinkActive(
+                        pathname,
+                        item.url,
+                        activeOrganizationSlug
+                      );
+
+                      return !isActive && visibility === NavItemVisibility.Auto;
+                    }) && (
+                      <SidebarMenuSubItem>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            render={<SidebarMenuButton size="sm" />}
+                          >
+                            <HugeiconsIcon
+                              icon={MoreHorizontalIcon}
+                              strokeWidth={2}
+                            />
+                            <span>More</span>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-48">
+                            <DropdownMenuGroup>
+                              {sidebarWorkspaceItems
+                                .filter((item) => {
+                                  const visibility =
+                                    sidebarConfig[item.title] ??
+                                    item.visibility ??
+                                    NavItemVisibility.Show;
+
+                                  const isActive = isNavLinkActive(
+                                    pathname,
+                                    item.url,
+                                    activeOrganizationSlug
+                                  );
+
+                                  return (
+                                    !isActive &&
+                                    visibility === NavItemVisibility.Auto
+                                  );
+                                })
+                                .map((item) => (
+                                  <DropdownMenuItem
+                                    key={item.title}
+                                    render={
+                                      <Link
+                                        to={resolveOrgUrl(
+                                          item.url,
+                                          activeOrganizationSlug
+                                        )}
+                                      />
+                                    }
+                                  >
+                                    <HugeiconsIcon
+                                      icon={item.icon}
+                                      strokeWidth={2}
                                     />
-                                  }
-                                >
-                                  <HugeiconsIcon
-                                    icon={item.icon}
-                                    strokeWidth={2}
+                                    <span>{item.title}</span>
+                                  </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                              <DropdownMenuItem
+                                className="w-full"
+                                nativeButton
+                                render={
+                                  <DialogTrigger
+                                    handle={sidebarCustomizationHandle}
                                   />
-                                  <span>{item.title}</span>
-                                </DropdownMenuItem>
-                              ))}
-                          </DropdownMenuGroup>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem
-                              className="w-full"
-                              nativeButton
-                              render={
-                                <DialogTrigger
-                                  handle={sidebarCustomizationHandle}
+                                }
+                              >
+                                <HugeiconsIcon
+                                  icon={TabletPenIcon}
+                                  strokeWidth={2}
                                 />
-                              }
-                            >
-                              <HugeiconsIcon
-                                icon={TabletPenIcon}
-                                strokeWidth={2}
-                              />
-                              <span>Customize sidebar</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </SidebarMenuSubItem>
-                  )}
+                                <span>Customize sidebar</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </SidebarMenuSubItem>
+                    )}
                 </SidebarMenuSub>
               </CollapsibleContent>
             </Collapsible>

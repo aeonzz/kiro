@@ -4,17 +4,12 @@ import {
   CenterFocusIcon,
   CopyIcon,
   Folder01Icon,
-  GridViewIcon,
   InboxIcon,
   LayerIcon,
-  Link01Icon,
-  Logout01Icon,
   NotificationSquareIcon,
-  Pen01Icon,
   SecurityIcon,
   Settings01Icon,
   SlidersHorizontalIcon,
-  TaskDaily01Icon,
   UserGroupIcon,
   UserIcon,
   UserSquareIcon,
@@ -58,20 +53,20 @@ export const sidebarMenuItems: NavItem[] = [
   },
 ];
 
-export const sidebarTeamItems = [
+export const sidebarTeamItems: NavItem[] = [
   {
     title: "Issues",
-    url: "/#",
+    url: "/$organization/team/$team/issues",
     icon: CopyIcon,
   },
   {
     title: "Projects",
-    url: "/#",
+    url: "/$organization/team/$team/projects",
     icon: Folder01Icon,
   },
   {
     title: "Views",
-    url: "/#",
+    url: "/$organization/team/$team/views",
     icon: LayerIcon,
   },
 ];
@@ -122,16 +117,6 @@ export const sidebarTeamOptions: NavItem[] = [
     title: "Team settings",
     url: "/",
     icon: Settings01Icon,
-  },
-  {
-    title: "Copy link",
-    url: "/",
-    icon: Link01Icon,
-  },
-  {
-    title: "Leave team",
-    url: "/",
-    icon: Logout01Icon,
   },
 ];
 
