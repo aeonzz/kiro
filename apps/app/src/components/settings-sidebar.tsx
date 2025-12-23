@@ -105,13 +105,18 @@ export function SettingsSidebar({
                         <SidebarMenuButton
                           size="sm"
                           className="[&_svg]:text-muted-foreground font-semibold"
-                          isActive={isNavLinkActive(pathname, team.name)}
+                          isActive={isNavLinkActive(
+                            pathname,
+                            "/$organization/settings/administration/teams/$name",
+                            activeOrganization?.slug,
+                            team.slug
+                          )}
                           render={
                             <Link
                               to="/$organization/settings/administration/teams/$name"
                               params={{
                                 organization: activeOrganization?.slug ?? "",
-                                name: team.name,
+                                name: team.slug,
                               }}
                             />
                           }
@@ -130,7 +135,7 @@ export function SettingsSidebar({
                       className="text-muted-foreground"
                       render={
                         <Link
-                          to="/$organization/settings/administration/teams/new-team"
+                          to="/$organization/settings/new-team"
                           params={{
                             organization: activeOrganization?.slug ?? "",
                           }}
@@ -138,7 +143,7 @@ export function SettingsSidebar({
                       }
                     >
                       <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
-                      <span>Crate a team</span>
+                      <span>Create a team</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>

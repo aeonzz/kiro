@@ -83,7 +83,7 @@ export function TeamNav({
                 className="group-hover/menu-header:opacity-100 md:group-hover/menu-header:opacity-100"
                 render={
                   <Link
-                    to="/$organization/settings/administration/teams/new-team"
+                    to="/$organization/settings/new-team"
                     params={{
                       organization: activeOrganizationSlug ?? "",
                     }}

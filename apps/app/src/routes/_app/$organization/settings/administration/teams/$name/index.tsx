@@ -7,7 +7,5 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  return (
-    <div>Hello "/_app/$organization/settings/administration/teams/$name/"!</div>
-  );
+  return <div>wtf</div>;
 }

@@ -345,7 +345,7 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
     <main
       data-slot="sidebar-inset"
       className={cn(
-        "bg-background relative flex w-full flex-1 flex-col md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-md md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
+        "bg-background ring-border relative flex w-full flex-1 flex-col ring-1 md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-md md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
         className
       )}
       {...props}
@@ -513,7 +513,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "ring-sidebar-ring/50 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-active:shadow-border peer/menu-button group/menu-button [&>svg:first-child]:text-muted-foreground hover:[&>svg:first-child]:text-sidebar-accent-foreground aria-expanded:[&>svg:first-child]:text-sidebar-accent-foreground text-xs-plus flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left font-medium outline-hidden transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate",
+  "ring-sidebar-ring/50 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-active:shadow-border peer/menu-button group/menu-button [&>svg:first-child]:text-muted-foreground hover:[&>svg:first-child]:text-sidebar-accent-foreground aria-expanded:[&>svg:first-child]:text-sidebar-accent-foreground text-xs-plus flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left font-normal outline-hidden transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate",
   {
     variants: {
       variant: {
@@ -800,7 +800,7 @@ function SidebarMenuSubButton({
     props: mergeProps<"a">(
       {
         className: cn(
-          "text-sidebar-foreground ring-sidebar-ring/50 [&>svg]:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-[size=sm]:text-xs-plus not-data-active:hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground aria-expanded:bg-sidebar-accent/60 aria-expanded:text-sidebar-accent-foreground data-active:shadow-border [&>svg:first-child]:text-muted-foreground hover:[&>svg:first-child]:text-sidebar-accent-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 font-medium outline-hidden group-data-[collapsible=icon]:hidden focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-sm [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate",
+          "text-sidebar-foreground ring-sidebar-ring/50 [&>svg]:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-[size=sm]:text-xs-plus not-data-active:hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground aria-expanded:bg-sidebar-accent/60 aria-expanded:text-sidebar-accent-foreground data-active:shadow-border [&>svg:first-child]:text-muted-foreground hover:[&>svg:first-child]:text-sidebar-accent-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 font-normal outline-hidden group-data-[collapsible=icon]:hidden focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-sm [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate",
           className
         ),
         "aria-expanded": menuOpen || undefined,
@@ -879,7 +879,7 @@ function SidebarMenuItemContext({
             onClick={() =>
               copy(
                 `${window.location.origin}${resolveOrgUrl(
-                  item?.url ?? "",
+                  item?.url ?? "/",
                   activeOrganization?.slug
                 )}`
               )

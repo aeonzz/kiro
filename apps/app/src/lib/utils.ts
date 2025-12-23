@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
 
+import { RoutePath } from "@/types/route-type";
+
 const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {
@@ -23,18 +25,19 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function resolveOrgUrl(
-  url: string,
+  url: RoutePath,
   organizationSlug?: string,
   teamSlug?: string
 ) {
   return url
     .replace("$organization", organizationSlug || "")
-    .replace("$team", teamSlug || "");
+    .replace("$team", teamSlug || "")
+    .replace("$name", teamSlug || "");
 }
 
 export function isNavLinkActive(
   pathname: string,
-  url: string,
+  url: RoutePath,
   organizationSlug?: string,
   teamSlug?: string
 ) {

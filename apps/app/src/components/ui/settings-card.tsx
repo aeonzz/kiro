@@ -72,7 +72,10 @@ function SettingsItemContent({
   return (
     <FieldContent
       data-slot="settings-item-content"
-      className={cn("gap-1.5", className)}
+      className={cn(
+        "gap-1.5 *:data-[slot=field-error]:leading-none",
+        className
+      )}
       {...props}
     />
   );
@@ -85,7 +88,7 @@ function SettingsItemTitle({
   return (
     <FieldTitle
       data-slot="settings-item-title"
-      className={cn("text-sm font-medium leading-none", className)}
+      className={cn("text-sm leading-none font-medium", className)}
       {...props}
     />
   );

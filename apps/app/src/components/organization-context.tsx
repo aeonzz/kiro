@@ -16,6 +16,7 @@ interface OrganizationContextValue {
   activeOrganization?: Organization | null;
   teams: Array<
     Omit<Team, "updatedAt"> & {
+      slug: string;
       updatedAt: Date | null;
     }
   >;
