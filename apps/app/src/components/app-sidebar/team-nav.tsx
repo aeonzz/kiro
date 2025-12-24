@@ -13,6 +13,7 @@ import type { Team } from "better-auth/plugins";
 import { sidebarTeamItems, sidebarTeamOptions } from "@/config/nav";
 import { isNavLinkActive, resolveOrgUrl } from "@/lib/utils";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { usePreferencesStore } from "@/hooks/use-preference-store";
 
 import { useOrganization } from "../organization-context";
 import { Button } from "../ui/button";
@@ -58,9 +59,16 @@ export function TeamNav({
 }: TeamNavProps) {
   const [, copy] = useCopyToClipboard();
   const { activeOrganization } = useOrganization();
+  const expandedTeams = usePreferencesStore((state) => state.expandedTeams);
+  const setTeamExpanded = usePreferencesStore((state) => state.setTeamExpanded);
+
+  const transitionDuration = `${Math.max(150, Math.min(500, 150 + teams.length * 30))}ms`;
+  const style = {
+    "--transition-duration": transitionDuration,
+  } as React.CSSProperties;
 
   return (
-    <SidebarGroup {...props}>
+    <SidebarGroup {...props} style={style}>
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem className="group/menu-header">
@@ -76,6 +84,7 @@ export function TeamNav({
                   icon={ArrowDown01Icon}
                   strokeWidth={2}
                   className="ease-out-expo -rotate-90 transition-all"
+                  style={{ transitionDuration }}
                 />
               </CollapsibleTrigger>
               <SidebarMenuAction
@@ -93,18 +102,18 @@ export function TeamNav({
                 <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
                 <span className="sr-only">Create a team</span>
               </SidebarMenuAction>
-              <CollapsibleContent>
-                <SidebarMenuSub>
+              <CollapsibleContent style={{ transitionDuration }}>
+                <SidebarMenuSub className="transition-opacity duration-300 ease-out group-data-ending-style:opacity-0 group-data-starting-style:opacity-0">
                   {teams.map((team) => (
-                    <SidebarMenuSubItem
-                      key={team.id}
-                      className="ease-out-expo transition-opacity duration-300 group-data-closed:opacity-0 group-data-open:opacity-100"
-                    >
-                      <Collapsible>
+                    <SidebarMenuSubItem key={team.id}>
+                      <Collapsible
+                        open={expandedTeams[team.id] ?? false}
+                        onOpenChange={(open) => setTeamExpanded(team.id, open)}
+                      >
                         <CollapsibleTrigger
                           data-sidebar="menu-button"
                           data-size="sm"
-                          className="[&_svg]:text-muted-foreground peer/menu-button w-full justify-start pr-8 font-semibold aria-expanded:bg-transparent data-panel-open:[&>svg]:rotate-0"
+                          className="[&_svg]:text-muted-foreground peer/menu-button w-full justify-start pr-8 font-medium aria-expanded:bg-transparent data-panel-open:[&>svg]:rotate-0"
                           render={<Button variant="ghost" size="sm" />}
                         >
                           <div className="bg-muted mr-1 rounded-sm p-0.5">
@@ -164,8 +173,8 @@ export function TeamNav({
                             </DropdownMenuGroup>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                        <CollapsibleContent>
-                          <SidebarMenuSub>
+                        <CollapsibleContent className="duration-450">
+                          <SidebarMenuSub className="mb-2 transition-opacity duration-300 ease-out group-data-ending-style:opacity-0 group-data-starting-style:opacity-0">
                             {sidebarTeamItems.map((item) => (
                               <SidebarMenuSubItem key={item.title}>
                                 <SidebarMenuSubButton

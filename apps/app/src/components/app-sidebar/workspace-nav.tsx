@@ -83,7 +83,7 @@ export function WorkspaceNav({
                 />
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <SidebarMenuSub>
+                <SidebarMenuSub className="transition-opacity duration-300 ease-out group-data-ending-style:opacity-0 group-data-starting-style:opacity-0">
                   {sidebarWorkspaceItems
                     .filter((item) => {
                       const visibility =

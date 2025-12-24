@@ -104,81 +104,93 @@ export function AppSidebar({
             </Button>
           </SidebarHeader>
           <ContextMenu>
-            <ContextMenuTrigger className="h-full">
-              <SidebarContent>
-                <SidebarGroup>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
-                      {sidebarMenuItems
-                        .filter((item) => {
-                          const visibility =
-                            sidebarConfig[item.title] ??
-                            item.visibility ??
-                            NavItemVisibility.Show;
+            <ContextMenuTrigger
+              className="h-full"
+              render={
+                <SidebarContent>
+                  <SidebarGroup>
+                    <SidebarGroupContent>
+                      <SidebarMenu>
+                        {sidebarMenuItems
+                          .filter((item) => {
+                            const visibility =
+                              sidebarConfig[item.title] ??
+                              item.visibility ??
+                              NavItemVisibility.Show;
 
-                          const isActive = isNavLinkActive(
-                            pathname,
-                            item.url,
-                            activeOrganization?.slug
-                          );
+                            const isActive = isNavLinkActive(
+                              pathname,
+                              item.url,
+                              activeOrganization?.slug
+                            );
 
-                          return (
-                            isActive ||
-                            (visibility !== NavItemVisibility.Hide &&
-                              visibility !== NavItemVisibility.Auto)
-                          );
-                        })
-                        .map((item) => {
-                          const itemUrl = resolveOrgUrl(
-                            item.url,
-                            activeOrganization?.slug
-                          );
-                          return (
-                            <SidebarMenuItem key={item.title}>
-                              <SidebarMenuButton
-                                item={item}
-                                size="sm"
-                                isActive={isNavLinkActive(
-                                  pathname,
-                                  item.url,
-                                  activeOrganization?.slug
-                                )}
-                                render={
-                                  <Link
-                                    to={itemUrl}
-                                    params={{
-                                      organization: activeOrganization?.slug,
-                                    }}
+                            return (
+                              isActive ||
+                              (visibility !== NavItemVisibility.Hide &&
+                                visibility !== NavItemVisibility.Auto)
+                            );
+                          })
+                          .map((item) => {
+                            const itemUrl = resolveOrgUrl(
+                              item.url,
+                              activeOrganization?.slug
+                            );
+                            return (
+                              <SidebarMenuItem key={item.title}>
+                                <SidebarMenuButton
+                                  item={item}
+                                  size="sm"
+                                  isActive={isNavLinkActive(
+                                    pathname,
+                                    item.url,
+                                    activeOrganization?.slug
+                                  )}
+                                  render={
+                                    <Link
+                                      to={itemUrl}
+                                      params={{
+                                        organization: activeOrganization?.slug,
+                                      }}
+                                    />
+                                  }
+                                >
+                                  <HugeiconsIcon
+                                    icon={item.icon}
+                                    strokeWidth={2}
                                   />
-                                }
-                              >
-                                <HugeiconsIcon
-                                  icon={item.icon}
-                                  strokeWidth={2}
-                                />
-                                <span>{item.title}</span>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-                          );
-                        })}
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                </SidebarGroup>
-                <WorkspaceNav
-                  pathname={pathname}
-                  open={workspaceOpen}
-                  onOpenChange={setWorkspaceOpen}
-                  activeOrganizationSlug={activeOrganization?.slug}
-                />
-                <TeamNav
-                  teams={teams}
-                  pathname={pathname}
-                  open={teamsOpen}
-                  onOpenChange={setTeamsOpen}
-                  activeOrganizationSlug={activeOrganization?.slug}
-                />
-              </SidebarContent>
-            </ContextMenuTrigger>
+                                  <span>{item.title}</span>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            );
+                          })}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </SidebarGroup>
+                  <WorkspaceNav
+                    pathname={pathname}
+                    open={workspaceOpen}
+                    onOpenChange={setWorkspaceOpen}
+                    activeOrganizationSlug={activeOrganization?.slug}
+                  />
+                  <TeamNav
+                    teams={teams}
+                    pathname={pathname}
+                    open={teamsOpen}
+                    onOpenChange={setTeamsOpen}
+                    activeOrganizationSlug={activeOrganization?.slug}
+                  />
+                  <SidebarGroup>
+                    <SidebarGroupContent>
+                      <SidebarMenu>
+                        <SidebarMenuItem>
+                          <span>asdagsd</span>
+                        </SidebarMenuItem>
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </SidebarGroup>
+                </SidebarContent>
+              }
+            />
             <ContextMenuContent className="w-48">
               {hiddenItems.length > 0 && (
                 <React.Fragment>

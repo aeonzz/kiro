@@ -104,7 +104,7 @@ export function SettingsSidebar({
                       <SidebarMenuItem key={team.id}>
                         <SidebarMenuButton
                           size="sm"
-                          className="[&_svg]:text-muted-foreground font-semibold"
+                          className="[&_svg]:text-muted-foreground font-medium"
                           isActive={isNavLinkActive(
                             pathname,
                             "/$organization/settings/administration/teams/$name",

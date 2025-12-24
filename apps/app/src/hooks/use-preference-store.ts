@@ -11,6 +11,7 @@ interface PreferencesState {
   sidebarConfig: Record<string, NavItemVisibility>;
   workspaceOpen: boolean;
   teamsOpen: boolean;
+  expandedTeams: Record<string, boolean>;
   homeView: HomeViewValue;
   setTheme: (theme: "light" | "dark") => void;
   setCursorPointer: (value: boolean) => void;
@@ -18,6 +19,7 @@ interface PreferencesState {
   setSidebarConfig: (title: string, visibility: NavItemVisibility) => void;
   setWorkspaceOpen: (open: boolean) => void;
   setTeamsOpen: (open: boolean) => void;
+  setTeamExpanded: (teamId: string, expanded: boolean) => void;
   setHomeView: (view: HomeViewValue) => void;
 }
 
@@ -30,6 +32,7 @@ export const usePreferencesStore = create<PreferencesState>()(
       sidebarConfig: {},
       workspaceOpen: true,
       teamsOpen: true,
+      expandedTeams: {},
       homeView: HomeViewValue.INBOX,
       setTheme: (theme) => set(() => ({ theme })),
       setCursorPointer: (value) => set(() => ({ cursorPointer: value })),
@@ -43,6 +46,13 @@ export const usePreferencesStore = create<PreferencesState>()(
         })),
       setWorkspaceOpen: (open) => set(() => ({ workspaceOpen: open })),
       setTeamsOpen: (open) => set(() => ({ teamsOpen: open })),
+      setTeamExpanded: (teamId, expanded) =>
+        set((state) => ({
+          expandedTeams: {
+            ...state.expandedTeams,
+            [teamId]: expanded,
+          },
+        })),
       setHomeView: (view) => set(() => ({ homeView: view })),
     }),
     {
