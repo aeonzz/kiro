@@ -7,3 +7,10 @@ export const createTeamSchema = z.object({
 });
 
 export type CreateTeamSchemaType = z.infer<typeof createTeamSchema>;
+
+export const getTeamByIdSchema = z.object({
+  slug: z.string(),
+  organizationSlug: z.string(),
+});
+
+export type GetTeamByIdSchemaType = z.infer<typeof getTeamByIdSchema>;

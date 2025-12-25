@@ -3,11 +3,13 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldTitle,
-} from "@/components/ui/field";
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/ui/item";
 
 function SettingsGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -47,30 +49,30 @@ function SettingsCard({
 
 function SettingsItem({
   className,
-  children,
+  render,
   ...props
-}: React.ComponentProps<typeof Field>) {
+}: React.ComponentProps<typeof Item>) {
   return (
-    <Field
+    <Item
       data-slot="settings-item"
-      orientation="horizontal"
+      variant="outline"
+      render={render}
       className={cn(
-        "border-border items-center gap-4 border-b px-4 py-4 last:border-0",
+        "border-border items-center gap-4 rounded-none border-0 border-b px-4 py-4 last:border-0 hover:bg-transparent [a]:hover:bg-[color-mix(in_oklab,var(--card)95%,var(--card-foreground))]",
+        "data-[invalid=true]:text-destructive",
         className
       )}
       {...props}
-    >
-      {children}
-    </Field>
+    />
   );
 }
 
 function SettingsItemContent({
   className,
   ...props
-}: React.ComponentProps<typeof FieldContent>) {
+}: React.ComponentProps<typeof ItemContent>) {
   return (
-    <FieldContent
+    <ItemContent
       data-slot="settings-item-content"
       className={cn(
         "gap-1.5 *:data-[slot=field-error]:leading-none",
@@ -84,9 +86,9 @@ function SettingsItemContent({
 function SettingsItemTitle({
   className,
   ...props
-}: React.ComponentProps<typeof FieldTitle>) {
+}: React.ComponentProps<typeof ItemTitle>) {
   return (
-    <FieldTitle
+    <ItemTitle
       data-slot="settings-item-title"
       className={cn("text-sm leading-none font-medium", className)}
       {...props}
@@ -97,11 +99,11 @@ function SettingsItemTitle({
 function SettingsItemDescription({
   className,
   ...props
-}: React.ComponentProps<typeof FieldDescription>) {
+}: React.ComponentProps<typeof ItemDescription>) {
   return (
-    <FieldDescription
+    <ItemDescription
       data-slot="settings-item-description"
-      className={cn("text-muted-foreground text-xs leading-none", className)}
+      className={cn("text-xs leading-none", className)}
       {...props}
     />
   );
@@ -110,11 +112,24 @@ function SettingsItemDescription({
 function SettingsItemControl({
   className,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<typeof ItemActions>) {
   return (
-    <div
+    <ItemActions
       data-slot="settings-item-control"
-      className={cn("flex shrink-0 items-center", className)}
+      className={cn("flex shrink-0 items-center gap-2", className)}
+      {...props}
+    />
+  );
+}
+
+function SettingsItemMedia({
+  className,
+  ...props
+}: React.ComponentProps<typeof ItemMedia>) {
+  return (
+    <ItemMedia
+      data-slot="settings-item-media"
+      className={cn("text-muted-foreground rounded-lg", className)}
       {...props}
     />
   );
@@ -128,5 +143,6 @@ export {
   SettingsItemContent,
   SettingsItemTitle,
   SettingsItemDescription,
+  SettingsItemMedia,
   SettingsItemControl,
 };

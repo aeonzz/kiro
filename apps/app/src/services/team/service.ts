@@ -1,7 +1,7 @@
 import { prisma } from "@kiro/db";
 import { generateId } from "better-auth";
 
-import type { CreateTeamSchemaType } from "./schema";
+import type { CreateTeamSchemaType, GetTeamByIdSchemaType } from "./schema";
 
 export async function createTeamService({
   userId,
@@ -25,7 +25,25 @@ export async function createTeamService({
         ...data,
       },
     });
-  } catch (error) {
-    throw new Error("Failed to create team");
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function getTeamByIdService({
+  slug,
+  organizationSlug,
+}: GetTeamByIdSchemaType) {
+  try {
+    return await prisma.team.findFirst({
+      where: {
+        slug,
+        organization: {
+          slug: organizationSlug,
+        },
+      },
+    });
+  } catch (err) {
+    throw err;
   }
 }

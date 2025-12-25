@@ -179,15 +179,6 @@ export function AppSidebar({
                     onOpenChange={setTeamsOpen}
                     activeOrganizationSlug={activeOrganization?.slug}
                   />
-                  <SidebarGroup>
-                    <SidebarGroupContent>
-                      <SidebarMenu>
-                        <SidebarMenuItem>
-                          <span>asdagsd</span>
-                        </SidebarMenuItem>
-                      </SidebarMenu>
-                    </SidebarGroupContent>
-                  </SidebarGroup>
                 </SidebarContent>
               }
             />

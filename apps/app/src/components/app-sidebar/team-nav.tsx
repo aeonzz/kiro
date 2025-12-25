@@ -174,7 +174,7 @@ export function TeamNav({
                           </DropdownMenuContent>
                         </DropdownMenu>
                         <CollapsibleContent className="duration-450">
-                          <SidebarMenuSub className="mb-2 transition-opacity duration-300 ease-out group-data-ending-style:opacity-0 group-data-starting-style:opacity-0">
+                          <SidebarMenuSub className="translate-x-1 pb-2 transition-opacity duration-300 ease-out group-data-ending-style:opacity-0 group-data-starting-style:opacity-0">
                             {sidebarTeamItems.map((item) => (
                               <SidebarMenuSubItem key={item.title}>
                                 <SidebarMenuSubButton
