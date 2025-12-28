@@ -24,6 +24,7 @@
     "@tanstack/react-router-devtools": "^1.140.5",
     "@tanstack/react-router-ssr-query": "^1.140.5",
     "@tanstack/react-start": "^1.140.5",
+    "@tanstack/react-table": "^8.21.3",
     "better-auth": "^1.4.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

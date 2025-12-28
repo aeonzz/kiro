@@ -151,22 +151,22 @@ export const settingsNavItems: GroupItem[] = [
     items: [
       {
         title: "Workspace",
-        url: "/$organization/settings/administration/workspace",
+        url: "/$organization/settings/workspace",
         icon: Building02Icon,
       },
       {
         title: "Teams",
-        url: "/$organization/settings/administration/teams",
+        url: "/$organization/settings/teams",
         icon: UserSquareIcon,
       },
       {
         title: "Members",
-        url: "/$organization/settings/administration/members",
+        url: "/$organization/settings/members",
         icon: UserGroupIcon,
       },
       {
         title: "Security",
-        url: "/$organization/settings/administration/security",
+        url: "/$organization/settings/security",
         icon: SecurityIcon,
       },
     ],

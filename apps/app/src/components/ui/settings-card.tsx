@@ -28,7 +28,7 @@ function SettingsGroupTitle({
   return (
     <h2
       data-slot="settings-group-title"
-      className={cn("text-foreground text-sm", className)}
+      className={cn("text-foreground text-sm scroll-m-20", className)}
       {...props}
     />
   );

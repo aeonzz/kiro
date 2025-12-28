@@ -6,7 +6,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarControl } from "@/components/app-sidebar/sidebar-control";
 import { useOrganization } from "@/components/organization-context";
-import { SettingsSidebar } from "@/components/settings-sidebar";
+import { SettingsSidebar } from "@/components/settings/settings-sidebar";
 
 export const Route = createFileRoute("/_app/$organization")({
   component: RouteComponent,

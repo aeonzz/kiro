@@ -1,5 +1,4 @@
 import * as React from "react";
-import { getOrganizationFn } from "@/services/organization/get";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -7,6 +6,7 @@ import type { Organization, Team } from "better-auth/plugins";
 
 import { HomeViewValue } from "@/config/preferences";
 import { authClient } from "@/lib/auth-client";
+import { organizationQueries } from "@/lib/query-factory";
 import { usePreferencesStore } from "@/hooks/use-preference-store";
 import { NotFound } from "@/components/not-found";
 
@@ -35,7 +35,6 @@ export function OrganizationProvider({
 }) {
   const { data: userOrganizations, isPending: userOrganizationsPending } =
     authClient.useListOrganizations();
-  const getOrganization = useServerFn(getOrganizationFn);
   const navigate = useNavigate();
   const location = useLocation();
   const homeView = usePreferencesStore((s) => s.homeView);
@@ -69,8 +68,7 @@ export function OrganizationProvider({
     isPending,
     isError,
   } = useQuery({
-    queryKey: ["get_organization", effectiveSlug],
-    queryFn: () => getOrganization({ data: { slug: effectiveSlug! } }),
+    ...organizationQueries.detail(effectiveSlug!),
     enabled: !!effectiveSlug,
   });
 

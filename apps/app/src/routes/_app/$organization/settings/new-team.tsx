@@ -8,6 +8,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { organizationQueries } from "@/lib/query-factory";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -21,7 +22,7 @@ import {
   SettingsItemTitle,
 } from "@/components/ui/settings-card";
 import { useOrganization } from "@/components/organization-context";
-import SettingsContainer from "@/components/settings-container";
+import SettingsContainer from "@/components/settings/settings-container";
 
 const formSchema = z.object({
   name: z
@@ -73,10 +74,10 @@ function RouteComponent() {
         {
           onSuccess: (data) => {
             qc.invalidateQueries({
-              queryKey: ["get_organization", activeOrganization.slug],
+              queryKey: organizationQueries.all(),
             });
             navigate({
-              to: `/$organization/settings/administration/teams/$name`,
+              to: `/$organization/settings/teams/$name`,
               params: {
                 organization: activeOrganization.slug,
                 name: data.slug,

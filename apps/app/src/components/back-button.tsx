@@ -50,8 +50,9 @@ export function BackButton({
   children,
   variant = "ghost",
   size,
+  showTooltip = true,
   ...props
-}: BackButtonProps) {
+}: BackButtonProps & { showTooltip?: boolean }) {
   const router = useRouter();
 
   const handleBack = () => {
@@ -67,18 +68,32 @@ export function BackButton({
     }
   };
 
+  const button = (
+    <Button
+      data-slot="back-button"
+      onClick={handleBack}
+      variant={variant}
+      size={size ?? (children ? "default" : "icon")}
+      {...props}
+    >
+      {children ?? (
+        <HugeiconsIcon
+          icon={ArrowLeft01Icon}
+          strokeWidth={2}
+          className="text-muted-foreground"
+        />
+      )}
+      <span className="sr-only">Go Back</span>
+    </Button>
+  );
+
+  if (!showTooltip) {
+    return button;
+  }
+
   return (
     <Tooltip>
-      <TooltipTrigger
-        render={
-          <Button
-            onClick={handleBack}
-            variant={variant}
-            size={size ?? (children ? "default" : "icon")}
-            {...props}
-          />
-        }
-      >
+      <TooltipTrigger data-slot="back-button" render={button}>
         {children ?? (
           <HugeiconsIcon
             icon={ArrowLeft01Icon}

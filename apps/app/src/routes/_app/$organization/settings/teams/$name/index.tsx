@@ -1,20 +1,23 @@
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
+import { teamQueries } from "@/lib/query-factory";
+import { BackButton } from "@/components/back-button";
 import { Error } from "@/components/error";
 import { NotFound } from "@/components/not-found";
-import SettingsContainer from "@/components/settings-container";
+import SettingsContainer from "@/components/settings/settings-container";
 
-import { General } from "./-general";
-import { DangerZone } from "./-general/danger-zone";
-import { teamQueryOptions } from "./-queries";
+import { DangerZone } from "./-components/danger-zone";
+import { General } from "./-components/general";
 
 export const Route = createFileRoute(
-  "/_app/$organization/settings/administration/teams/$name/"
+  "/_app/$organization/settings/teams/$name/"
 )({
   loader: async ({ params: { organization, name }, context }) => {
     const data = await context.queryClient.ensureQueryData(
-      teamQueryOptions({ organizationSlug: organization, slug: name })
+      teamQueries.detail({ organizationSlug: organization, slug: name })
     );
 
     if (!data) {
@@ -39,11 +42,20 @@ function RouteComponent() {
   const { name, organization } = Route.useParams();
 
   const { data } = useSuspenseQuery(
-    teamQueryOptions({ organizationSlug: organization, slug: name })
+    teamQueries.detail({ organizationSlug: organization, slug: name })
   );
 
   return (
     <SettingsContainer key={data!.id}>
+      <BackButton
+        to="/$organization/settings/teams"
+        variant="ghost"
+        className="text-muted-foreground w-fit"
+        showTooltip={false}
+      >
+        <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
+        <span>Teams</span>
+      </BackButton>
       <h1 className="text-foreground text-2xl font-medium">{data?.name}</h1>
       <General team={data!} />
       <DangerZone />

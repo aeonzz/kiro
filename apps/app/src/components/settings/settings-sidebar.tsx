@@ -21,8 +21,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-import { BackButton } from "./back-button";
-import { useOrganization } from "./organization-context";
+import { BackButton } from "../back-button";
+import { useOrganization } from "../organization-context";
 
 interface SettingsSidebarProps extends React.ComponentProps<typeof Sidebar> {
   isPending?: boolean;
@@ -107,13 +107,14 @@ export function SettingsSidebar({
                           className="[&_svg]:text-muted-foreground font-medium"
                           isActive={isNavLinkActive(
                             pathname,
-                            "/$organization/settings/administration/teams/$name",
+                            "/$organization/settings/teams/$name",
                             activeOrganization?.slug,
-                            team.slug
+                            team.slug,
+                            false
                           )}
                           render={
                             <Link
-                              to="/$organization/settings/administration/teams/$name"
+                              to="/$organization/settings/teams/$name"
                               params={{
                                 organization: activeOrganization?.slug ?? "",
                                 name: team.slug,

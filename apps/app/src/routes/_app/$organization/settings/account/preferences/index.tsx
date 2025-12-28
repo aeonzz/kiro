@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import SettingsContainer from "@/components/settings-container";
+import SettingsContainer from "@/components/settings/settings-container";
 
 import { General } from "./-components/-general";
 import { Interface } from "./-components/-interface";

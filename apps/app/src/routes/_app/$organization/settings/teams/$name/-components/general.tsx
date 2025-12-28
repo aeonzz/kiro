@@ -3,9 +3,12 @@ import { ArrowRight01Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { Team } from "@kiro/db";
 import { useForm, useStore } from "@tanstack/react-form";
-import { Link, useParams } from "@tanstack/react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useParams } from "@tanstack/react-router";
+import { toast } from "sonner";
 import * as z from "zod";
 
+import { organizationQueries, teamQueries } from "@/lib/query-factory";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -19,6 +22,7 @@ import {
   SettingsItemMedia,
   SettingsItemTitle,
 } from "@/components/ui/settings-card";
+import { useOrganization } from "@/components/organization-context";
 
 const formSchema = z.object({
   name: z
@@ -41,8 +45,16 @@ export function General({
   ...props
 }: React.ComponentProps<typeof SettingsGroup> & { team: Team }) {
   const { name, organization } = useParams({
-    from: "/_app/$organization/settings/administration/teams/$name/",
+    from: "/_app/$organization/settings/teams/$name/",
   });
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const { teams } = useOrganization();
+
+  const mutation = useMutation({
+    ...teamQueries.mutations.update(),
+  });
+
   const form = useForm({
     defaultValues: {
       name: team.name,
@@ -50,13 +62,70 @@ export function General({
     },
     validators: {
       onSubmit: formSchema,
+      onChange: formSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
+      await mutation.mutateAsync(
+        {
+          data: {
+            id: team.id,
+            payload: {
+              name: value.name,
+              slug: value.slug,
+            },
+          },
+        },
+        {
+          onSuccess: (data) => {
+            const isSlugChanged = data.slug !== team.slug;
+
+            if (isSlugChanged) {
+              qc.setQueryData(
+                teamQueries.detail({
+                  organizationSlug: organization,
+                  slug: data.slug,
+                }).queryKey,
+                data
+              );
+
+              qc.removeQueries({
+                queryKey: teamQueries.detail({
+                  organizationSlug: organization,
+                  slug: team.slug,
+                }).queryKey,
+              });
+
+              navigate({
+                to: "/$organization/settings/teams/$name",
+                params: {
+                  organization,
+                  name: data.slug,
+                },
+              });
+            }
+
+            qc.invalidateQueries({
+              queryKey: teamQueries.all(),
+            });
+            qc.invalidateQueries({
+              queryKey: organizationQueries.all(),
+            });
+            toast("Settings updated.", {
+              description: "The team settings have been updated.",
+            });
+          },
+          onError: (error) => {
+            toast.error(error?.message ?? "Something went wrong");
+          },
+        }
+      );
     },
   });
 
-  const { values, isSubmitting } = useStore(form.store, (state) => state);
+  const { values, isSubmitting, canSubmit } = useStore(
+    form.store,
+    (state) => state
+  );
   const isDirty =
     (values as any).name !== team.name || (values as any).slug !== team.slug;
 
@@ -109,6 +178,15 @@ export function General({
 
           <form.Field
             name="slug"
+            validators={{
+              onChange: ({ value }) => {
+                if (value === team.slug) return undefined;
+                const isTaken = teams.some((t) => t.slug === value);
+                return isTaken
+                  ? { message: "This slug is already in use." }
+                  : undefined;
+              },
+            }}
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
@@ -148,7 +226,11 @@ export function General({
         </SettingsCard>
         {isDirty && (
           <div className="flex justify-end pt-4">
-            <Button type="submit" disabled={isSubmitting} variant="default">
+            <Button
+              type="submit"
+              disabled={isSubmitting || !canSubmit}
+              variant="default"
+            >
               Save
             </Button>
           </div>
@@ -158,7 +240,7 @@ export function General({
         <SettingsItem
           render={
             <Link
-              to="/$organization/settings/administration/teams/$name/members"
+              to="/$organization/settings/teams/$name/members"
               params={{
                 name,
                 organization,

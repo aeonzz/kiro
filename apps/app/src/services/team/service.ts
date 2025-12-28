@@ -1,7 +1,11 @@
 import { prisma } from "@kiro/db";
 import { generateId } from "better-auth";
 
-import type { CreateTeamSchemaType, GetTeamByIdSchemaType } from "./schema";
+import type {
+  CreateTeamSchemaType,
+  GetTeamByIdSchemaType,
+  UpdateTeamSchemaType,
+} from "./schema";
 
 export async function createTeamService({
   userId,
@@ -40,6 +44,33 @@ export async function getTeamByIdService({
         slug,
         organization: {
           slug: organizationSlug,
+        },
+      },
+      include: {
+        teammembers: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+  } catch (err) {
+    throw err;
+  }
+}
+export async function updateTeamService({
+  id,
+  payload: data,
+}: UpdateTeamSchemaType) {
+  try {
+    return await prisma.team.update({
+      where: { id },
+      data,
+      include: {
+        teammembers: {
+          include: {
+            user: true,
+          },
         },
       },
     });

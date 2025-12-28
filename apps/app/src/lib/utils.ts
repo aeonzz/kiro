@@ -39,10 +39,18 @@ export function isNavLinkActive(
   pathname: string,
   url: RoutePath,
   organizationSlug?: string,
-  teamSlug?: string
+  teamSlug?: string,
+  exact: boolean = true
 ) {
+  const resolvedUrl = resolveOrgUrl(url, organizationSlug, teamSlug);
+  const decodedPathname = decodeURIComponent(pathname);
+
+  if (exact) {
+    return decodedPathname === resolvedUrl;
+  }
+
   return (
-    decodeURIComponent(pathname) ===
-    resolveOrgUrl(url, organizationSlug, teamSlug)
+    decodedPathname === resolvedUrl ||
+    decodedPathname.startsWith(`${resolvedUrl}/`)
   );
 }

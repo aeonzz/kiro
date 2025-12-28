@@ -14,3 +14,13 @@ export const getTeamByIdSchema = z.object({
 });
 
 export type GetTeamByIdSchemaType = z.infer<typeof getTeamByIdSchema>;
+
+export const updateTeamSchema = z.object({
+  id: z.string(),
+  payload: z.object({
+    name: z.string().optional(),
+    slug: z.string().optional(),
+  }),
+});
+
+export type UpdateTeamSchemaType = z.infer<typeof updateTeamSchema>;
