@@ -24,3 +24,15 @@ export const updateTeamSchema = z.object({
 });
 
 export type UpdateTeamSchemaType = z.infer<typeof updateTeamSchema>;
+
+export const getTeamsSchema = z.object({
+  organizationSlug: z.string(),
+});
+
+export type GetTeamsSchemaType = z.infer<typeof getTeamsSchema>;
+
+export const deleteTeamSchema = z.object({
+  id: z.string(),
+});
+
+export type DeleteTeamSchemaType = z.infer<typeof deleteTeamSchema>;

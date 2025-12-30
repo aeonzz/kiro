@@ -258,4 +258,8 @@
   html[data-font-size="xl"] {
     --font-scale: 1.15;
   }
+
+  [data-base-ui-inert] {
+    pointer-events: none;
+  }
 }

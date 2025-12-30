@@ -1,6 +1,11 @@
 import { getOrganizationFn } from "@/services/organization/get";
-import { getTeamByIdFn } from "@/services/team/get";
-import { updateTeamFn } from "@/services/team/update";
+import {
+  createTeamFn,
+  deleteTeamFn,
+  getTeamByIdFn,
+  getTeamsFn,
+  updateTeamFn,
+} from "@/services/team/server-fn";
 import { queryOptions } from "@tanstack/react-query";
 
 export const organizationQueries = {
@@ -15,12 +20,11 @@ export const organizationQueries = {
 
 export const teamQueries = {
   all: () => ["teams"],
-  lists: () => [...teamQueries.all(), "list"],
-  //   list: (filters: string) =>
-  //     queryOptions({
-  //       queryKey: [...teamQueries.lists(), filters],
-  //       queryFn: () => fetchTeams(filters),
-  //     }),
+  lists: ({ organizationSlug }: { organizationSlug: string }) =>
+    queryOptions({
+      queryKey: [...teamQueries.all(), "list", organizationSlug],
+      queryFn: () => getTeamsFn({ data: { organizationSlug } }),
+    }),
   details: () => [...teamQueries.all(), "detail"],
   detail: ({
     organizationSlug,
@@ -38,8 +42,17 @@ export const teamQueries = {
       staleTime: 5000,
     }),
   mutations: {
+    create: () => ({
+      mutationKey: [...teamQueries.all(), "create"],
+      mutationFn: createTeamFn,
+    }),
     update: () => ({
+      mutationKey: [...teamQueries.all(), "update"],
       mutationFn: updateTeamFn,
+    }),
+    delete: () => ({
+      mutationKey: [...teamQueries.all(), "delete"],
+      mutationFn: deleteTeamFn,
     }),
   },
 };

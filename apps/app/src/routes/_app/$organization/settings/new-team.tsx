@@ -1,14 +1,11 @@
 import * as React from "react";
-import { createTeamFn } from "@/services/team/create";
-import type { CreateTeamSchemaType } from "@/services/team/schema";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { organizationQueries } from "@/lib/query-factory";
+import { organizationQueries, teamQueries } from "@/lib/query-factory";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -47,12 +44,11 @@ export const Route = createFileRoute("/_app/$organization/settings/new-team")({
 function RouteComponent() {
   const qc = useQueryClient();
   const { activeOrganization } = useOrganization();
-  const createTeam = useServerFn(createTeamFn);
   const navigate = useNavigate();
   const [slugLock, setSlugLock] = React.useState(false);
 
-  const { mutateAsync } = useMutation({
-    mutationFn: (data: CreateTeamSchemaType) => createTeam({ data }),
+  const mutation = useMutation({
+    ...teamQueries.mutations.create(),
   });
 
   const form = useForm({
@@ -66,10 +62,12 @@ function RouteComponent() {
     onSubmit: async ({ value }) => {
       if (!activeOrganization) return;
 
-      await mutateAsync(
+      await mutation.mutateAsync(
         {
-          organizationId: activeOrganization.id,
-          ...value,
+          data: {
+            organizationId: activeOrganization.id,
+            ...value,
+          },
         },
         {
           onSuccess: (data) => {
@@ -102,7 +100,7 @@ function RouteComponent() {
           Create a new team to manage your organization's projects and issues.
         </p>
       </div>
-      <SettingsGroup className="mt-6">
+      <SettingsGroup className="mt-6" disabled={mutation.isPending}>
         <form
           id="create-team-form"
           onSubmit={(e) => {

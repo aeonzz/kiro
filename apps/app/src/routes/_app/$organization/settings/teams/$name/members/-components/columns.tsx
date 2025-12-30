@@ -1,36 +1,24 @@
-import React from "react";
-import {
-  ArrowUpDownIcon,
-  MoreHorizontalIcon,
-} from "@hugeicons/core-free-icons";
+import { ArrowUpDownIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { Team } from "@/types/schema-types";
-import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { TableColumnHeader } from "@/components/settings/table-column-header";
 
 import { Actions } from "./actions";
 
 export const columns: ColumnDef<Team["teammembers"][number]>[] = [
   {
+    id: "name",
     accessorKey: "user.name",
     meta: {
       className: "w-full",
     },
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          size="xs"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Name
-          <HugeiconsIcon icon={ArrowUpDownIcon} strokeWidth={2} />
-        </Button>
-      );
-    },
+    header: ({ column }) => (
+      <TableColumnHeader column={column} title="Name" showDefaultArrow />
+    ),
     cell: ({ row }) => {
       return (
         <div className="flex items-center gap-2">
@@ -51,19 +39,14 @@ export const columns: ColumnDef<Team["teammembers"][number]>[] = [
     },
   },
   {
+    id: "email",
     accessorKey: "user.email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          size="xs"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <HugeiconsIcon icon={ArrowUpDownIcon} strokeWidth={2} />
-        </Button>
-      );
-    },
+    header: ({ column }) => <TableColumnHeader column={column} title="Email" />,
+    cell: ({ row }) => (
+      <div className="text-xs-plus text-muted-foreground font-normal">
+        {row.original.user.email}
+      </div>
+    ),
   },
   {
     accessorKey: "actions",

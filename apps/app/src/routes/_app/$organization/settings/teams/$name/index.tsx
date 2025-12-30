@@ -1,6 +1,6 @@
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMutationState, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { teamQueries } from "@/lib/query-factory";
@@ -45,8 +45,17 @@ function RouteComponent() {
     teamQueries.detail({ organizationSlug: organization, slug: name })
   );
 
+  const status = useMutationState({
+    filters: { mutationKey: teamQueries.mutations.delete().mutationKey },
+    select: (mutation) => mutation.state.status,
+  });
+
+  if (!data) {
+    throw notFound();
+  }
+
   return (
-    <SettingsContainer key={data!.id}>
+    <SettingsContainer key={data.id}>
       <BackButton
         to="/$organization/settings/teams"
         variant="ghost"
@@ -56,9 +65,12 @@ function RouteComponent() {
         <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
         <span>Teams</span>
       </BackButton>
-      <h1 className="text-foreground text-2xl font-medium">{data?.name}</h1>
-      <General team={data!} />
-      <DangerZone />
+      <h1 className="text-foreground text-2xl font-medium">{data.name}</h1>
+      <General disabled={status.includes("pending")} team={data} />
+      <DangerZone
+        disabled={status.includes("pending")}
+        team={{ id: data.id, name: data.name }}
+      />
     </SettingsContainer>
   );
 }

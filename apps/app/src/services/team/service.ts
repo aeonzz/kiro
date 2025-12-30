@@ -4,6 +4,7 @@ import { generateId } from "better-auth";
 import type {
   CreateTeamSchemaType,
   GetTeamByIdSchemaType,
+  GetTeamsSchemaType,
   UpdateTeamSchemaType,
 } from "./schema";
 
@@ -58,6 +59,7 @@ export async function getTeamByIdService({
     throw err;
   }
 }
+
 export async function updateTeamService({
   id,
   payload: data,
@@ -66,6 +68,39 @@ export async function updateTeamService({
     return await prisma.team.update({
       where: { id },
       data,
+      include: {
+        teammembers: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+  } catch (err) {
+    throw err;
+  }
+}
+
+export function deleteTeamService({ id }: { id: string }) {
+  try {
+    return prisma.team.delete({
+      where: { id },
+    });
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function getTeamsService({
+  organizationSlug,
+}: GetTeamsSchemaType) {
+  try {
+    return await prisma.team.findMany({
+      where: {
+        organization: {
+          slug: organizationSlug,
+        },
+      },
       include: {
         teammembers: {
           include: {

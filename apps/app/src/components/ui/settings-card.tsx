@@ -11,11 +11,19 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 
-function SettingsGroup({ className, ...props }: React.ComponentProps<"div">) {
+function SettingsGroup({
+  className,
+  disabled,
+  ...props
+}: React.ComponentProps<"div"> & { disabled?: boolean }) {
   return (
     <div
       data-slot="settings-group"
-      className={cn("space-y-4", className)}
+      data-disabled={disabled}
+      className={cn(
+        "space-y-4 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
+        className
+      )}
       {...props}
     />
   );
@@ -28,7 +36,7 @@ function SettingsGroupTitle({
   return (
     <h2
       data-slot="settings-group-title"
-      className={cn("text-foreground text-sm scroll-m-20", className)}
+      className={cn("text-foreground scroll-m-20 text-sm", className)}
       {...props}
     />
   );

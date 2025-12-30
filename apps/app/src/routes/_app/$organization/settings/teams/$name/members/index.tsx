@@ -1,35 +1,22 @@
-import { ArrowLeft01Icon, Search01Icon } from "@hugeicons/core-free-icons";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { teamQueries } from "@/lib/query-factory";
 import { Button } from "@/components/ui/button";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { BackButton } from "@/components/back-button";
 import { Error } from "@/components/error";
 import { NotFound } from "@/components/not-found";
 import SettingsContainer from "@/components/settings/settings-container";
 import {
   SettingsTable,
-  SettingsTableAction,
   SettingsTableContainer,
   SettingsTableHeader,
   SettingsTableTitle,
 } from "@/components/settings/settings-table";
 
+import { MemberActionItems } from "./-components/actions";
 import { columns } from "./-components/columns";
 
 export const Route = createFileRoute(
@@ -84,40 +71,20 @@ function RouteComponent() {
       <SettingsTableContainer>
         <SettingsTableHeader>
           <SettingsTableTitle>Team members</SettingsTableTitle>
-          <SettingsTableAction cols={2}>
-            <div className="gap-2">
-              <InputGroup className="w-full max-w-xs">
-                <InputGroupInput placeholder="Search..." />
-                <InputGroupAddon>
-                  <HugeiconsIcon icon={Search01Icon} strokeWidth={2} />
-                </InputGroupAddon>
-              </InputGroup>
-              <Select
-                items={viewOptions}
-                defaultValue={viewOptions[0]}
-                itemToStringValue={(item) => item.value}
-                itemToStringLabel={(item) => item.label}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {viewOptions.map((option) => (
-                      <SelectItem key={option.value} value={option}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="justify-end">
-              <Button>Add a member</Button>
-            </div>
-          </SettingsTableAction>
         </SettingsTableHeader>
-        <SettingsTable columns={columns} data={data?.teammembers || []} />
+        <SettingsTable
+          columns={columns}
+          data={data?.teammembers || []}
+          filterColumn="email"
+          filterPlaceholder="Filter by email..."
+          filterOptions={viewOptions}
+          defaultSorting={[{ id: "createdAt", desc: true }]}
+          getRowContextMenu={(row) => (
+            <MemberActionItems row={{ original: row } as any} isContext />
+          )}
+        >
+          <Button>Add member</Button>
+        </SettingsTable>
       </SettingsTableContainer>
     </SettingsContainer>
   );
