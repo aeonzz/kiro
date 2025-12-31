@@ -1,10 +1,18 @@
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { ArrowLeft01Icon, UserAdd01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { teamQueries } from "@/lib/query-factory";
 import { Button } from "@/components/ui/button";
+import { DialogTrigger } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { BackButton } from "@/components/back-button";
 import { Error } from "@/components/error";
 import { NotFound } from "@/components/not-found";
@@ -18,6 +26,7 @@ import {
 
 import { MemberActionItems } from "./-components/actions";
 import { columns } from "./-components/columns";
+import { memberInvitationDialogHandle } from "./-components/member-invitation-dialog";
 
 export const Route = createFileRoute(
   "/_app/$organization/settings/teams/$name/members/"
@@ -78,12 +87,28 @@ function RouteComponent() {
           filterColumn="email"
           filterPlaceholder="Filter by email..."
           filterOptions={viewOptions}
-          defaultSorting={[{ id: "createdAt", desc: true }]}
           getRowContextMenu={(row) => (
             <MemberActionItems row={{ original: row } as any} isContext />
           )}
         >
-          <Button>Add member</Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button />}>
+              Add a member
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="left" className="w-40">
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  className="w-full"
+                  render={
+                    <DialogTrigger handle={memberInvitationDialogHandle} />
+                  }
+                >
+                  <HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} />
+                  <span>Invite people</span>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </SettingsTable>
       </SettingsTableContainer>
     </SettingsContainer>

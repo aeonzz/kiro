@@ -222,13 +222,15 @@ function SettingsTable<TData, TValue>({
             <Select
               items={filterOptions}
               defaultValue={
-                filterOptions.find(
-                  (o) =>
-                    o.value ===
-                    (table
-                      .getColumn(filterSelectColumn || "")
-                      ?.getFilterValue() as string)
-                ) ?? filterOptions[0]
+                (filterSelectColumn
+                  ? filterOptions.find(
+                      (o) =>
+                        o.value ===
+                        (table
+                          .getColumn(filterSelectColumn)
+                          ?.getFilterValue() as string)
+                    )
+                  : undefined) ?? filterOptions[0]
               }
               onValueChange={(val) => {
                 const column = filterSelectColumn

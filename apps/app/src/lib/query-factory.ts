@@ -8,6 +8,8 @@ import {
 } from "@/services/team/server-fn";
 import { queryOptions } from "@tanstack/react-query";
 
+import { authClient } from "./auth-client";
+
 export const organizationQueries = {
   all: () => ["organizations"],
   details: () => [...organizationQueries.all(), "detail"],
@@ -16,6 +18,14 @@ export const organizationQueries = {
       queryKey: [...organizationQueries.details(), slug],
       queryFn: () => getOrganizationFn({ data: { slug } }),
     }),
+  mutations: {
+    inviteMember: () => ({
+      mutationKey: [...organizationQueries.details(), "invite-member"],
+      mutationFn: (variables: {
+        data: Parameters<typeof authClient.organization.inviteMember>[0];
+      }) => authClient.organization.inviteMember(variables.data),
+    }),
+  },
 };
 
 export const teamQueries = {
