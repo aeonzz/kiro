@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-import { MemberInvitationDialog } from "./teams/$name/members/-components/member-invitation-dialog";
+import { MemberInvitationDialog } from "./-components/member-invitation-dialog";
 
 export const Route = createFileRoute("/_app/$organization/settings")({
   component: RouteComponent,

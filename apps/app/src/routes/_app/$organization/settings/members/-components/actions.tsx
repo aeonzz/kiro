@@ -3,7 +3,7 @@ import { MoreHorizontalIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { Row } from "@tanstack/react-table";
 
-import type { Team } from "@/types/schema-types";
+import type { Organization } from "@/types/schema-types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ContextMenuItem } from "@/components/ui/context-menu";
@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type TableRow = Team["teammembers"][number];
+type TableRow = Organization["members"][number];
 
 interface ActionsProps {
   row: Row<TableRow>;
@@ -32,7 +32,7 @@ export function MemberActionItems({
 
   return (
     <DropdownMenuGroup>
-      <Item>Leave</Item>
+      <Item>Leave organization</Item>
     </DropdownMenuGroup>
   );
 }

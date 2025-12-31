@@ -1,14 +1,12 @@
 import * as React from "react";
-import { createOrganizationFn } from "@/services/organization/create";
-import { OrganizationInput } from "@/services/organization/schema";
-import { useForm, useStore } from "@tanstack/react-form";
+import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "@/lib/auth-client";
+import { organizationQueries } from "@/lib/query-factory";
 import { useDebounceCallback } from "@/hooks/use-debounce-callback";
 
 import { Button } from "./ui/button";
@@ -54,10 +52,13 @@ const formSchema = z.object({
 
 export function CreateOrganization() {
   const navigate = useNavigate();
-  const createOrganization = useServerFn(createOrganizationFn);
   const [slugLock, setSlugLock] = React.useState(false);
   const [slugLoading, setSlugLoading] = React.useState(false);
   const [slugError, setSlugError] = React.useState<string | null>(null);
+
+  const mutation = useMutation({
+    ...organizationQueries.mutations.create(),
+  });
 
   const checkSlug = useDebounceCallback(async (slug: string) => {
     if (!slug || slug.length < 5) {
@@ -82,10 +83,6 @@ export function CreateOrganization() {
     setSlugLoading(false);
   }, 500);
 
-  const { mutateAsync } = useMutation({
-    mutationFn: (data: OrganizationInput) => createOrganization({ data }),
-  });
-
   const form = useForm({
     defaultValues: {
       organizationName: "",
@@ -100,10 +97,12 @@ export function CreateOrganization() {
         return;
       }
       const { organizationName, slug } = value;
-      await mutateAsync(
+      await mutation.mutateAsync(
         {
-          name: organizationName,
-          slug,
+          data: {
+            name: organizationName,
+            slug,
+          },
         },
         {
           onSuccess: () => {

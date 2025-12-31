@@ -24,9 +24,9 @@ import {
   SettingsTableTitle,
 } from "@/components/settings/settings-table";
 
+import { memberInvitationDialogHandle } from "../../../-components/member-invitation-dialog";
 import { MemberActionItems } from "./-components/actions";
 import { columns } from "./-components/columns";
-import { memberInvitationDialogHandle } from "./-components/member-invitation-dialog";
 
 export const Route = createFileRoute(
   "/_app/$organization/settings/teams/$name/members/"

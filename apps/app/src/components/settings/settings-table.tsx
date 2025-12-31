@@ -155,6 +155,7 @@ function SettingsTable<TData, TValue>({
   filterSelectColumn,
   children,
 }: SettingsTableProps<TData, TValue>) {
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const [sorting, setSorting] = React.useState<SortingState>(defaultSorting);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -181,6 +182,7 @@ function SettingsTable<TData, TValue>({
           {filterColumn && (
             <InputGroup className="w-full max-w-xs">
               <InputGroupInput
+                ref={inputRef}
                 placeholder={filterPlaceholder}
                 value={
                   (table.getColumn(filterColumn)?.getFilterValue() as string) ??
@@ -204,9 +206,10 @@ function SettingsTable<TData, TValue>({
                     aria-label="Clear"
                     title="Clear"
                     size="icon-xs"
-                    onClick={() =>
-                      table.getColumn(filterColumn)?.setFilterValue("")
-                    }
+                    onClick={() => {
+                      table.getColumn(filterColumn)?.setFilterValue("");
+                      inputRef.current?.focus();
+                    }}
                   >
                     <HugeiconsIcon
                       icon={MultiplicationSignIcon}
@@ -258,7 +261,7 @@ function SettingsTable<TData, TValue>({
             </Select>
           )}
         </div>
-        <div className="justify-end">{children}</div>
+        <div className="flex items-center justify-end gap-2">{children}</div>
       </SettingsTableAction>
       <div className="group/settings-table overflow-hidden">
         {table.getRowModel().rows?.length ? (

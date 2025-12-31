@@ -41,7 +41,11 @@ export async function getOrganizationService({
         },
       },
       include: {
-        members: true,
+        members: {
+          include: {
+            user: true,
+          },
+        },
         teams: true,
       },
     });

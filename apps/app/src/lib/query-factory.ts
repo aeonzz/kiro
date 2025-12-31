@@ -1,4 +1,7 @@
-import { getOrganizationFn } from "@/services/organization/get";
+import {
+  createOrganizationFn,
+  getOrganizationFn,
+} from "@/services/organization/server-fn";
 import {
   createTeamFn,
   deleteTeamFn,
@@ -13,12 +16,16 @@ import { authClient } from "./auth-client";
 export const organizationQueries = {
   all: () => ["organizations"],
   details: () => [...organizationQueries.all(), "detail"],
-  detail: (slug: string) =>
+  detail: ({ slug }: { slug: string }) =>
     queryOptions({
       queryKey: [...organizationQueries.details(), slug],
       queryFn: () => getOrganizationFn({ data: { slug } }),
     }),
   mutations: {
+    create: () => ({
+      mutationKey: [...organizationQueries.all(), "create"],
+      mutationFn: createOrganizationFn,
+    }),
     inviteMember: () => ({
       mutationKey: [...organizationQueries.details(), "invite-member"],
       mutationFn: (variables: {

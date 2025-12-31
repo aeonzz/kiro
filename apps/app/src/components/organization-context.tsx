@@ -68,7 +68,7 @@ export function OrganizationProvider({
     isPending,
     isError,
   } = useQuery({
-    ...organizationQueries.detail(effectiveSlug!),
+    ...organizationQueries.detail({ slug: effectiveSlug! }),
     enabled: !!effectiveSlug,
   });
 
