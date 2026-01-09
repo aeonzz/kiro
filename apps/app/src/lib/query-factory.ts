@@ -13,6 +13,38 @@ import { queryOptions } from "@tanstack/react-query";
 
 import { authClient } from "./auth-client";
 
+export const userQueries = {
+  all: () => ["user"],
+  details: () => [...userQueries.all(), "detail"],
+  mutations: {
+    update: () => ({
+      mutationKey: [...userQueries.details(), "update"],
+      mutationFn: (variables: {
+        data: Parameters<typeof authClient.updateUser>[0];
+      }) => authClient.updateUser(variables.data),
+    }),
+  },
+};
+
+export const authQueries = {
+  all: () => ["auth"],
+  sessions: () =>
+    queryOptions({
+      queryKey: [...authQueries.all(), "sessions"],
+      queryFn: () => authClient.listSessions(),
+    }),
+  revokeSession: () => ({
+    mutationKey: [...authQueries.all(), "revoke-session"],
+    mutationFn: (variables: {
+      data: Parameters<typeof authClient.revokeSession>[0];
+    }) => authClient.revokeSession(variables.data),
+  }),
+  revokeOtherSessions: () => ({
+    mutationKey: [...authQueries.all(), "revoke-other-sessions"],
+    mutationFn: () => authClient.revokeOtherSessions(),
+  }),
+};
+
 export const organizationQueries = {
   all: () => ["organizations"],
   details: () => [...organizationQueries.all(), "detail"],
@@ -31,6 +63,24 @@ export const organizationQueries = {
       mutationFn: (variables: {
         data: Parameters<typeof authClient.organization.inviteMember>[0];
       }) => authClient.organization.inviteMember(variables.data),
+    }),
+    removeMember: () => ({
+      mutationKey: [...organizationQueries.details(), "remove-member"],
+      mutationFn: (variables: {
+        data: Parameters<typeof authClient.organization.removeMember>[0];
+      }) => authClient.organization.removeMember(variables.data),
+    }),
+    leaveOrganization: () => ({
+      mutationKey: [...organizationQueries.details(), "leave-organization"],
+      mutationFn: (variables: {
+        data: Parameters<typeof authClient.organization.leave>[0];
+      }) => authClient.organization.leave(variables.data),
+    }),
+    deleteOrganization: () => ({
+      mutationKey: [...organizationQueries.details(), "delete-organization"],
+      mutationFn: (variables: {
+        data: Parameters<typeof authClient.organization.delete>[0];
+      }) => authClient.organization.delete(variables.data),
     }),
   },
 };

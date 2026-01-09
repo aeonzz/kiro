@@ -21,9 +21,22 @@ function SettingsGroup({
       data-slot="settings-group"
       data-disabled={disabled}
       className={cn(
-        "space-y-4 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
+        "group/settings-group space-y-4 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
         className
       )}
+      {...props}
+    />
+  );
+}
+
+function SettingsGroupHeader({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="settings-group-header"
+      className={cn("space-y-2", className)}
       {...props}
     />
   );
@@ -37,6 +50,22 @@ function SettingsGroupTitle({
     <h2
       data-slot="settings-group-title"
       className={cn("text-foreground scroll-m-20 text-sm", className)}
+      {...props}
+    />
+  );
+}
+
+function SettingsGroupDescription({
+  className,
+  ...props
+}: React.ComponentProps<"p">) {
+  return (
+    <p
+      data-slot="settings-group-description"
+      className={cn(
+        "text-muted-foreground text-xs-plus leading-none",
+        className
+      )}
       {...props}
     />
   );
@@ -66,7 +95,7 @@ function SettingsItem({
       variant="outline"
       render={render}
       className={cn(
-        "border-border items-center gap-4 rounded-none border-0 border-b px-4 py-4 last:border-0 hover:bg-transparent [a]:hover:bg-[color-mix(in_oklab,var(--card)95%,var(--card-foreground))]",
+        "border-border min-h-16.25 items-center gap-4 rounded-none border-0 border-b px-4 py-4 last:border-0 hover:bg-transparent data-[slot=dialog-trigger]:hover:bg-[color-mix(in_oklab,var(--card)98%,var(--card-foreground))] [a]:hover:bg-[color-mix(in_oklab,var(--card)98%,var(--card-foreground))]",
         "data-[invalid=true]:text-destructive",
         className
       )}
@@ -98,7 +127,7 @@ function SettingsItemTitle({
   return (
     <ItemTitle
       data-slot="settings-item-title"
-      className={cn("text-sm leading-none font-medium", className)}
+      className={cn("text-xs-plus leading-none font-medium", className)}
       {...props}
     />
   );
@@ -145,7 +174,9 @@ function SettingsItemMedia({
 
 export {
   SettingsGroup,
+  SettingsGroupHeader,
   SettingsGroupTitle,
+  SettingsGroupDescription,
   SettingsCard,
   SettingsItem,
   SettingsItemContent,

@@ -31,7 +31,7 @@ export async function getOrganizationService({
   slug: GetUserOrganization["slug"];
 }) {
   try {
-    return await prisma.organization.findFirst({
+    const organization = await prisma.organization.findFirst({
       where: {
         slug,
         members: {
@@ -47,8 +47,26 @@ export async function getOrganizationService({
           },
         },
         teams: true,
+        invitations: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
+
+    if (!organization) {
+      return null;
+    }
+
+    const userRole = organization.members.find(
+      (m) => m.userId === userId
+    )?.role;
+
+    return {
+      ...organization,
+      userRole,
+    };
   } catch (error) {
     throw new Error("Failed to get organization");
   }

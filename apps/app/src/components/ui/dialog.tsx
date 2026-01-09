@@ -69,8 +69,8 @@ function DialogContent({
         <DialogPrimitive.Popup
           data-slot="dialog-content"
           className={cn(
-            "bg-background shadow-border ease-out-expo fixed left-1/2 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-[20%] gap-4 rounded-xl p-4 text-sm transition-all duration-450 outline-none sm:max-w-sm",
-            "top-[calc(20%+1rem*var(--nested-dialogs))] scale-[calc(1-0.05*var(--nested-dialogs))] data-ending-style:top-[20%] data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:top-[20%] data-starting-style:scale-95 data-starting-style:opacity-0",
+            "bg-background shadow-border ease-out-expo fixed left-1/2 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-[30%] gap-4 rounded-xl p-4 text-sm transition-all duration-450 outline-none sm:max-w-sm",
+            "top-[calc(30%+1rem*var(--nested-dialogs))] scale-[calc(1-0.05*var(--nested-dialogs))] data-ending-style:top-[30%] data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:top-[30%] data-starting-style:scale-95 data-starting-style:opacity-0",
             className
           )}
           {...props}

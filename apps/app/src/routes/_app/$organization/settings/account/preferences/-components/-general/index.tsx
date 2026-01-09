@@ -39,49 +39,6 @@ export function General({
             <ViewControl />
           </SettingsItemControl>
         </SettingsItem>
-        <SettingsItem>
-          <SettingsItemContent>
-            <SettingsItemTitle>Display full names</SettingsItemTitle>
-            <SettingsItemDescription>
-              Show full names of users instead of shorter usernames
-            </SettingsItemDescription>
-          </SettingsItemContent>
-          <SettingsItemControl>
-            <Switch />
-          </SettingsItemControl>
-        </SettingsItem>
-        <SettingsItem>
-          <SettingsItemContent>
-            <SettingsItemTitle>First day of the week</SettingsItemTitle>
-            <SettingsItemDescription>
-              Used for date pickers
-            </SettingsItemDescription>
-          </SettingsItemContent>
-          <SettingsItemControl>
-            <Select defaultValue="sunday">
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sunday">Sunday</SelectItem>
-                <SelectItem value="monday">Monday</SelectItem>
-              </SelectContent>
-            </Select>
-          </SettingsItemControl>
-        </SettingsItem>
-        <SettingsItem>
-          <SettingsItemContent>
-            <SettingsItemTitle>
-              Convert text emoticons into emojis
-            </SettingsItemTitle>
-            <SettingsItemDescription>
-              Strings like :) will be converted to 🙂
-            </SettingsItemDescription>
-          </SettingsItemContent>
-          <SettingsItemControl>
-            <Switch defaultChecked />
-          </SettingsItemControl>
-        </SettingsItem>
       </SettingsCard>
     </SettingsGroup>
   );

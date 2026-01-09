@@ -1,4 +1,5 @@
-import {
+import type {
+  Invitation,
   Member,
   Organization as OrganizationType,
   TeamMember,
@@ -17,4 +18,7 @@ export type Organization = OrganizationType & {
     user: User;
   })[];
   teams: Team[];
+  invitations: (Invitation & {
+    user: User;
+  })[];
 };

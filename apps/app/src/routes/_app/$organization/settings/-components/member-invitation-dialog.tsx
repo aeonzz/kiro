@@ -184,7 +184,7 @@ export function MemberInvitationDialog({
                       value={field.state.value}
                       onValueChange={(value) => field.handleChange(value)}
                     >
-                      <ComboboxChips ref={anchor}>
+                      <ComboboxChips ref={anchor} className="bg-transparent!">
                         <ComboboxValue>
                           {(values) => (
                             <React.Fragment>

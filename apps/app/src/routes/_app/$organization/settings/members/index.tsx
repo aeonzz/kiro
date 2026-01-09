@@ -40,8 +40,8 @@ export const Route = createFileRoute("/_app/$organization/settings/members/")({
 
 const viewOptions = [
   { value: "all", label: "All teams" },
-  { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
+  { value: "members", label: "Members" },
+  { value: "pending", label: "Pending invites" },
 ];
 
 function RouteComponent() {
@@ -55,7 +55,7 @@ function RouteComponent() {
     <SettingsContainer type="table">
       <SettingsTableContainer>
         <SettingsTableHeader>
-          <SettingsTableTitle>Teams</SettingsTableTitle>
+          <SettingsTableTitle>Members</SettingsTableTitle>
         </SettingsTableHeader>
         <SettingsTable
           columns={columns}

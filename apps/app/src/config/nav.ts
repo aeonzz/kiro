@@ -6,7 +6,6 @@ import {
   Folder01Icon,
   InboxIcon,
   LayerIcon,
-  NotificationSquareIcon,
   SecurityIcon,
   Settings01Icon,
   SlidersHorizontalIcon,
@@ -135,11 +134,6 @@ export const settingsNavItems: GroupItem[] = [
         icon: UserIcon,
       },
       {
-        title: "Notifications",
-        url: "/$organization/settings/account/notifications",
-        icon: NotificationSquareIcon,
-      },
-      {
         title: "Security and access",
         url: "/$organization/settings/account/security",
         icon: AccessIcon,
@@ -163,11 +157,6 @@ export const settingsNavItems: GroupItem[] = [
         title: "Members",
         url: "/$organization/settings/members",
         icon: UserGroupIcon,
-      },
-      {
-        title: "Security",
-        url: "/$organization/settings/security",
-        icon: SecurityIcon,
       },
     ],
   },

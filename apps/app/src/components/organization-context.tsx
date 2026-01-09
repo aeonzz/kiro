@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import type { Organization, Team } from "better-auth/plugins";
 
 import { HomeViewValue } from "@/config/preferences";
@@ -13,13 +12,14 @@ import { NotFound } from "@/components/not-found";
 interface OrganizationContextValue {
   organizations: Organization[] | undefined;
   isPending: boolean;
-  activeOrganization?: Organization | null;
+  activeOrganization?: (Organization & { userRole?: string | null }) | null;
   teams: Array<
     Omit<Team, "updatedAt"> & {
       slug: string;
-      updatedAt: Date | null;
+      updatedAt?: Date;
     }
   >;
+  userRole?: string | null;
 }
 
 const OrganizationContext = React.createContext<
@@ -114,7 +114,12 @@ export function OrganizationProvider({
       organizations: userOrganizations ?? [],
       isPending: (isPending && !isReserved) || userOrganizationsPending,
       activeOrganization: organization,
-      teams: organization?.teams ?? [],
+      teams:
+        organization?.teams.map((t) => ({
+          ...t,
+          updatedAt: t.updatedAt ?? undefined,
+        })) ?? [],
+      userRole: organization?.userRole,
     };
   }, [
     userOrganizations,

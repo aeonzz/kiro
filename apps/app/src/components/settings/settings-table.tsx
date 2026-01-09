@@ -7,10 +7,14 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, type LinkProps } from "@tanstack/react-router";
 import {
+  ExpandedState,
   flexRender,
   getCoreRowModel,
+  getExpandedRowModel,
   getFilteredRowModel,
+  getGroupedRowModel,
   getSortedRowModel,
+  GroupingState,
   useReactTable,
   type ColumnDef,
   type ColumnFiltersState,
