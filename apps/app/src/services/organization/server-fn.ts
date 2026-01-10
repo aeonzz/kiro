@@ -3,8 +3,16 @@ import loggerMiddleware from "@/middlewares/logger";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 
-import { getUserOrganizationSchema, organizationInputSchema } from "./schema";
-import { createOrganizationService, getOrganizationService } from "./service";
+import {
+  getUserOrganizationSchema,
+  organizationInputSchema,
+  updateOrganizationSchema,
+} from "./schema";
+import {
+  createOrganizationService,
+  getOrganizationService,
+  updateOrganizationService,
+} from "./service";
 
 export const getOrganizationFn = createServerFn({ method: "GET" })
   .middleware([loggerMiddleware, authMiddleware])
@@ -25,6 +33,18 @@ export const createOrganizationFn = createServerFn({ method: "POST" })
 
     return createOrganizationService({
       data: { ...data, userId: session.user.id },
+      headers,
+    });
+  });
+
+export const updateOrganizationFn = createServerFn({ method: "POST" })
+  .middleware([loggerMiddleware, authMiddleware])
+  .inputValidator(updateOrganizationSchema)
+  .handler(async ({ data }) => {
+    const headers = getRequestHeaders();
+
+    return updateOrganizationService({
+      data,
       headers,
     });
   });

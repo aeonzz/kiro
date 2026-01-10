@@ -1,6 +1,7 @@
 import {
   createOrganizationFn,
   getOrganizationFn,
+  updateOrganizationFn,
 } from "@/services/organization/server-fn";
 import {
   createTeamFn,
@@ -57,6 +58,10 @@ export const organizationQueries = {
     create: () => ({
       mutationKey: [...organizationQueries.all(), "create"],
       mutationFn: createOrganizationFn,
+    }),
+    update: () => ({
+      mutationKey: [...organizationQueries.all(), "update"],
+      mutationFn: updateOrganizationFn,
     }),
     inviteMember: () => ({
       mutationKey: [...organizationQueries.details(), "invite-member"],

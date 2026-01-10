@@ -11,32 +11,26 @@ import {
   SettingsItemControl,
   SettingsItemTitle,
 } from "@/components/ui/settings-card";
-import { useOrganization } from "@/components/organization-context";
 
-import { deleteOrganizationDialogHandle } from "../../../-components/delete-organization-dialog";
+import { deleteOrganizationDialogHandle } from "../../-components/delete-organization-dialog";
 
-export function OrganizationAccess({
+export function DangerZone({
   ...props
 }: React.ComponentProps<typeof SettingsGroup>) {
-  const { userRole } = useOrganization();
-  const isOwner = userRole === "owner";
-
   return (
     <SettingsGroup {...props}>
       <SettingsGroupTitle>Organization access</SettingsGroupTitle>
       <SettingsCard>
         <SettingsItem>
           <SettingsItemContent>
-            <SettingsItemTitle>
-              {isOwner ? "Delete organization" : "Leave organization"}
-            </SettingsItemTitle>
+            <SettingsItemTitle>Delete organization</SettingsItemTitle>
           </SettingsItemContent>
           <SettingsItemControl>
             <AlertDialogTrigger
               handle={deleteOrganizationDialogHandle}
               render={<Button variant="ghostDestructive" />}
             >
-              {isOwner ? "Delete" : "Leave"}
+              Delete organization
             </AlertDialogTrigger>
           </SettingsItemControl>
         </SettingsItem>

@@ -11,7 +11,7 @@ import { Sessions } from "./-components/sessions";
 export const Route = createFileRoute(
   "/_app/$organization/settings/account/security/"
 )({
-  loader: async ({ params: { organization }, context }) => {
+  loader: async ({ context }) => {
     const data = await context.queryClient.ensureQueryData(
       authQueries.sessions()
     );

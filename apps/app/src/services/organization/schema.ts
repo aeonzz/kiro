@@ -14,3 +14,14 @@ export const getUserOrganizationSchema = z.object({
 });
 
 export type GetUserOrganization = z.infer<typeof getUserOrganizationSchema>;
+
+export const updateOrganizationSchema = z.object({
+  id: z.string(),
+  payload: z.object({
+    name: z.string().optional(),
+    slug: z.string().optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
+  }),
+});
+
+export type UpdateOrganization = z.infer<typeof updateOrganizationSchema>;

@@ -2,7 +2,11 @@ import { prisma } from "@kiro/db";
 
 import { auth } from "@/lib/auth";
 
-import type { GetUserOrganization, OrganizationInput } from "./schema";
+import type {
+  GetUserOrganization,
+  OrganizationInput,
+  UpdateOrganization,
+} from "./schema";
 
 export async function createOrganizationService({
   data,
@@ -67,7 +71,28 @@ export async function getOrganizationService({
       ...organization,
       userRole,
     };
-  } catch (error) {
-    throw new Error("Failed to get organization");
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function updateOrganizationService({
+  data,
+  headers,
+}: {
+  data: UpdateOrganization;
+  headers: Headers;
+}) {
+  const { id, payload } = data;
+  try {
+    return await auth.api.updateOrganization({
+      body: {
+        data: { ...payload },
+        organizationId: id,
+      },
+      headers,
+    });
+  } catch (err) {
+    throw err;
   }
 }
