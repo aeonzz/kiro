@@ -15,6 +15,23 @@ import { cn } from "@/lib/utils";
 
 const Select = SelectPrimitive.Root;
 
+function SelectPortal({ ...props }: SelectPrimitive.Portal.Props) {
+  return <SelectPrimitive.Portal data-slot="select-portal" {...props} />;
+}
+
+function SelectOverlay({
+  className,
+  ...props
+}: SelectPrimitive.Backdrop.Props) {
+  return (
+    <SelectPrimitive.Backdrop
+      data-slot="select-overlay"
+      className={cn("absolute inset-0", className)}
+      {...props}
+    />
+  );
+}
+
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (
     <SelectPrimitive.Group
@@ -104,7 +121,8 @@ function SelectContent({
     "align" | "alignOffset" | "side" | "sideOffset" | "alignItemWithTrigger"
   >) {
   return (
-    <SelectPrimitive.Portal>
+    <SelectPortal>
+      <SelectOverlay />
       <SelectPrimitive.Positioner
         side={side}
         sideOffset={sideOffset}
@@ -131,7 +149,7 @@ function SelectContent({
           <SelectScrollDownButton />
         </SelectPrimitive.Popup>
       </SelectPrimitive.Positioner>
-    </SelectPrimitive.Portal>
+    </SelectPortal>
   );
 }
 
@@ -232,6 +250,8 @@ function SelectScrollDownButton({
 
 export {
   Select,
+  SelectPortal,
+  SelectOverlay,
   SelectContent,
   SelectGroup,
   SelectItem,

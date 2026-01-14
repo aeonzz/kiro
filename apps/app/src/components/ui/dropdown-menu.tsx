@@ -24,6 +24,19 @@ function DropdownMenuTrigger({ ...props }: MenuPrimitive.Trigger.Props) {
   return <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />;
 }
 
+function DropdownMenuOverlay({
+  className,
+  ...props
+}: MenuPrimitive.Backdrop.Props) {
+  return (
+    <MenuPrimitive.Backdrop
+      data-slot="dropdown-menu-overlay"
+      className={cn("absolute inset-0", className)}
+      {...props}
+    />
+  );
+}
+
 function DropdownMenuContent({
   align = "start",
   alignOffset,
@@ -44,9 +57,10 @@ function DropdownMenuContent({
     | "collisionBoundary"
   >) {
   return (
-    <MenuPrimitive.Portal>
+    <DropdownMenuPortal>
+      <DropdownMenuOverlay />
       <MenuPrimitive.Positioner
-        className="isolate z-50 outline-none"
+        className="isolate outline-none"
         align={align}
         alignOffset={alignOffset}
         side={side}
@@ -63,7 +77,7 @@ function DropdownMenuContent({
           {...props}
         />
       </MenuPrimitive.Positioner>
-    </MenuPrimitive.Portal>
+    </DropdownMenuPortal>
   );
 }
 
@@ -344,6 +358,7 @@ export {
   DropdownMenu,
   DropdownMenuPortal,
   DropdownMenuTrigger,
+  DropdownMenuOverlay,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuLabel,

@@ -20,6 +20,23 @@ import {
 
 const Combobox = ComboboxPrimitive.Root;
 
+function ComboboxMenuPortal({ ...props }: ComboboxPrimitive.Portal.Props) {
+  return <ComboboxPrimitive.Portal data-slot="combobox-portal" {...props} />;
+}
+
+function ComboboxOverlay({
+  className,
+  ...props
+}: React.ComponentProps<typeof ComboboxPrimitive.Backdrop>) {
+  return (
+    <ComboboxPrimitive.Backdrop
+      data-slot="combobox-overlay"
+      className={cn("absolute inset-0", className)}
+      {...props}
+    />
+  );
+}
+
 function ComboboxValue({ ...props }: ComboboxPrimitive.Value.Props) {
   return <ComboboxPrimitive.Value data-slot="combobox-value" {...props} />;
 }
@@ -105,7 +122,7 @@ function ComboboxInput({
 function ComboboxContent({
   className,
   side = "bottom",
-  sideOffset = 6,
+  sideOffset = 4,
   align = "start",
   alignOffset = 0,
   anchor,
@@ -116,7 +133,8 @@ function ComboboxContent({
     "side" | "align" | "sideOffset" | "alignOffset" | "anchor"
   >) {
   return (
-    <ComboboxPrimitive.Portal>
+    <ComboboxMenuPortal>
+      <ComboboxOverlay />
       <ComboboxPrimitive.Positioner
         side={side}
         sideOffset={sideOffset}
@@ -136,7 +154,7 @@ function ComboboxContent({
           {...props}
         />
       </ComboboxPrimitive.Positioner>
-    </ComboboxPrimitive.Portal>
+    </ComboboxMenuPortal>
   );
 }
 
@@ -310,6 +328,8 @@ function useComboboxAnchor() {
 
 export {
   Combobox,
+  ComboboxMenuPortal,
+  ComboboxOverlay,
   ComboboxInput,
   ComboboxContent,
   ComboboxList,

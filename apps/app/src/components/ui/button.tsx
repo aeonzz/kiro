@@ -14,6 +14,8 @@ const buttonVariants = cva(
           "shadow-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground",
         secondary:
           "shadow-border bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+        muted:
+          "shadow-border bg-muted text-foreground/95 aria-expanded:bg-muted aria-expanded:text-foreground/95 hover:text-foreground/95 hover:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] aria-expanded:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))]",
         ghost:
           "hover:bg-muted hover:text-foreground dark:hover:bg-muted/70 aria-expanded:bg-muted dark:aria-expanded:bg-muted/70 aria-expanded:text-foreground",
         destructive:

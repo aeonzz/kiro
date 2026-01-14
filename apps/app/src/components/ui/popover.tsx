@@ -11,6 +11,23 @@ function PopoverTrigger({ ...props }: PopoverPrimitive.Trigger.Props) {
   return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
 }
 
+function PopoverMenuPortal({ ...props }: PopoverPrimitive.Portal.Props) {
+  return <PopoverPrimitive.Portal data-slot="popover-menu-portal" {...props} />;
+}
+
+function PopoverMenuOverlay({
+  className,
+  ...props
+}: PopoverPrimitive.Backdrop.Props) {
+  return (
+    <PopoverPrimitive.Backdrop
+      data-slot="popover-menu-overlay"
+      className={cn("absolute inset-0", className)}
+      {...props}
+    />
+  );
+}
+
 function PopoverContent({
   className,
   align = "center",
@@ -27,7 +44,8 @@ function PopoverContent({
     flush?: boolean;
   }) {
   return (
-    <PopoverPrimitive.Portal>
+    <PopoverMenuPortal>
+      <PopoverMenuOverlay />
       <PopoverPrimitive.Positioner
         align={align}
         alignOffset={alignOffset}
@@ -45,7 +63,7 @@ function PopoverContent({
           {...props}
         />
       </PopoverPrimitive.Positioner>
-    </PopoverPrimitive.Portal>
+    </PopoverMenuPortal>
   );
 }
 
@@ -84,6 +102,8 @@ function PopoverDescription({
 
 export {
   Popover,
+  PopoverMenuPortal,
+  PopoverMenuOverlay,
   PopoverContent,
   PopoverDescription,
   PopoverHeader,
