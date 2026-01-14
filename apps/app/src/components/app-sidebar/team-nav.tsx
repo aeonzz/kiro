@@ -76,7 +76,7 @@ export function TeamNav({
               <CollapsibleTrigger
                 data-sidebar="menu-button"
                 data-size="sm"
-                className="text-muted-foreground hover:text-muted-foreground aria-expanded:text-muted-foreground peer/menu-button w-full justify-start aria-expanded:bg-transparent data-panel-open:[&>svg]:rotate-0"
+                className="text-muted-foreground hover:text-muted-foreground aria-expanded:text-muted-foreground peer/menu-button w-full justify-start [&:not(:hover)[aria-expanded='true']]:bg-transparent data-panel-open:[&>svg]:rotate-0"
                 render={<Button variant="ghost" size="sm" />}
               >
                 <span>Your teams</span>
@@ -113,7 +113,7 @@ export function TeamNav({
                         <CollapsibleTrigger
                           data-sidebar="menu-button"
                           data-size="sm"
-                          className="[&_svg]:text-muted-foreground peer/menu-button w-full justify-start pr-8 font-medium aria-expanded:bg-transparent data-panel-open:[&>svg]:rotate-0"
+                          className="[&_svg]:text-muted-foreground peer/menu-button w-full justify-start pr-8 font-medium [&:not(:hover)[aria-expanded='true']]:bg-transparent data-panel-open:[&>svg]:rotate-0"
                           render={<Button variant="ghost" size="sm" />}
                         >
                           <div className="bg-muted mr-1 rounded-sm p-0.5">

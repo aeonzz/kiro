@@ -4,11 +4,12 @@ import { cn } from "@/lib/utils";
 
 import { ScrollArea } from "./ui/scroll-area";
 
-function Container({ className, ...props }: React.ComponentProps<"div">) {
+function Container({ className, ref, ...props }: React.ComponentProps<"div">) {
   return (
     <div
+      ref={ref}
       data-slot="container"
-      className={cn("relative overflow-hidden", className)}
+      className={cn("relative flex h-full flex-col overflow-hidden", className)}
       {...props}
     />
   );
@@ -22,7 +23,7 @@ function ContainerHeader({
     <header
       data-slot="header"
       className={cn(
-        "border-b-border text-xs-plus flex h-10 items-center space-x-1.5 border-b px-2 py-1.5 font-semibold",
+        "border-b-border text-xs-plus flex h-10 items-center gap-1 border-b px-2 py-1.5 font-semibold",
         className
       )}
       {...props}
@@ -36,8 +37,13 @@ function ContainerContent({
   ...props
 }: React.ComponentProps<"main">) {
   return (
-    <ScrollArea className="h-full min-h-0 **:data-[slot=scroll-area-viewport]:focus-visible:ring-0 **:data-[slot=scroll-area-viewport]:focus-visible:outline-0">
-      <main data-slot="content" className={cn("", className)} {...props}>
+    <ScrollArea
+      className={cn(
+        "h-full min-h-0 flex-1 **:data-[slot=scroll-area-viewport]:focus-visible:ring-0 **:data-[slot=scroll-area-viewport]:focus-visible:outline-0",
+        className
+      )}
+    >
+      <main data-slot="content" className={cn("h-full", className)} {...props}>
         {children}
       </main>
     </ScrollArea>

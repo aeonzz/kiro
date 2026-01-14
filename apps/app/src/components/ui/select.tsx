@@ -47,6 +47,7 @@ const buttonVariants = cva(
       size: {
         default: "h-8",
         sm: "h-7 rounded-[min(var(--radius-md),10px)]",
+        xs: "h-6 rounded-[min(var(--radius-md),10px)]",
       },
     },
     defaultVariants: {
@@ -66,7 +67,12 @@ function SelectTrigger({
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
-      className={cn(buttonVariants({ size, variant }), className)}
+      data-size={size}
+      className={cn(
+        buttonVariants({ size, variant }),
+        "peer/select-trigger",
+        className
+      )}
       {...props}
     >
       {children}
@@ -105,13 +111,17 @@ function SelectContent({
         align={align}
         alignOffset={alignOffset}
         alignItemWithTrigger={alignItemWithTrigger}
-        className="isolate z-50"
+        className="isolate"
       >
         <SelectPrimitive.Popup
           data-slot="select-content"
+          data-align-item-to-trigger={alignItemWithTrigger}
           className={cn(
-            "bg-popover text-popover-foreground shadow-border ease-out-expo relative isolate z-50 max-h-(--available-height) min-w-[calc(var(--anchor-width)+0.5rem)] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg duration-450",
+            "bg-popover text-popover-foreground shadow-popup-border ease-out-expo group/select-content relative isolate max-h-(--available-height) origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg duration-450",
             "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 data-[side=none]:data-ending-style:scale-100 data-[side=none]:data-ending-style:opacity-0 data-[side=none]:data-ending-style:transition-none data-[side=none]:data-starting-style:scale-100 data-[side=none]:data-starting-style:opacity-0",
+            alignItemWithTrigger
+              ? "min-w-[calc(var(--anchor-width)+0.5rem)]"
+              : "min-w-(--anchor-width)",
             className
           )}
           {...props}
@@ -147,7 +157,7 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground text-xs-plus relative flex w-full items-center gap-1.5 rounded-md py-2 pr-8 pl-2.5 leading-4 outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground text-xs-plus relative flex w-full items-center gap-1.5 rounded-md py-2 pr-8 pl-2.5 leading-4 outline-hidden select-none group-data-[align-item-to-trigger=false]/select-content:pl-1.5 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className
       )}
       {...props}
@@ -156,6 +166,7 @@ function SelectItem({
         {children}
       </SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator
+        data-slot="select-item-indicator"
         render={
           <span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center" />
         }

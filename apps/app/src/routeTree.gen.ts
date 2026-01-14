@@ -18,7 +18,6 @@ import { Route as AppOrganizationRouteRouteImport } from './routes/_app/$organiz
 import { Route as AppOrganizationIndexRouteImport } from './routes/_app/$organization/index'
 import { Route as ApiUsersIdRouteImport } from './routes/api/users.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as AppOrganizationInboxRouteImport } from './routes/_app/$organization/inbox'
 import { Route as AppOrganizationSettingsRouteRouteImport } from './routes/_app/$organization/settings/route'
 import { Route as AppOrganizationViewsIndexRouteImport } from './routes/_app/$organization/views/index'
 import { Route as AppOrganizationTeamsIndexRouteImport } from './routes/_app/$organization/teams/index'
@@ -27,6 +26,7 @@ import { Route as AppOrganizationSettingsIndexRouteImport } from './routes/_app/
 import { Route as AppOrganizationProjectsIndexRouteImport } from './routes/_app/$organization/projects/index'
 import { Route as AppOrganizationMyIssuesIndexRouteImport } from './routes/_app/$organization/my-issues/index'
 import { Route as AppOrganizationMembersIndexRouteImport } from './routes/_app/$organization/members/index'
+import { Route as AppOrganizationInboxIndexRouteImport } from './routes/_app/$organization/inbox/index'
 import { Route as AppOrganizationViewsIssuesRouteImport } from './routes/_app/$organization/views/issues'
 import { Route as AppOrganizationSettingsNewTeamRouteImport } from './routes/_app/$organization/settings/new-team'
 import { Route as AppOrganizationProjectsAllRouteImport } from './routes/_app/$organization/projects/all'
@@ -90,11 +90,6 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppOrganizationInboxRoute = AppOrganizationInboxRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
-  getParentRoute: () => AppOrganizationRouteRoute,
-} as any)
 const AppOrganizationSettingsRouteRoute =
   AppOrganizationSettingsRouteRouteImport.update({
     id: '/settings',
@@ -141,6 +136,12 @@ const AppOrganizationMembersIndexRoute =
   AppOrganizationMembersIndexRouteImport.update({
     id: '/members/',
     path: '/members/',
+    getParentRoute: () => AppOrganizationRouteRoute,
+  } as any)
+const AppOrganizationInboxIndexRoute =
+  AppOrganizationInboxIndexRouteImport.update({
+    id: '/inbox/',
+    path: '/inbox/',
     getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationViewsIssuesRoute =
@@ -259,7 +260,6 @@ export interface FileRoutesByFullPath {
   '/api/users': typeof ApiUsersRouteWithChildren
   '/': typeof AppIndexRoute
   '/$organization/settings': typeof AppOrganizationSettingsRouteRouteWithChildren
-  '/$organization/inbox': typeof AppOrganizationInboxRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/users/$id': typeof ApiUsersIdRoute
   '/$organization/': typeof AppOrganizationIndexRoute
@@ -268,6 +268,7 @@ export interface FileRoutesByFullPath {
   '/$organization/projects/all': typeof AppOrganizationProjectsAllRoute
   '/$organization/settings/new-team': typeof AppOrganizationSettingsNewTeamRoute
   '/$organization/views/issues': typeof AppOrganizationViewsIssuesRoute
+  '/$organization/inbox': typeof AppOrganizationInboxIndexRoute
   '/$organization/members': typeof AppOrganizationMembersIndexRoute
   '/$organization/my-issues': typeof AppOrganizationMyIssuesIndexRoute
   '/$organization/projects': typeof AppOrganizationProjectsIndexRoute
@@ -294,7 +295,6 @@ export interface FileRoutesByTo {
   '/join': typeof AppJoinRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/': typeof AppIndexRoute
-  '/$organization/inbox': typeof AppOrganizationInboxRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/users/$id': typeof ApiUsersIdRoute
   '/$organization': typeof AppOrganizationIndexRoute
@@ -302,6 +302,7 @@ export interface FileRoutesByTo {
   '/$organization/projects/all': typeof AppOrganizationProjectsAllRoute
   '/$organization/settings/new-team': typeof AppOrganizationSettingsNewTeamRoute
   '/$organization/views/issues': typeof AppOrganizationViewsIssuesRoute
+  '/$organization/inbox': typeof AppOrganizationInboxIndexRoute
   '/$organization/members': typeof AppOrganizationMembersIndexRoute
   '/$organization/my-issues': typeof AppOrganizationMyIssuesIndexRoute
   '/$organization/projects': typeof AppOrganizationProjectsIndexRoute
@@ -332,7 +333,6 @@ export interface FileRoutesById {
   '/api/users': typeof ApiUsersRouteWithChildren
   '/_app/': typeof AppIndexRoute
   '/_app/$organization/settings': typeof AppOrganizationSettingsRouteRouteWithChildren
-  '/_app/$organization/inbox': typeof AppOrganizationInboxRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/users/$id': typeof ApiUsersIdRoute
   '/_app/$organization/': typeof AppOrganizationIndexRoute
@@ -341,6 +341,7 @@ export interface FileRoutesById {
   '/_app/$organization/projects/all': typeof AppOrganizationProjectsAllRoute
   '/_app/$organization/settings/new-team': typeof AppOrganizationSettingsNewTeamRoute
   '/_app/$organization/views/issues': typeof AppOrganizationViewsIssuesRoute
+  '/_app/$organization/inbox/': typeof AppOrganizationInboxIndexRoute
   '/_app/$organization/members/': typeof AppOrganizationMembersIndexRoute
   '/_app/$organization/my-issues/': typeof AppOrganizationMyIssuesIndexRoute
   '/_app/$organization/projects/': typeof AppOrganizationProjectsIndexRoute
@@ -371,7 +372,6 @@ export interface FileRouteTypes {
     | '/api/users'
     | '/'
     | '/$organization/settings'
-    | '/$organization/inbox'
     | '/api/auth/$'
     | '/api/users/$id'
     | '/$organization/'
@@ -380,6 +380,7 @@ export interface FileRouteTypes {
     | '/$organization/projects/all'
     | '/$organization/settings/new-team'
     | '/$organization/views/issues'
+    | '/$organization/inbox'
     | '/$organization/members'
     | '/$organization/my-issues'
     | '/$organization/projects'
@@ -406,7 +407,6 @@ export interface FileRouteTypes {
     | '/join'
     | '/api/users'
     | '/'
-    | '/$organization/inbox'
     | '/api/auth/$'
     | '/api/users/$id'
     | '/$organization'
@@ -414,6 +414,7 @@ export interface FileRouteTypes {
     | '/$organization/projects/all'
     | '/$organization/settings/new-team'
     | '/$organization/views/issues'
+    | '/$organization/inbox'
     | '/$organization/members'
     | '/$organization/my-issues'
     | '/$organization/projects'
@@ -443,7 +444,6 @@ export interface FileRouteTypes {
     | '/api/users'
     | '/_app/'
     | '/_app/$organization/settings'
-    | '/_app/$organization/inbox'
     | '/api/auth/$'
     | '/api/users/$id'
     | '/_app/$organization/'
@@ -452,6 +452,7 @@ export interface FileRouteTypes {
     | '/_app/$organization/projects/all'
     | '/_app/$organization/settings/new-team'
     | '/_app/$organization/views/issues'
+    | '/_app/$organization/inbox/'
     | '/_app/$organization/members/'
     | '/_app/$organization/my-issues/'
     | '/_app/$organization/projects/'
@@ -546,13 +547,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/$organization/inbox': {
-      id: '/_app/$organization/inbox'
-      path: '/inbox'
-      fullPath: '/$organization/inbox'
-      preLoaderRoute: typeof AppOrganizationInboxRouteImport
-      parentRoute: typeof AppOrganizationRouteRoute
-    }
     '/_app/$organization/settings': {
       id: '/_app/$organization/settings'
       path: '/settings'
@@ -607,6 +601,13 @@ declare module '@tanstack/react-router' {
       path: '/members'
       fullPath: '/$organization/members'
       preLoaderRoute: typeof AppOrganizationMembersIndexRouteImport
+      parentRoute: typeof AppOrganizationRouteRoute
+    }
+    '/_app/$organization/inbox/': {
+      id: '/_app/$organization/inbox/'
+      path: '/inbox'
+      fullPath: '/$organization/inbox'
+      preLoaderRoute: typeof AppOrganizationInboxIndexRouteImport
       parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/views/issues': {
@@ -798,11 +799,11 @@ const AppOrganizationSettingsRouteRouteWithChildren =
 
 interface AppOrganizationRouteRouteChildren {
   AppOrganizationSettingsRouteRoute: typeof AppOrganizationSettingsRouteRouteWithChildren
-  AppOrganizationInboxRoute: typeof AppOrganizationInboxRoute
   AppOrganizationIndexRoute: typeof AppOrganizationIndexRoute
   AppOrganizationMyIssuesAssignedRoute: typeof AppOrganizationMyIssuesAssignedRoute
   AppOrganizationProjectsAllRoute: typeof AppOrganizationProjectsAllRoute
   AppOrganizationViewsIssuesRoute: typeof AppOrganizationViewsIssuesRoute
+  AppOrganizationInboxIndexRoute: typeof AppOrganizationInboxIndexRoute
   AppOrganizationMembersIndexRoute: typeof AppOrganizationMembersIndexRoute
   AppOrganizationMyIssuesIndexRoute: typeof AppOrganizationMyIssuesIndexRoute
   AppOrganizationProjectsIndexRoute: typeof AppOrganizationProjectsIndexRoute
@@ -818,11 +819,11 @@ interface AppOrganizationRouteRouteChildren {
 const AppOrganizationRouteRouteChildren: AppOrganizationRouteRouteChildren = {
   AppOrganizationSettingsRouteRoute:
     AppOrganizationSettingsRouteRouteWithChildren,
-  AppOrganizationInboxRoute: AppOrganizationInboxRoute,
   AppOrganizationIndexRoute: AppOrganizationIndexRoute,
   AppOrganizationMyIssuesAssignedRoute: AppOrganizationMyIssuesAssignedRoute,
   AppOrganizationProjectsAllRoute: AppOrganizationProjectsAllRoute,
   AppOrganizationViewsIssuesRoute: AppOrganizationViewsIssuesRoute,
+  AppOrganizationInboxIndexRoute: AppOrganizationInboxIndexRoute,
   AppOrganizationMembersIndexRoute: AppOrganizationMembersIndexRoute,
   AppOrganizationMyIssuesIndexRoute: AppOrganizationMyIssuesIndexRoute,
   AppOrganizationProjectsIndexRoute: AppOrganizationProjectsIndexRoute,

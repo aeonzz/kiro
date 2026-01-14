@@ -27,8 +27,11 @@ function ComboboxValue({ ...props }: ComboboxPrimitive.Value.Props) {
 function ComboboxTrigger({
   className,
   children,
+  isIcon = false,
   ...props
-}: ComboboxPrimitive.Trigger.Props) {
+}: ComboboxPrimitive.Trigger.Props & {
+  isIcon?: boolean;
+}) {
   return (
     <ComboboxPrimitive.Trigger
       data-slot="combobox-trigger"
@@ -36,11 +39,13 @@ function ComboboxTrigger({
       {...props}
     >
       {children}
-      <HugeiconsIcon
-        icon={ArrowDown01Icon}
-        strokeWidth={2}
-        className="text-muted-foreground pointer-events-none size-4"
-      />
+      {!isIcon && (
+        <HugeiconsIcon
+          icon={ArrowDown01Icon}
+          strokeWidth={2}
+          className="text-muted-foreground pointer-events-none size-4"
+        />
+      )}
     </ComboboxPrimitive.Trigger>
   );
 }
@@ -124,7 +129,7 @@ function ComboboxContent({
           data-slot="combobox-content"
           data-chips={!!anchor}
           className={cn(
-            "bg-popover text-popover-foreground shadow-border *:data-[slot=input-group]:bg-input/30 *:data-[slot=input-group]:border-input/30 group/combobox-content ease-out-expo relative max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) min-w-[calc(var(--anchor-width)+--spacing(7))] origin-(--transform-origin) overflow-hidden rounded-lg duration-450 data-[chips=true]:min-w-(--anchor-width) *:data-[slot=input-group]:m-1 *:data-[slot=input-group]:mb-0 *:data-[slot=input-group]:h-8 *:data-[slot=input-group]:shadow-none",
+            "bg-popover text-popover-foreground shadow-popup-border *:data-[slot=input-group]:bg-input/30 *:data-[slot=input-group]:border-input/30 group/combobox-content ease-out-expo relative max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) min-w-[calc(var(--anchor-width)+--spacing(7))] origin-(--transform-origin) overflow-hidden rounded-lg duration-450 data-[chips=true]:min-w-(--anchor-width) *:data-[slot=input-group]:m-1 *:data-[slot=input-group]:mb-0 *:data-[slot=input-group]:h-8 *:data-[slot=input-group]:shadow-none",
             "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
             className
           )}
