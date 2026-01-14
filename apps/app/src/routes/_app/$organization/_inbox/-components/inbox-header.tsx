@@ -20,11 +20,8 @@ import { InboxDisplayOptions } from "./inbox-display-options";
 import { InboxFilterMenu } from "./inbox-filter-menu";
 
 export function InboxHeader({
-  containerRef,
   ...props
-}: React.ComponentProps<typeof ContainerHeader> & {
-  containerRef: HTMLDivElement | null;
-}) {
+}: React.ComponentProps<typeof ContainerHeader>) {
   const { activeOrganization } = useOrganization();
   const { filters } = useInboxFilters(activeOrganization?.id);
 
@@ -59,9 +56,7 @@ export function InboxHeader({
           </DropdownMenu>
         </div>
         <div className="flex items-center gap-1">
-          {filters.length === 0 && (
-            <InboxFilterMenu containerRef={containerRef} />
-          )}
+          {filters.length === 0 && <InboxFilterMenu />}
           <InboxDisplayOptions />
         </div>
       </div>

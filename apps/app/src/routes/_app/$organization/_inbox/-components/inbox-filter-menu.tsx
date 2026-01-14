@@ -26,10 +26,10 @@ import {
 import { useOrganization } from "@/components/organization-context";
 
 export function InboxFilterMenu({
-  containerRef,
+  align = "end",
   ...props
 }: React.ComponentProps<typeof DropdownMenu> & {
-  containerRef: HTMLDivElement | null;
+  align?: React.ComponentProps<typeof DropdownMenuContent>["align"];
 }) {
   const { teams, activeOrganization } = useOrganization();
   const { addFilter } = useInboxFilters(activeOrganization?.id);
@@ -139,7 +139,7 @@ export function InboxFilterMenu({
       </Tooltip>
       <DropdownMenuContent
         disableAnchorTracking={true}
-        collisionBoundary={containerRef ?? undefined}
+        align={align}
         finalFocus={false}
         className="w-auto min-w-60"
       >

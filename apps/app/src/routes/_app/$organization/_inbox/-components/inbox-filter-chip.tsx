@@ -19,13 +19,11 @@ import {
 
 export function InboxFilterChip({
   filter,
-  containerRef,
   orgId,
   className,
   ...props
 }: {
   filter: InboxFilter;
-  containerRef?: HTMLDivElement | null;
   orgId?: string;
 } & React.ComponentProps<"div">) {
   const { removeFilter, updateFilterOperator, toggleFilterValue } =
@@ -87,7 +85,7 @@ export function InboxFilterChip({
         >
           {displayOperator}
         </DropdownMenuTrigger>
-        <DropdownMenuContent collisionBoundary={containerRef ?? undefined}>
+        <DropdownMenuContent>
           <DropdownMenuGroup>
             <DropdownMenuCheckboxItem
               checked={filter.operator !== "is not"}
@@ -155,10 +153,7 @@ export function InboxFilterChip({
           )}
           <span className="whitespace-nowrap">{valueLabel}</span>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          className="w-fit min-w-52"
-          collisionBoundary={containerRef ?? undefined}
-        >
+        <DropdownMenuContent className="w-fit min-w-52">
           <DropdownMenuSearch
             placeholder={category?.label}
             value={search}

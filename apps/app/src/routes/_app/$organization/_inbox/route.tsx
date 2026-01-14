@@ -18,7 +18,6 @@ export const Route = createFileRoute("/_app/$organization/_inbox")({
 
 function RouteComponent() {
   const location = useLocation();
-  const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
 
   const state = location.state as { viewMode?: string } | undefined;
   const isFullView = state?.viewMode === "full";
@@ -34,10 +33,10 @@ function RouteComponent() {
         maxSize="50%"
         className="@container/inbox-panel"
       >
-        <Container ref={setContainer}>
-          <InboxHeader containerRef={container} />
+        <Container>
+          <InboxHeader />
           <div className="flex flex-col gap-0 pt-0">
-            <InboxFilterList containerRef={container} />
+            <InboxFilterList />
           </div>
           <NotificationList />
         </Container>

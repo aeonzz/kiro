@@ -9,12 +9,9 @@ import { InboxFilterChip } from "./inbox-filter-chip";
 import { InboxFilterMenu } from "./inbox-filter-menu";
 
 export function InboxFilterList({
-  containerRef,
   className,
   ...props
-}: React.ComponentProps<"div"> & {
-  containerRef: HTMLDivElement | null;
-}) {
+}: React.ComponentProps<"div">) {
   const { activeOrganization } = useOrganization();
   const { filters } = useInboxFilters(activeOrganization?.id);
 
@@ -33,11 +30,10 @@ export function InboxFilterList({
           <InboxFilterChip
             key={filter.id}
             filter={filter}
-            containerRef={containerRef}
             orgId={activeOrganization?.id}
           />
         ))}
-        <InboxFilterMenu containerRef={containerRef} />
+        <InboxFilterMenu align="start" />
         {filters.length > 1 && (
           <div className="flex w-full items-center justify-end">
             <Button variant="ghost" size="sm">
