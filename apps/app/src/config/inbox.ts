@@ -3,21 +3,29 @@ import {
   CheckmarkCircle01Icon,
   CircleArrowLeftRightIcon,
   CircleIcon,
+  Clipboard,
+  Clock01Icon,
+  CopyIcon,
   DashedLine01Icon,
   DashedLineCircleIcon,
   Delete04Icon,
   Folder01Icon,
   FullSignalIcon,
+  InboxUnreadIcon,
+  Link04Icon,
   LowSignalIcon,
   MediumSignalIcon,
   MultiplicationSignCircleIcon,
+  NotificationOff01Icon,
+  NotificationSnoozeIcon,
   NotificationSquareIcon,
   PlayCircleIcon,
+  StarIcon,
+  TextIcon,
   UserSquareIcon,
 } from "@hugeicons/core-free-icons";
-import { IconSvgElement } from "@hugeicons/react";
 
-import { FilterOptions } from "@/types/inbox";
+import { FilterOptions, NotificationAction } from "@/types/inbox";
 
 export const inboxDeleteOptions = [
   {
@@ -207,6 +215,94 @@ export const filterOptions: FilterOptions[] = [
         value: "cancelled",
         label: "Cancelled",
         icon: MultiplicationSignCircleIcon,
+      },
+    ],
+  },
+];
+
+export const notificationActions: NotificationAction[] = [
+  {
+    value: "mark-as-unread",
+    label: "Mark as unread",
+    icon: InboxUnreadIcon,
+    shortcut: "u",
+    options: [],
+  },
+  {
+    value: "mark-as-read",
+    label: "Mark as read",
+    icon: InboxUnreadIcon,
+    options: [],
+  },
+  {
+    value: "delete",
+    label: "Delete notification",
+    icon: Delete04Icon,
+    shortcut: "⌫",
+    options: [],
+  },
+  {
+    value: "snooze",
+    label: "Snooze",
+    icon: NotificationSnoozeIcon,
+    shortcut: "h",
+    options: [
+      {
+        value: "hour",
+        label: "An hour from now",
+        icon: Clock01Icon,
+      },
+      {
+        value: "tomorrow",
+        label: "Tomorrow",
+        icon: Clock01Icon,
+      },
+      {
+        value: "next-week",
+        label: "Next week",
+        icon: Clock01Icon,
+      },
+      {
+        value: "month",
+        label: "A month from now",
+        icon: Clock01Icon,
+      },
+    ],
+  },
+  {
+    value: "unsubscribe",
+    label: "Unsubscribe",
+    icon: NotificationOff01Icon,
+    options: [],
+  },
+  {
+    value: "favorite",
+    label: "Favorite",
+    icon: StarIcon,
+    options: [],
+  },
+  {
+    value: "copy",
+    label: "Copy",
+    icon: Clipboard,
+    options: [
+      {
+        value: "id",
+        label: "Copy ID",
+        icon: CopyIcon,
+        shortcut: "ctrl ."
+      },
+      {
+        value: "url",
+        label: "Copy URL",
+        icon: Link04Icon,
+        shortcut: "ctrl ⇧ ,"
+      },
+      {
+        value: "title",
+        label: "Copy title",
+        icon: TextIcon,
+        shortcut: "ctrl ⇧ '"
       },
     ],
   },

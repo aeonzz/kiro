@@ -13,3 +13,18 @@ export type FilterOptions = {
   icon: IconSvgElement;
   options: FilterOption[];
 };
+
+export type NotificationActionOption = {
+  value: string;
+  label: string;
+  icon: IconSvgElement;
+  shortcut?: string;
+};
+
+export type NotificationAction = {
+  value: string;
+  label: string;
+  icon: IconSvgElement;
+  shortcut?: string;
+  options: NotificationActionOption[];
+};

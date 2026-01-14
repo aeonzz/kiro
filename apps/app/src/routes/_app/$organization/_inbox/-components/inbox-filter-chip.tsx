@@ -63,11 +63,15 @@ export function InboxFilterChip({
         className
       )}
     >
-      <div className="bg-secondary text-secondary-foreground flex items-center gap-1 px-1.5 py-1">
+      <div className="bg-muted text-muted-foreground flex items-center gap-1 px-1.5 py-1">
         {category?.icon && (
-          <HugeiconsIcon icon={category.icon} strokeWidth={2} />
+          <HugeiconsIcon
+            icon={category.icon}
+            strokeWidth={2}
+            className="@max-md/inbox-panel:hidden"
+          />
         )}
-        <span className="shrink-0 font-normal whitespace-nowrap">
+        <span className="text-foreground/95 shrink-0 font-normal whitespace-nowrap">
           {category?.label}
         </span>
       </div>
@@ -75,7 +79,7 @@ export function InboxFilterChip({
         <DropdownMenuTrigger
           render={
             <Button
-              variant="secondary"
+              variant="muted"
               size="xs"
               className="text-muted-foreground rounded-none border-none shadow-none"
             />
@@ -112,7 +116,7 @@ export function InboxFilterChip({
         <DropdownMenuTrigger
           render={
             <Button
-              variant="secondary"
+              variant="muted"
               size="xs"
               className="rounded-none border-none font-normal shadow-none"
             />
@@ -120,7 +124,7 @@ export function InboxFilterChip({
         >
           {filter.filterId === "status-type" &&
           options.some((option) => option.icon) ? (
-            <span className="mr-1 flex items-center">
+            <span className="mr-1 flex items-center @max-md/inbox-panel:hidden">
               {options
                 .slice(0, 3)
                 .map(
@@ -130,7 +134,7 @@ export function InboxFilterChip({
                         key={option.value}
                         icon={option.icon}
                         strokeWidth={2}
-                        className="bg-secondary outline-secondary rounded-full outline-1 duration-200 not-first:-ml-1"
+                        className="bg-muted outline-muted rounded-full outline-1 duration-200 not-first:-ml-1"
                       />
                     )
                 )}
@@ -144,7 +148,7 @@ export function InboxFilterChip({
                     key={option.value}
                     icon={option.icon}
                     strokeWidth={2}
-                    className="bg-secondary outline-secondary rounded-full outline-1 duration-200 not-first:-ml-1"
+                    className="bg-muted outline-muted rounded-full outline-1 duration-200 not-first:-ml-1 @max-md/inbox-panel:hidden"
                   />
                 )
             )
@@ -212,7 +216,7 @@ export function InboxFilterChip({
         </DropdownMenuContent>
       </DropdownMenu>
       <Button
-        variant="secondary"
+        variant="muted"
         size="icon-xs"
         className="text-muted-foreground rounded-none border-none shadow-none"
         onClick={() => removeFilter(filter.id)}

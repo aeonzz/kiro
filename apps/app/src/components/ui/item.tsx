@@ -35,16 +35,16 @@ function ItemSeparator({
 }
 
 const itemVariants = cva(
-  "[a]:hover:bg-muted rounded-lg border text-sm w-full group/item focus-visible:border-ring focus-visible:ring-ring/50 flex items-center flex-wrap outline-none transition-colors duration-100 focus-visible:ring-[3px] [a]:transition-colors",
+  "[a]:[&:not([data-active])]:hover:bg-muted/50 [a]:focus-visible:ring-0 [a]:data-active:bg-muted rounded-lg border text-xs-plus w-full group/item focus-visible:ring-ring/50 flex items-center flex-wrap outline-none transition-colors duration-100 focus-visible:ring-1 [a]:transition-colors",
   {
     variants: {
       variant: {
         default: "border-transparent",
         outline: "border-border",
-        muted: "bg-muted/50 border-transparent",
+        muted: "bg-muted border-transparent",
       },
       size: {
-        default: "gap-2.5 px-3 py-2.5",
+        default: "gap-2.5 px-3 py-3",
         sm: "gap-2.5 px-3 py-2.5",
         xs: "gap-2 px-2.5 py-2 [[data-slot=dropdown-menu-content]_&]:p-0",
       },
@@ -60,9 +60,13 @@ function Item({
   className,
   variant = "default",
   size = "default",
+  isActive,
   render,
   ...props
-}: useRender.ComponentProps<"div"> & VariantProps<typeof itemVariants>) {
+}: useRender.ComponentProps<"div"> &
+  VariantProps<typeof itemVariants> & {
+    isActive?: boolean;
+  }) {
   return useRender({
     defaultTagName: "div",
     props: mergeProps<"div">(
@@ -76,12 +80,13 @@ function Item({
       slot: "item",
       variant,
       size,
+      active: isActive,
     },
   });
 }
 
 const itemMediaVariants = cva(
-  "gap-2 group-has-[[data-slot=item-description]]/item:translate-y-0.5 group-has-[[data-slot=item-description]]/item:self-start flex shrink-0 items-center justify-center [&_svg]:pointer-events-none",
+  "gap-2 group-has-[[data-slot=item-description]]/item:self-start flex shrink-0 items-center justify-center [&_svg]:pointer-events-none",
   {
     variants: {
       variant: {
@@ -130,7 +135,7 @@ function ItemTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="item-title"
       className={cn(
-        "line-clamp-1 flex w-fit items-center gap-2 text-sm leading-snug font-medium underline-offset-4",
+        "text-xs-plus line-clamp-1 flex w-fit items-center gap-1 leading-4 font-medium underline-offset-4",
         className
       )}
       {...props}
@@ -143,7 +148,7 @@ function ItemDescription({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="item-description"
       className={cn(
-        "text-muted-foreground [&>a:hover]:text-primary line-clamp-2 text-left text-sm leading-normal font-normal group-data-[size=xs]/item:text-xs [&>a]:underline [&>a]:underline-offset-4",
+        "text-muted-foreground [&>a:hover]:text-primary group-data-[size=xs]/item:text-micro line-clamp-2 text-left text-xs leading-none font-normal group-data-active/item:text-[color-mix(in_oklab,var(--muted-foreground)80%,var(--foreground))] [&>a]:underline [&>a]:underline-offset-4",
         className
       )}
       {...props}

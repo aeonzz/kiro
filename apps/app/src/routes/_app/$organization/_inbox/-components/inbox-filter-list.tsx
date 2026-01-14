@@ -23,27 +23,29 @@ export function InboxFilterList({
   return (
     <div
       className={cn(
-        "border-border no-scrollbar flex min-w-sm flex-wrap items-center gap-2 overflow-x-auto border-b px-4 py-2",
+        "no-scrollbar border-border flex flex-col overflow-x-auto border-b",
         className
       )}
       {...props}
     >
-      {filters.map((filter) => (
-        <InboxFilterChip
-          key={filter.id}
-          filter={filter}
-          containerRef={containerRef}
-          orgId={activeOrganization?.id}
-        />
-      ))}
-      <InboxFilterMenu containerRef={containerRef} />
-      {filters.length > 1 && (
-        <div className="flex w-full items-center justify-end">
-          <Button variant="ghost" size="sm">
-            Match all filters
-          </Button>
-        </div>
-      )}
+      <div className="flex w-fit min-w-full flex-wrap items-center gap-2 px-4 py-2">
+        {filters.map((filter) => (
+          <InboxFilterChip
+            key={filter.id}
+            filter={filter}
+            containerRef={containerRef}
+            orgId={activeOrganization?.id}
+          />
+        ))}
+        <InboxFilterMenu containerRef={containerRef} />
+        {filters.length > 1 && (
+          <div className="flex w-full items-center justify-end">
+            <Button variant="ghost" size="sm">
+              Match all filters
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
