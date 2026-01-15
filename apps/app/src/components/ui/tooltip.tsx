@@ -49,12 +49,12 @@ function TooltipContent({
         alignOffset={alignOffset}
         side={side}
         sideOffset={sideOffset}
-        className="ease-out-expo isolate z-50 h-(--positioner-height) max-h-[--available-height] w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-400"
+        className="ease-out-expo isolate h-(--positioner-height) max-h-[--available-height] w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-400"
       >
         <TooltipPrimitive.Popup
           data-slot="tooltip-content"
           className={cn(
-            "bg-popover text-popover-foreground shadow-border ease-out-expo text-micro-plus relative z-50 h-(--popup-height,auto) max-h-[--available-height] w-(--popup-width,auto) max-w-[--available-width] origin-(--transform-origin) rounded-md px-2 py-1.5 transition-[width,height,opacity,scale] duration-400",
+            "bg-popover text-popover-foreground shadow-border ease-out-expo text-micro-plus relative h-(--popup-height,auto) max-h-[--available-height] w-(--popup-width,auto) max-w-[--available-width] origin-(--transform-origin) rounded-md px-2 py-1.5 transition-[width,height,opacity,scale] duration-400",
             "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
             className
           )}

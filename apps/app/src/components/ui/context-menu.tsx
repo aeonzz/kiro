@@ -35,7 +35,7 @@ function ContextMenuOverlay({
   return (
     <ContextMenuPrimitive.Backdrop
       data-slot="context-menu-overlay"
-      className={cn("absolute inset-0", className)}
+      className={cn("absolute inset-0 z-50", className)}
       {...props}
     />
   );
@@ -57,7 +57,7 @@ function ContextMenuContent({
     <ContextMenuPortal>
       <ContextMenuOverlay />
       <ContextMenuPrimitive.Positioner
-        className="isolate outline-none"
+        className="isolate z-50 outline-none"
         align={align}
         alignOffset={alignOffset}
         side={side}
