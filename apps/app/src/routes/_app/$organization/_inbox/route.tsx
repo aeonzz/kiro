@@ -1,5 +1,6 @@
 import * as React from "react";
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
+import { useDefaultLayout } from "react-resizable-panels";
 
 import {
   ResizableHandle,
@@ -19,6 +20,11 @@ export const Route = createFileRoute("/_app/$organization/_inbox")({
 function RouteComponent() {
   const location = useLocation();
 
+  const { defaultLayout, onLayoutChange } = useDefaultLayout({
+    groupId: "inbox-layout-storage",
+    storage: localStorage,
+  });
+
   const state = location.state as { viewMode?: string } | undefined;
   const isFullView = state?.viewMode === "full";
 
@@ -27,8 +33,13 @@ function RouteComponent() {
   }
 
   return (
-    <ResizablePanelGroup orientation="horizontal">
+    <ResizablePanelGroup
+      defaultLayout={defaultLayout}
+      onLayoutChange={onLayoutChange}
+      orientation="horizontal"
+    >
       <ResizablePanel
+        id="inbox-panel"
         minSize="30%"
         maxSize="50%"
         className="@container/inbox-panel"
@@ -42,7 +53,7 @@ function RouteComponent() {
         </Container>
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel>
+      <ResizablePanel id="inbox-content-panel">
         <Outlet />
       </ResizablePanel>
     </ResizablePanelGroup>
