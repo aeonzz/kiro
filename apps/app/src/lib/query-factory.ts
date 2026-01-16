@@ -1,4 +1,10 @@
 import {
+  deleteNotificationFn,
+  getUserNotificationsFn,
+  readNotificationFn,
+  restoreNotificationFn,
+} from "@/services/notification/server-fn";
+import {
   createOrganizationFn,
   getOrganizationFn,
   updateOrganizationFn,
@@ -125,6 +131,36 @@ export const teamQueries = {
     delete: () => ({
       mutationKey: [...teamQueries.all(), "delete"],
       mutationFn: deleteTeamFn,
+    }),
+  },
+};
+
+export const notificationQueries = {
+  all: () => ["notifications"],
+  lists: ({
+    organizationSlug,
+    userId,
+  }: {
+    organizationSlug: string;
+    userId: string;
+  }) =>
+    queryOptions({
+      queryKey: [...notificationQueries.all(), "list", organizationSlug],
+      queryFn: () =>
+        getUserNotificationsFn({ data: { organizationSlug, userId } }),
+    }),
+  mutations: {
+    read: () => ({
+      mutationKey: [...notificationQueries.all(), "read"],
+      mutationFn: readNotificationFn,
+    }),
+    delete: () => ({
+      mutationKey: [...notificationQueries.all(), "delete"],
+      mutationFn: deleteNotificationFn,
+    }),
+    restore: () => ({
+      mutationKey: [...notificationQueries.all(), "restore"],
+      mutationFn: restoreNotificationFn,
     }),
   },
 };

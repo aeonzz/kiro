@@ -1,29 +1,60 @@
 import * as React from "react";
-import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  createFileRoute,
+  notFound,
+  Outlet,
+  useLocation,
+} from "@tanstack/react-router";
 import { useDefaultLayout } from "react-resizable-panels";
 
+import type { Notification } from "@/types/schema-types";
+import { notificationQueries } from "@/lib/query-factory";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { Container } from "@/components/container";
+import { Error } from "@/components/error";
 
 import { InboxFilterList } from "./-components/inbox-filter-list";
 import { InboxHeader } from "./-components/inbox-header";
 import { NotificationList } from "./-components/notification-list";
 
 export const Route = createFileRoute("/_app/$organization/_inbox")({
+  loader: async ({ params: { organization }, context }) => {
+    const data = await context.queryClient.ensureQueryData(
+      notificationQueries.lists({
+        organizationSlug: organization,
+        userId: context.session.user.id,
+      })
+    );
+
+    if (!data) {
+      throw notFound();
+    }
+  },
+  errorComponent: Error,
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const location = useLocation();
+  const { organization } = Route.useParams();
+  const { session } = Route.useRouteContext();
 
   const { defaultLayout, onLayoutChange } = useDefaultLayout({
     groupId: "inbox-layout-storage",
     storage: localStorage,
   });
+
+  const { data } = useSuspenseQuery(
+    notificationQueries.lists({
+      organizationSlug: organization,
+      userId: session.user.id,
+    })
+  );
 
   const state = location.state as { viewMode?: string } | undefined;
   const isFullView = state?.viewMode === "full";
@@ -49,7 +80,7 @@ function RouteComponent() {
           <div className="flex flex-col gap-0 pt-0">
             <InboxFilterList />
           </div>
-          <NotificationList />
+          <NotificationList notifications={(data as Notification[]) || []} />
         </Container>
       </ResizablePanel>
       <ResizableHandle />

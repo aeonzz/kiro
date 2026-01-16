@@ -3,29 +3,28 @@ import {
   CheckmarkCircle01Icon,
   CircleArrowLeftRightIcon,
   CircleIcon,
-  Clipboard,
-  Clock01Icon,
-  CopyIcon,
   DashedLine01Icon,
   DashedLineCircleIcon,
   Delete04Icon,
   Folder01Icon,
   FullSignalIcon,
-  InboxUnreadIcon,
-  Link04Icon,
   LowSignalIcon,
   MediumSignalIcon,
   MultiplicationSignCircleIcon,
-  NotificationOff01Icon,
-  NotificationSnoozeIcon,
   NotificationSquareIcon,
   PlayCircleIcon,
-  StarIcon,
-  TextIcon,
   UserSquareIcon,
 } from "@hugeicons/core-free-icons";
 
-import { FilterOptions, NotificationAction } from "@/types/inbox";
+import { FilterOptions } from "@/types/inbox";
+import {
+  BacklogIcon,
+  CancelledIcon,
+  DoneIcon,
+  InProgressIcon,
+  InReviewIcon,
+  TodoIcon,
+} from "@/components/icons";
 
 export const inboxDeleteOptions = [
   {
@@ -220,90 +219,48 @@ export const filterOptions: FilterOptions[] = [
   },
 ];
 
-export const notificationActions: NotificationAction[] = [
-  {
-    value: "mark-as-unread",
-    label: "Mark as unread",
-    icon: InboxUnreadIcon,
-    shortcut: "u",
-    options: [],
+export const issueStatusMap = {
+  TRIAGE: {
+    label: "Triage",
+    icon: TodoIcon,
+    fillClass: "text-muted-foreground",
   },
-  {
-    value: "mark-as-read",
-    label: "Mark as read",
-    icon: InboxUnreadIcon,
-    options: [],
+  BACKLOG: {
+    label: "Backlog",
+    icon: BacklogIcon,
+    fillClass: "text-muted-foreground",
   },
-  {
-    value: "delete",
-    label: "Delete notification",
-    icon: Delete04Icon,
-    shortcut: "⌫",
-    options: [],
+  UNSTARTED: {
+    label: "Todo",
+    icon: TodoIcon,
+    fillClass: "text-muted-foreground",
   },
-  {
-    value: "snooze",
-    label: "Snooze",
-    icon: NotificationSnoozeIcon,
-    shortcut: "h",
-    options: [
-      {
-        value: "hour",
-        label: "An hour from now",
-        icon: Clock01Icon,
-      },
-      {
-        value: "tomorrow",
-        label: "Tomorrow",
-        icon: Clock01Icon,
-      },
-      {
-        value: "next-week",
-        label: "Next week",
-        icon: Clock01Icon,
-      },
-      {
-        value: "month",
-        label: "A month from now",
-        icon: Clock01Icon,
-      },
-    ],
+  STARTED: {
+    label: "In Progress",
+    icon: InProgressIcon,
+    fillClass: "text-yellow-500",
   },
-  {
-    value: "unsubscribe",
-    label: "Unsubscribe",
-    icon: NotificationOff01Icon,
-    options: [],
+  IN_REVIEW: {
+    label: "In Review",
+    icon: InReviewIcon,
+    fillClass: "text-green-500",
   },
-  {
-    value: "favorite",
-    label: "Favorite",
-    icon: StarIcon,
-    options: [],
+  COMPLETED: {
+    label: "Done",
+    icon: DoneIcon,
+    fillClass: "text-indigo-500",
   },
-  {
-    value: "copy",
-    label: "Copy",
-    icon: Clipboard,
-    options: [
-      {
-        value: "id",
-        label: "Copy ID",
-        icon: CopyIcon,
-        shortcut: "ctrl ."
-      },
-      {
-        value: "url",
-        label: "Copy URL",
-        icon: Link04Icon,
-        shortcut: "ctrl ⇧ ,"
-      },
-      {
-        value: "title",
-        label: "Copy title",
-        icon: TextIcon,
-        shortcut: "ctrl ⇧ '"
-      },
-    ],
+  CANCELLED: {
+    label: "Canceled",
+    icon: CancelledIcon,
+    fillClass: "text-muted-foreground",
   },
-];
+} as const;
+
+export const issuePriorityMap = {
+  NO_PRIORITY: { label: "No priority", icon: DashedLine01Icon },
+  URGENT: { label: "Urgent", icon: AlertSquareIcon },
+  HIGH: { label: "High", icon: FullSignalIcon },
+  MEDIUM: { label: "Medium", icon: MediumSignalIcon },
+  LOW: { label: "Low", icon: LowSignalIcon },
+} as const;

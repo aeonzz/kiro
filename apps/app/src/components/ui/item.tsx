@@ -44,9 +44,9 @@ const itemVariants = cva(
         muted: "bg-muted border-transparent",
       },
       size: {
-        default: "gap-2.5 px-3 py-3",
-        sm: "gap-2.5 px-3 py-2.5",
-        xs: "gap-2 px-2.5 py-2 [[data-slot=dropdown-menu-content]_&]:p-0",
+        default: "gap-2 p-2",
+        sm: "gap-1 px-2 py-2",
+        xs: "gap-1 px-2 py-2 [[data-slot=dropdown-menu-content]_&]:p-0",
       },
     },
     defaultVariants: {
@@ -93,7 +93,7 @@ const itemMediaVariants = cva(
         default: "bg-transparent",
         icon: "size-8 rounded-sm bg-muted [&_svg:not([class*='size-'])]:size-4",
         image:
-          "size-10 overflow-hidden rounded-sm group-data-[size=sm]/item:size-8 group-data-[size=xs]/item:size-6 [&_img]:size-full [&_img]:object-cover",
+          "size-9 overflow-hidden rounded-sm group-data-[size=sm]/item:size-8 group-data-[size=xs]/item:size-6 [&_img]:size-full [&_img]:object-cover",
       },
     },
     defaultVariants: {
@@ -148,7 +148,7 @@ function ItemDescription({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="item-description"
       className={cn(
-        "text-muted-foreground [&>a:hover]:text-primary group-data-[size=xs]/item:text-micro line-clamp-2 text-left text-xs leading-none font-normal group-data-active/item:text-[color-mix(in_oklab,var(--muted-foreground)80%,var(--foreground))] [&>a]:underline [&>a]:underline-offset-4",
+        "text-muted-foreground [&>a:hover]:text-primary group-data-[size=xs]/item:text-micro line-clamp-2 text-left text-xs leading-none font-normal group-data-active/item:text-[color-mix(in_oklab,var(--muted-foreground)90%,var(--foreground))] [&>a]:underline [&>a]:underline-offset-4",
         className
       )}
       {...props}

@@ -14,6 +14,9 @@ model User {
   teammembers     TeamMember[]
   userPreferences UserPreference[]
 
+  notifications          Notification[] @relation("NotificationRecipient")
+  triggeredNotifications Notification[] @relation("NotificationActor")
+
   @@unique([email])
   @@map("user")
 }
@@ -80,6 +83,8 @@ model Organization {
   invitations Invitation[]
 
   teams Team[]
+
+  notifications Notification[]
 
   @@unique([slug])
   @@map("organization")
