@@ -50,21 +50,6 @@ export const orderingOptions = [
   { value: "priority", label: "Priority" },
 ];
 
-export const showItemsToggleOptions = [
-  {
-    value: "showSnoozedItems",
-    label: "Show snoozed items",
-  },
-  {
-    value: "showReadItems",
-    label: "Show read items",
-  },
-  {
-    value: "showUnreadItems",
-    label: "Show unread items",
-  },
-];
-
 export const filterOptions: FilterOptions[] = [
   {
     id: "type",

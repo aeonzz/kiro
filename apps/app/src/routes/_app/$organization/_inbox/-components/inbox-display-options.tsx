@@ -5,7 +5,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
-import { orderingOptions, showItemsToggleOptions } from "@/config/inbox";
+import { orderingOptions } from "@/config/inbox";
+import { useActiveInboxDisplayOptions } from "@/hooks/use-inbox-display-store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -32,6 +33,23 @@ import {
 export function InboxDisplayOptions({
   ...props
 }: React.ComponentProps<typeof Popover>) {
+  const {
+    ordering,
+    showSnoozedItems,
+    showReadItems,
+    showUnreadFirst,
+    showId,
+    showStatusAndIcon,
+    setOrdering,
+    setShowSnoozedItems,
+    setShowReadItems,
+    setShowUnreadFirst,
+    setShowId,
+    setShowStatusAndIcon,
+  } = useActiveInboxDisplayOptions();
+
+  const selectedOrdering = orderingOptions.find((f) => f.value === ordering);
+
   return (
     <Popover {...props}>
       <Tooltip>
@@ -69,7 +87,14 @@ export function InboxDisplayOptions({
               Ordering
             </Label>
           </div>
-          <Select items={orderingOptions} defaultValue={orderingOptions[0]}>
+          <Select
+            value={selectedOrdering}
+            itemToStringValue={(item) => item.value}
+            onValueChange={(value) => {
+              if (!value) return;
+              setOrdering(value.value);
+            }}
+          >
             <SelectTrigger id="ordering" className="w-24" size="xs">
               <SelectValue />
             </SelectTrigger>
@@ -81,7 +106,7 @@ export function InboxDisplayOptions({
                 {orderingOptions.map((option) => (
                   <SelectItem
                     key={option.value}
-                    value={option.value}
+                    value={option}
                     className="*:data-[slot=select-item-indicator]:right-1"
                   >
                     {option.label}
@@ -92,34 +117,81 @@ export function InboxDisplayOptions({
           </Select>
         </div>
         <div className="space-y-4 px-4 py-3">
-          {showItemsToggleOptions.map((option) => (
+          <div className="flex items-start gap-3">
+            <Label
+              htmlFor="showSnoozedItems"
+              className="text-muted-foreground text-xs font-normal"
+            >
+              Show snoozed items
+            </Label>
+            <div className="flex flex-1 items-center justify-end">
+              <Switch
+                id="showSnoozedItems"
+                size="sm"
+                checked={showSnoozedItems}
+                onCheckedChange={setShowSnoozedItems}
+              />
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <Label
+              htmlFor="showReadItems"
+              className="text-muted-foreground text-xs font-normal"
+            >
+              Show read items
+            </Label>
+            <div className="flex flex-1 items-center justify-end">
+              <Switch
+                id="showReadItems"
+                size="sm"
+                checked={showReadItems}
+                onCheckedChange={setShowReadItems}
+              />
+            </div>
+          </div>
+          {showReadItems && (
             <div className="flex items-start gap-3">
               <Label
-                htmlFor={option.value}
+                htmlFor="showUnreadFirst"
                 className="text-muted-foreground text-xs font-normal"
               >
-                {option.label}
+                Show unread first
               </Label>
               <div className="flex flex-1 items-center justify-end">
-                <Switch id={option.value} size="sm" />
+                <Switch
+                  id="showUnreadFirst"
+                  size="sm"
+                  checked={showUnreadFirst}
+                  onCheckedChange={setShowUnreadFirst}
+                />
               </div>
             </div>
-          ))}
+          )}
         </div>
         <div className="border-border border-t px-4 py-3">
           <div className="space-y-2.5">
             <Label
-              htmlFor="ordering"
+              htmlFor="rendering"
               className="text-muted-foreground text-xs font-normal"
             >
-              Ordering
+              Display
             </Label>
             <div className="*:not-data-pressed:text-muted-foreground flex items-center gap-1">
-              <Toggle aria-label="Toggle bookmark" size="sm" variant="outline">
+              <Toggle
+                size="sm"
+                variant="outline"
+                pressed={showId}
+                onPressedChange={setShowId}
+              >
                 ID
               </Toggle>
 
-              <Toggle aria-label="Toggle bookmark" size="sm" variant="outline">
+              <Toggle
+                size="sm"
+                variant="outline"
+                pressed={showStatusAndIcon}
+                onPressedChange={setShowStatusAndIcon}
+              >
                 Status and icon
               </Toggle>
             </div>

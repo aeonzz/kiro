@@ -1,11 +1,11 @@
 import * as React from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { formatDistanceToNowStrict } from "date-fns";
 
 import { NotificationType } from "@/types/enums";
 import { Notification } from "@/types/schema-types";
 import { issuePriorityMap, issueStatusMap } from "@/config/inbox";
 import { cn } from "@/lib/utils";
+import { useActiveInboxDisplayConfig } from "@/hooks/use-inbox-display-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   ItemContent,
@@ -13,13 +13,14 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
-import { DoneIcon, InProgressIcon } from "@/components/icons";
 
 interface IssueViewProps {
   notification: Notification;
 }
 
 export function IssueView({ notification }: IssueViewProps) {
+  const { showId, showStatusAndIcon } = useActiveInboxDisplayConfig();
+
   const read = !!notification.readAt;
 
   const status =
@@ -70,18 +71,23 @@ export function IssueView({ notification }: IssueViewProps) {
               <div className="bg-primary size-2 rounded-full" />
             </span>
           )}
-          <span>{notification.entityId}</span>
-          <span className="truncate">
-            {(notification.data as any)?.entityTitle}
-          </span>
+          {showId && <span className="mr-1">{notification.entityId}</span>}
+          <span className="truncate">ArtPrompted</span>
         </ItemTitle>
         <ItemDescription className="truncate group-data-[read=false]/item:text-[color-mix(in_oklab,var(--muted-foreground)90%,var(--foreground))]">
           {description}
         </ItemDescription>
       </ItemContent>
-      <ItemContent className="flex-none">
-        <div className="flex flex-col items-end gap-y-1">
-          <status.icon className={cn("size-3.5", status.fillClass)} />
+      <ItemContent className="h-full">
+        <div
+          className={cn(
+            "flex flex-1 flex-col items-end",
+            showStatusAndIcon ? "justify-between" : "justify-end"
+          )}
+        >
+          {showStatusAndIcon && (
+            <status.icon className={cn("size-3.5", status.fillClass)} />
+          )}
           <ItemDescription className="text-micro-plus group-data-[read=false]/item:text-[color-mix(in_oklab,var(--muted-foreground)90%,var(--foreground))]">
             {formatDistanceToNowStrict(notification.createdAt)}
           </ItemDescription>
