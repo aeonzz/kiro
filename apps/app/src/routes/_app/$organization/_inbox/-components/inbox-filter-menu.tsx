@@ -133,7 +133,7 @@ export function InboxFilterMenu({
             <path d="M9 18H15" />
           </svg>
         </TooltipTrigger>
-        <TooltipContent>
+        <TooltipContent side="bottom">
           <span>Filter notifications by</span>
         </TooltipContent>
       </Tooltip>

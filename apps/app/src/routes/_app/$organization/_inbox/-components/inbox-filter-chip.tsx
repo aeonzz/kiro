@@ -16,6 +16,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function InboxFilterChip({
   filter,
@@ -210,14 +215,23 @@ export function InboxFilterChip({
             )}
         </DropdownMenuContent>
       </DropdownMenu>
-      <Button
-        variant="muted"
-        size="icon-xs"
-        className="text-muted-foreground rounded-none border-none shadow-none"
-        onClick={() => removeFilter(filter.id)}
-      >
-        <HugeiconsIcon icon={Cancel01Icon} size={12} strokeWidth={2} />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <Button
+              variant="muted"
+              size="icon-xs"
+              className="text-muted-foreground rounded-none border-none shadow-none"
+              onClick={() => removeFilter(filter.id)}
+            />
+          }
+        >
+          <HugeiconsIcon icon={Cancel01Icon} size={12} strokeWidth={2} />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          <span>Remove filter</span>
+        </TooltipContent>
+      </Tooltip>
     </div>
   );
 }
