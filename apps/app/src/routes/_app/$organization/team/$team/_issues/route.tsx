@@ -7,7 +7,9 @@ import {
   useLocation,
 } from "@tanstack/react-router";
 
+import { teamIssueTabs } from "@/config/team";
 import { teamQueries } from "@/lib/query-factory";
+import { isNavLinkActive } from "@/lib/utils";
 import { useLastVisitedStore } from "@/hooks/use-last-visited-store";
 import { Container } from "@/components/container";
 import { Error } from "@/components/error";
@@ -46,11 +48,11 @@ function RouteComponent() {
   );
 
   React.useEffect(() => {
-    if (
-      pathname.endsWith("/all") ||
-      pathname.endsWith("/active") ||
-      pathname.endsWith("/backlog")
-    ) {
+    const isIssueTab = teamIssueTabs.some((tab) =>
+      isNavLinkActive(pathname, tab.url, organization, team)
+    );
+
+    if (isIssueTab) {
       setLastIssueTab(organization, team, pathname);
     }
   }, [pathname, organization, team, setLastIssueTab]);
