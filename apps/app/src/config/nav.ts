@@ -55,7 +55,7 @@ export const sidebarMenuItems: NavItem[] = [
 export const sidebarTeamItems: NavItem[] = [
   {
     title: "Issues",
-    url: "/$organization/team/$team/issues",
+    url: "/$organization/team/$team",
     icon: CopyIcon,
   },
   {

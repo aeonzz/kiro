@@ -1,4 +1,5 @@
 import React from "react";
+import { StrictOmit } from "@/types";
 import {
   ArrowDown01Icon,
   Link04Icon,
@@ -8,11 +9,12 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
-import type { Team } from "better-auth/plugins";
 
+import type { Team } from "@/types/schema-types";
 import { sidebarTeamItems, sidebarTeamOptions } from "@/config/nav";
 import { isNavLinkActive, resolveOrgUrl } from "@/lib/utils";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { useLastVisitedStore } from "@/hooks/use-last-visited-store";
 import { usePreferencesStore } from "@/hooks/use-preference-store";
 
 import { useOrganization } from "../organization-context";
@@ -43,7 +45,7 @@ import {
 
 interface TeamNavProps extends React.ComponentProps<typeof SidebarGroup> {
   pathname: string;
-  teams: Team[];
+  teams: Array<StrictOmit<Team, "teammembers">>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   activeOrganizationSlug?: string;
@@ -175,36 +177,69 @@ export function TeamNav({
                         </DropdownMenu>
                         <CollapsibleContent className="duration-450">
                           <SidebarMenuSub className="translate-x-1 pb-2 transition-opacity duration-300 ease-out group-data-ending-style:opacity-0 group-data-starting-style:opacity-0">
-                            {sidebarTeamItems.map((item) => (
-                              <SidebarMenuSubItem key={item.title}>
-                                <SidebarMenuSubButton
-                                  item={item}
-                                  isActive={isNavLinkActive(
+                            {sidebarTeamItems.map((item) => {
+                              const lastTab = useLastVisitedStore
+                                .getState()
+                                .getLastIssueTab(
+                                  activeOrganizationSlug || "",
+                                  team.slug
+                                );
+
+                              const itemUrl =
+                                item.title === "Issues" && lastTab
+                                  ? (lastTab as any)
+                                  : resolveOrgUrl(
+                                      item.url,
+                                      activeOrganizationSlug,
+                                      team.slug
+                                    );
+
+                              const isIssues = item.title === "Issues";
+                              const resolvedItemUrl = resolveOrgUrl(
+                                item.url,
+                                activeOrganizationSlug,
+                                team.slug
+                              );
+
+                              const isActive = isIssues
+                                ? pathname.startsWith(resolvedItemUrl) &&
+                                  !sidebarTeamItems.some(
+                                    (sibling) =>
+                                      sibling.title !== "Issues" &&
+                                      pathname.startsWith(
+                                        resolveOrgUrl(
+                                          sibling.url,
+                                          activeOrganizationSlug,
+                                          team.slug
+                                        )
+                                      )
+                                  )
+                                : isNavLinkActive(
                                     pathname,
                                     item.url,
                                     activeOrganizationSlug,
-                                    team.name
-                                  )}
-                                  size="sm"
-                                  className="pl-6"
-                                  render={
-                                    <Link
-                                      to={resolveOrgUrl(
-                                        item.url,
-                                        activeOrganizationSlug,
-                                        team.name
-                                      )}
+                                    team.slug,
+                                    true
+                                  );
+
+                              return (
+                                <SidebarMenuSubItem key={item.title}>
+                                  <SidebarMenuSubButton
+                                    item={item}
+                                    isActive={isActive}
+                                    size="sm"
+                                    className="pl-6"
+                                    render={<Link to={itemUrl} />}
+                                  >
+                                    <HugeiconsIcon
+                                      icon={item.icon}
+                                      strokeWidth={2}
                                     />
-                                  }
-                                >
-                                  <HugeiconsIcon
-                                    icon={item.icon}
-                                    strokeWidth={2}
-                                  />
-                                  <span>{item.title}</span>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            ))}
+                                    <span>{item.title}</span>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              );
+                            })}
                           </SidebarMenuSub>
                         </CollapsibleContent>
                       </Collapsible>

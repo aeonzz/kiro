@@ -11,7 +11,9 @@ const buttonVariants = cva(
         default:
           "shadow-border bg-primary text-primary-foreground [a]:hover:bg-primary/80",
         outline:
-          "shadow-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground",
+          "shadow-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:dark:bg-input/50 aria-expanded:text-foreground",
+        flatOutline:
+          "bg-transparent border border-border hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground data-activable:text-muted-foreground data-activable:data-active:dark:bg-input/30 data-activable:data-active:text-foreground data-activable:data-active:[&_svg]:text-foreground data-activable:hover:text-foreground",
         secondary:
           "shadow-border bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         muted:
@@ -27,12 +29,12 @@ const buttonVariants = cva(
       size: {
         default:
           "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
+        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5",
+        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5",
         lg: "h-9 text-xs-plus gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
         icon: "size-8",
         "icon-xs":
-          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
+          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg",
         "icon-sm":
           "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
         "icon-lg": "size-9",
@@ -47,13 +49,21 @@ const buttonVariants = cva(
 
 function Button({
   className,
+  activable,
+  isActive,
   variant = "default",
   size = "default",
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonPrimitive.Props &
+  VariantProps<typeof buttonVariants> & {
+    activable?: boolean;
+    isActive?: boolean;
+  }) {
   return (
     <ButtonPrimitive
+      data-activable={activable}
       data-slot="button"
+      data-active={isActive}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />

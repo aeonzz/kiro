@@ -11,20 +11,27 @@ import type {
 import type { StrictOmit } from ".";
 import type { RoutePath } from "./route-type";
 
-export type Team = TeamType & {
-  teammembers: (TeamMember & {
-    user: User;
-  })[];
+export type Team = StrictOmit<TeamType, "updatedAt"> & {
+  teammembers: Array<
+    TeamMember & {
+      user: User;
+    }
+  >;
+  updatedAt?: Date;
 };
 
 export type Organization = OrganizationType & {
-  members: (Member & {
-    user: User;
-  })[];
+  members: Array<
+    Member & {
+      user: User;
+    }
+  >;
   teams: Team[];
-  invitations: (Invitation & {
-    user: User;
-  })[];
+  invitations: Array<
+    Invitation & {
+      user: User;
+    }
+  >;
 };
 
 export type Notification = StrictOmit<NotificationType, "link"> & {

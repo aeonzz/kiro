@@ -17,13 +17,15 @@ function Container({ className, ref, ...props }: React.ComponentProps<"div">) {
 
 function ContainerHeader({
   className,
+  inset,
   ...props
-}: React.ComponentProps<"header">) {
+}: React.ComponentProps<"header"> & { inset?: boolean }) {
   return (
     <header
+      data-inset={inset}
       data-slot="header"
       className={cn(
-        "border-b-border text-xs-plus flex h-10 items-center gap-1 border-b px-2 py-1.5 font-semibold",
+        "border-b-border text-xs-plus flex h-10 items-center gap-1 border-b px-2 py-1.5 font-semibold data-inset:px-8",
         className
       )}
       {...props}
@@ -35,7 +37,7 @@ function ContainerContent({
   children,
   className,
   ...props
-}: React.ComponentProps<"main">) {
+}: React.ComponentProps<"div">) {
   return (
     <ScrollArea
       className={cn(
@@ -43,9 +45,9 @@ function ContainerContent({
         className
       )}
     >
-      <main data-slot="content" className={cn("h-full", className)} {...props}>
+      <div data-slot="content" className={cn("h-full", className)} {...props}>
         {children}
-      </main>
+      </div>
     </ScrollArea>
   );
 }

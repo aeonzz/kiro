@@ -37,7 +37,6 @@ export function InboxHeader({
                 <Button
                   variant="ghost"
                   size="icon-xs"
-                  className="[&_svg:not([class*='size-'])]:size-4"
                 />
               }
             >
