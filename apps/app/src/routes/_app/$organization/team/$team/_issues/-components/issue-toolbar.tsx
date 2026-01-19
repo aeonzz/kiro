@@ -2,10 +2,10 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-import { ListDisplayOptions } from "./list-display-options";
-import { ListFilterMenu } from "./list-filter-menu";
+import { IssueDisplayOptions } from "./issue-display-options";
+import { IssueFilterMenu } from "./issue-filter-menu";
 
-export function ListToolbar({
+export function IssueToolbar({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -18,10 +18,10 @@ export function ListToolbar({
       {...props}
     >
       <div className="flex-1">
-        <ListFilterMenu />
+        <IssueFilterMenu />
       </div>
       <div className="flex items-center">
-        <ListDisplayOptions />
+        <IssueDisplayOptions />
       </div>
     </div>
   );

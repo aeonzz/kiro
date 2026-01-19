@@ -15,11 +15,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-interface ListDisplayOptionsProps extends React.ComponentProps<
+interface IssueDisplayOptionsProps extends React.ComponentProps<
   typeof Popover
 > {}
 
-export function ListDisplayOptions({ ...props }: ListDisplayOptionsProps) {
+export function IssueDisplayOptions({ ...props }: IssueDisplayOptionsProps) {
   return (
     <Popover {...props}>
       <Tooltip>

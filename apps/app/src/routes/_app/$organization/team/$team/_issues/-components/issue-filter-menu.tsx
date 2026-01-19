@@ -13,11 +13,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-interface ListFilterMenuProps extends React.ComponentProps<
+interface IssueFilterMenuProps extends React.ComponentProps<
   typeof DropdownMenu
 > {}
 
-export function ListFilterMenu({ ...props }: ListFilterMenuProps) {
+export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
   return (
     <DropdownMenu {...props}>
       <Tooltip>

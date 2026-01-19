@@ -15,7 +15,7 @@ import { Container } from "@/components/container";
 import { Error } from "@/components/error";
 
 import { Header } from "./-components/header";
-import { ListToolbar } from "./-components/list-toolbar";
+import { IssueToolbar } from "./-components/issue-toolbar";
 
 export const Route = createFileRoute("/_app/$organization/team/$team/_issues")({
   loader: async ({ params: { organization, team }, context }) => {
@@ -64,7 +64,7 @@ function RouteComponent() {
   return (
     <Container>
       <Header teamName={data.name} />
-      <ListToolbar />
+      <IssueToolbar />
       <Outlet />
     </Container>
   );
