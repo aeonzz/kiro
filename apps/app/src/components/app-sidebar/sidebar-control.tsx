@@ -71,7 +71,7 @@ export function SidebarControl({
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-6">
-          <div className="shadow-border bg-card flex items-center justify-start gap-4 rounded-md px-3 py-2.5">
+          <div className="shadow-border-sm bg-card flex items-center justify-start gap-4 rounded-md px-3 py-2.5">
             <h4 className="text-xs-plus flex-1 font-medium">
               Default badge style
             </h4>
@@ -104,7 +104,7 @@ export function SidebarControl({
           </div>
           <div className="flex flex-col gap-4">
             <h3 className="text-xs-plus flex-1 font-medium">Personal</h3>
-            <div className="shadow-border bg-card flex h-auto items-center justify-start gap-4 rounded-md px-3 py-2.5">
+            <div className="shadow-border-sm bg-card flex h-auto items-center justify-start gap-4 rounded-md px-3 py-2.5">
               <ul className="flex flex-1 flex-col gap-2">
                 {sidebarMenuItems.map((item) => (
                   <Item key={item.title} item={item} />
@@ -114,7 +114,7 @@ export function SidebarControl({
           </div>
           <div className="flex flex-col gap-4">
             <h3 className="text-xs-plus flex-1 font-medium">Workspace</h3>
-            <div className="shadow-border bg-card flex h-auto items-center justify-start gap-4 rounded-md px-3 py-2.5">
+            <div className="shadow-border-sm bg-card flex h-auto items-center justify-start gap-4 rounded-md px-3 py-2.5">
               <ul className="flex flex-1 flex-col gap-2">
                 {sidebarWorkspaceItems.map((item) => (
                   <Item key={item.title} item={item} />

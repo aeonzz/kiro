@@ -16,7 +16,7 @@ const twMerge = extendTailwindMerge({
         "text-xl-plus",
         "text-2xl-plus",
       ],
-      shadow: ["shadow-border", "shadow-popup-border"],
+      shadow: ["shadow-border", "shadow-border-md", "shadow-border-sm"],
     },
   },
 });

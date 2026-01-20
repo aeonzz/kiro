@@ -121,7 +121,8 @@
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
 
   --shadow-border: var(--shadow-border-val);
-  --shadow-popup-border: var(--shadow-popup-border-val);
+  --shadow-border-sm: var(--shadow-border-sm-val);
+  --shadow-border-md: var(--shadow-border-md-val);
 }
 
 :root {
@@ -161,7 +162,9 @@
   --shadow-border-val:
     0 0 0 1px oklch(0.2562 0 0 / 8%), 0 1px 2px oklch(0.2562 0 0 / 4%),
     0 3px 4px -1px oklch(0.2562 0 0 / 5%);
-  --shadow-popup-border-val:
+  --shadow-border-sm-val:
+    0 0 0 1px oklch(0.2562 0 0 / 8%), 0 1px 2px oklch(0.2562 0 0 / 4%);
+  --shadow-border-md-val:
     0 0 0 1px oklch(0.2562 0 0 / 8%), 0 1px 10px oklch(0.2562 0 0 / 8%),
     0 3px 20px -1px oklch(0.2562 0 0 / 5%);
 }
@@ -202,7 +205,9 @@
   --shadow-border-val:
     0 0 0 1px oklch(1 0 0 / 10%), 0 1px 2px oklch(0 0 0 / 20%),
     0 3px 4px -1px oklch(0 0 0 / 25%);
-  --shadow-popup-border-val:
+  --shadow-border-sm-val:
+    0 0 0 1px oklch(1 0 0 / 10%), 0 1px 2px oklch(0 0 0 / 20%);
+  --shadow-border-md-val:
     0 0 0 1px oklch(1 0 0 / 12%), 0 1px 8px oklch(0 0 0 / 20%),
     0 3px 8px -1px oklch(0 0 0 / 25%);
 }

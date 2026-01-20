@@ -71,7 +71,7 @@ function DropdownMenuContent({
         <MenuPrimitive.Popup
           data-slot="dropdown-menu-content"
           className={cn(
-            "bg-popover text-popover-foreground shadow-popup-border yawa ease-out-expo max-h-(--available-height) w-(--anchor-width) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg p-1 duration-450 outline-none data-closed:overflow-hidden data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+            "bg-popover text-popover-foreground shadow-border-md yawa ease-out-expo max-h-(--available-height) w-(--anchor-width) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg p-1 duration-450 outline-none data-closed:overflow-hidden data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
             className
           )}
           {...props}
@@ -239,7 +239,7 @@ function DropdownMenuSubContent({
     <DropdownMenuContent
       data-slot="dropdown-menu-sub-content"
       className={cn(
-        "bg-popover text-popover-foreground shadow-popup-border w-auto min-w-24 rounded-lg p-1 transition-none",
+        "bg-popover text-popover-foreground shadow-border-md w-auto min-w-24 rounded-lg p-1 transition-none",
         className
       )}
       align={align}

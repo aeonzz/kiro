@@ -56,8 +56,8 @@ function PopoverContent({
         <PopoverPrimitive.Popup
           data-slot="popover-content"
           className={cn(
-            "bg-popover text-popover-foreground shadow-popup-border ease-out-expo text-xs-plus flex max-h-(--available-height) w-72 min-w-32 origin-(--transform-origin) flex-col gap-2.5 rounded-lg outline-hidden duration-450 data-closed:overflow-hidden data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
-            flush ? "p-0" : "p-2.5",
+            "bg-popover text-popover-foreground shadow-border-md ease-out-expo text-xs-plus flex max-h-(--available-height) w-75 min-w-32 origin-(--transform-origin) flex-col gap-2.5 rounded-lg outline-hidden duration-450 data-closed:overflow-hidden data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+            flush ? "gap-0 p-0" : "p-2.5",
             className
           )}
           {...props}

@@ -58,7 +58,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "shadow-border dark:bg-input/30 dark:hover:bg-input/50 bg-transparent",
+          "shadow-border-sm dark:bg-input/30 dark:hover:bg-input/50 bg-transparent",
         ghost: "hover:bg-accent hover:text-accent-foreground",
       },
       size: {
@@ -135,7 +135,7 @@ function SelectContent({
           data-slot="select-content"
           data-align-item-to-trigger={alignItemWithTrigger}
           className={cn(
-            "bg-popover text-popover-foreground shadow-popup-border ease-out-expo group/select-content relative isolate max-h-(--available-height) origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg duration-450",
+            "bg-popover text-popover-foreground shadow-border-md ease-out-expo group/select-content relative isolate max-h-(--available-height) origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg duration-450",
             "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 data-[side=none]:data-ending-style:scale-100 data-[side=none]:data-ending-style:opacity-0 data-[side=none]:data-ending-style:transition-none data-[side=none]:data-starting-style:scale-100 data-[side=none]:data-starting-style:opacity-0",
             alignItemWithTrigger
               ? "min-w-[calc(var(--anchor-width)+0.5rem)]"

@@ -130,7 +130,7 @@ function AutocompleteContent({
         <AutocompletePrimitive.Popup
           data-slot="autocomplete-content"
           className={cn(
-            "group bg-popover text-popover-foreground shadow-popup-border max-h-[min(23rem,var(--available-height))] w-(--anchor-width) max-w-(--available-width) overflow-hidden rounded-md transition-[transform,scale,opacity] duration-150 ease-out",
+            "group bg-popover text-popover-foreground shadow-border-md max-h-[min(23rem,var(--available-height))] w-(--anchor-width) max-w-(--available-width) overflow-hidden rounded-md transition-[transform,scale,opacity] duration-150 ease-out",
             "origin-(--transform-origin) data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
             className
           )}
