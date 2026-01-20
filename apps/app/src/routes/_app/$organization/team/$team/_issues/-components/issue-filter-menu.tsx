@@ -1,9 +1,22 @@
 import * as React from "react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { useParams } from "@tanstack/react-router";
 
+import { issueFilterOptions } from "@/config/team";
+import { useIssueFilters } from "@/hooks/use-issue-filter-store";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuEmpty,
+  DropdownMenuGroup,
+  DropdownMenuPortal,
+  DropdownMenuSearch,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Kbd } from "@/components/ui/kbd";
@@ -18,13 +31,75 @@ interface IssueFilterMenuProps extends React.ComponentProps<
 > {}
 
 export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
+  const { team } = useParams({
+    from: "/_app/$organization/team/$team/_issues",
+  });
+  const { addFilter, filters } = useIssueFilters(team);
+  const [search, setSearch] = React.useState("");
+  const [subMenuSearch, setSubMenuSearch] = React.useState("");
+
+  const flattenedFilterOptions = React.useMemo(() => {
+    const lowerSearch = search.toLowerCase();
+
+    if (lowerSearch.length < 2) {
+      return issueFilterOptions.map((f) => ({
+        type: "category" as const,
+        ...f,
+      }));
+    }
+
+    const results: (
+      | { type: "category"; id: string; label: string; icon: any }
+      | {
+          type: "option";
+          filterId: string;
+          categoryLabel: string;
+          value: string;
+          label: string;
+          icon?: any;
+        }
+    )[] = [];
+
+    issueFilterOptions.forEach((filter) => {
+      const isCategoryMatch = filter.label.toLowerCase().includes(lowerSearch);
+
+      // Add category if it matches
+      if (isCategoryMatch) {
+        results.push({
+          type: "category",
+          id: filter.id,
+          label: filter.label,
+          icon: filter.icon,
+        });
+      }
+
+      filter.options.forEach((option) => {
+        if (option.label.toLowerCase().includes(lowerSearch)) {
+          results.push({
+            type: "option",
+            filterId: filter.id,
+            categoryLabel: filter.label,
+            ...option,
+          });
+        }
+      });
+    });
+
+    return results;
+  }, [search]);
+
   return (
     <DropdownMenu {...props}>
       <Tooltip>
         <TooltipTrigger
           render={
             <DropdownMenuTrigger
-              render={<Button variant="ghost" size="xs" />}
+              render={
+                <Button
+                  variant="ghost"
+                  size={filters.length === 0 ? "xs" : "icon-xs"}
+                />
+              }
             />
           }
         >
@@ -44,7 +119,7 @@ export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
             <path d="M6 12H18" />
             <path d="M9 18H15" />
           </svg>
-          <span>Filter</span>
+          {filters.length === 0 && <span>Filter</span>}
         </TooltipTrigger>
         <TooltipContent side="bottom" className="space-x-2">
           <span>Add filter</span>
@@ -56,7 +131,7 @@ export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
         finalFocus={false}
         className="w-auto min-w-60"
       >
-        {/* <DropdownMenuSearch
+        <DropdownMenuSearch
           placeholder="Filter notification by..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -73,15 +148,10 @@ export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
             <React.Fragment>
               {flattenedFilterOptions.map((item) => {
                 if (item.type === "category") {
-                  const filter = filterOptions.find((f) => f.id === item.id)!;
-                  const options =
-                    filter.id === "team"
-                      ? teams.map((team) => ({
-                          value: team.id,
-                          label: team.name,
-                          icon: filter.icon,
-                        }))
-                      : filter.options;
+                  const filter = issueFilterOptions.find(
+                    (f) => f.id === item.id
+                  )!;
+                  const options = filter.options;
 
                   const filteredSubOptions = options.filter((opt) =>
                     opt.label
@@ -176,7 +246,7 @@ export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
               })}
             </React.Fragment>
           )}
-        </DropdownMenuGroup> */}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

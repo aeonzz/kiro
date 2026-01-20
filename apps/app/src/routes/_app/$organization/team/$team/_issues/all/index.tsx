@@ -6,6 +6,7 @@ import { Container, ContainerContent } from "@/components/container";
 import { Error } from "@/components/error";
 
 import { DetailsSidePanel } from "../-components/details-side-panel";
+import { FilterTabs } from "../-components/filter-tabs";
 import { Header } from "../-components/header";
 
 export const Route = createFileRoute(
@@ -45,7 +46,9 @@ function RouteComponent() {
   return (
     <ContainerContent className="flex">
       <div className="flex-1"></div>
-      <DetailsSidePanel title="All issues" team={data.name} />
+      <DetailsSidePanel title="All issues" team={data.name}>
+        <FilterTabs />
+      </DetailsSidePanel>
     </ContainerContent>
   );
 }

@@ -1,11 +1,12 @@
 import * as React from "react";
 
+import { filterOptions } from "@/config/inbox";
 import { cn } from "@/lib/utils";
 import { useInboxFilters } from "@/hooks/use-inbox-filter-store";
 import { Button } from "@/components/ui/button";
+import { FilterChip } from "@/components/filter-chip";
 import { useOrganization } from "@/components/organization-context";
 
-import { InboxFilterChip } from "./inbox-filter-chip";
 import { InboxFilterMenu } from "./inbox-filter-menu";
 
 export function InboxFilterList({
@@ -13,7 +14,8 @@ export function InboxFilterList({
   ...props
 }: React.ComponentProps<"div">) {
   const { activeOrganization } = useOrganization();
-  const { filters } = useInboxFilters(activeOrganization?.id);
+  const { filters, removeFilter, toggleFilterValue, updateFilterOperator } =
+    useInboxFilters(activeOrganization?.id);
 
   if (filters.length === 0) return null;
 
@@ -27,10 +29,15 @@ export function InboxFilterList({
     >
       <div className="flex w-fit min-w-full flex-wrap items-center gap-2 px-4 py-2">
         {filters.map((filter) => (
-          <InboxFilterChip
+          <FilterChip
             key={filter.id}
             filter={filter}
-            orgId={activeOrganization?.id}
+            filterConfig={filterOptions.find((f) => f.id === filter.filterId)}
+            onRemove={(id) => removeFilter(id)}
+            onToggleValue={(id, value) => toggleFilterValue(id, value)}
+            onUpdateOperator={(id, operator) =>
+              updateFilterOperator(id, operator)
+            }
           />
         ))}
         <InboxFilterMenu align="start" />

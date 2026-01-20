@@ -16,20 +16,32 @@ function Container({ className, ref, ...props }: React.ComponentProps<"div">) {
 }
 
 function ContainerHeader({
+  setContainer,
   className,
   inset,
+  children,
   ...props
-}: React.ComponentProps<"header"> & { inset?: boolean }) {
+}: React.ComponentProps<"header"> & {
+  inset?: boolean;
+  setContainer?: (node: HTMLDivElement | null) => void;
+}) {
   return (
     <header
       data-inset={inset}
       data-slot="header"
-      className={cn(
-        "border-b-border text-xs-plus flex h-10 items-center gap-1 border-b px-2 py-1.5 font-semibold data-inset:px-8",
-        className
-      )}
+      className="group/header border-b-border text-xs-plus h-10 w-full border-b font-semibold"
       {...props}
-    />
+    >
+      <div
+        ref={setContainer}
+        className={cn(
+          "mx-2 flex items-center gap-1 py-1.5 group-data-inset/header:mx-8",
+          className
+        )}
+      >
+        {children}
+      </div>
+    </header>
   );
 }
 

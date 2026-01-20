@@ -2,9 +2,8 @@ import * as React from "react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
-import { filterOptions } from "@/config/inbox";
+import { FilterOption } from "@/types/inbox";
 import { cn } from "@/lib/utils";
-import { InboxFilter, useInboxFilters } from "@/hooks/use-inbox-filter-store";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,20 +21,41 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export function InboxFilterChip({
+export type FilterOperator = "is" | "is not" | "is any of";
+
+export interface FilterConfig {
+  id: string;
+  label: string;
+  icon?: any;
+  multiLabel?: string;
+  options: FilterOption[];
+}
+
+export interface GenericFilter {
+  id: string; // The specific instance ID of the filter
+  filterId: string; // The type of filter (e.g., 'status', 'team')
+  operator: FilterOperator;
+  options: FilterOption[];
+}
+
+interface FilterChipProps extends React.ComponentProps<"div"> {
+  filter: GenericFilter;
+  filterConfig?: FilterConfig; // Configuration for this specific filter type
+  onRemove: (id: string) => void;
+  onUpdateOperator: (id: string, operator: FilterOperator) => void;
+  onToggleValue: (id: string, option: FilterOption) => void;
+}
+
+export function FilterChip({
   filter,
-  orgId,
+  filterConfig,
+  onRemove,
+  onUpdateOperator,
+  onToggleValue,
   className,
   ...props
-}: {
-  filter: InboxFilter;
-  orgId?: string;
-} & React.ComponentProps<"div">) {
-  const { removeFilter, updateFilterOperator, toggleFilterValue } =
-    useInboxFilters(orgId);
+}: FilterChipProps) {
   const [search, setSearch] = React.useState("");
-
-  const category = filterOptions.find((f) => f.id === filter.filterId);
 
   const isMulti = filter.options.length > 1;
   const displayOperator =
@@ -44,7 +64,7 @@ export function InboxFilterChip({
   const options = filter.options;
   const valueLabel =
     filter.options.length > 1
-      ? `${filter.options.length} ${category?.multiLabel}`
+      ? `${filter.options.length} ${filterConfig?.multiLabel ?? "items"}`
       : filter.options.map((o) => o.label).join(", ");
 
   const filteredSelectedOptions = filter.options.filter((option) =>
@@ -52,7 +72,7 @@ export function InboxFilterChip({
   );
 
   const filteredAvailableOptions =
-    category?.options.filter(
+    filterConfig?.options.filter(
       (subOption) =>
         !filter.options.some((o) => o.value === subOption.value) &&
         subOption.label.toLowerCase().includes(search.toLowerCase())
@@ -67,15 +87,15 @@ export function InboxFilterChip({
       )}
     >
       <div className="bg-muted text-muted-foreground flex items-center gap-1 px-1.5 py-1">
-        {category?.icon && (
+        {filterConfig?.icon && (
           <HugeiconsIcon
-            icon={category.icon}
+            icon={filterConfig.icon}
             strokeWidth={2}
             className="@max-md/inbox-panel:hidden"
           />
         )}
         <span className="text-foreground/95 shrink-0 font-normal whitespace-nowrap">
-          {category?.label}
+          {filterConfig?.label ?? filter.filterId}
         </span>
       </div>
       <DropdownMenu>
@@ -95,7 +115,7 @@ export function InboxFilterChip({
             <DropdownMenuCheckboxItem
               checked={filter.operator !== "is not"}
               onCheckedChange={() =>
-                updateFilterOperator(filter.id, isMulti ? "is any of" : "is")
+                onUpdateOperator(filter.id, isMulti ? "is any of" : "is")
               }
               closeOnClick
             >
@@ -103,7 +123,7 @@ export function InboxFilterChip({
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
               checked={filter.operator === "is not"}
-              onCheckedChange={() => updateFilterOperator(filter.id, "is not")}
+              onCheckedChange={() => onUpdateOperator(filter.id, "is not")}
               closeOnClick
             >
               Is not
@@ -160,7 +180,7 @@ export function InboxFilterChip({
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-fit min-w-52">
           <DropdownMenuSearch
-            placeholder={category?.label}
+            placeholder={filterConfig?.label}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             autoFocus
@@ -173,7 +193,7 @@ export function InboxFilterChip({
                 checked
                 onCheckedChange={() => {
                   setTimeout(() => {
-                    toggleFilterValue(filter.id, option);
+                    onToggleValue(filter.id, option);
                   }, 150);
                 }}
                 closeOnClick
@@ -196,7 +216,7 @@ export function InboxFilterChip({
                   checked={false}
                   onCheckedChange={() => {
                     setTimeout(() => {
-                      toggleFilterValue(filter.id, subOption);
+                      onToggleValue(filter.id, subOption);
                     }, 150);
                   }}
                   closeOnClick
@@ -222,7 +242,7 @@ export function InboxFilterChip({
               variant="muted"
               size="icon-xs"
               className="text-muted-foreground rounded-none border-none shadow-none"
-              onClick={() => removeFilter(filter.id)}
+              onClick={() => onRemove(filter.id)}
             />
           }
         >

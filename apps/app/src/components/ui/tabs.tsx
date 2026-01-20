@@ -26,7 +26,7 @@ const tabsListVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-sidebar/40",
+        default: "bg-sidebar",
         line: "gap-1 bg-transparent",
       },
       size: {

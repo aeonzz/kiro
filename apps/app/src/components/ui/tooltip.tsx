@@ -27,16 +27,23 @@ function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
 
 function TooltipContent({
   className,
-  side = "top",
+  side = "bottom",
   sideOffset = 4,
   align = "center",
   alignOffset = 0,
+  collisionBoundary,
+  collisionPadding,
   children,
   ...props
 }: TooltipPrimitive.Popup.Props &
   Pick<
     TooltipPrimitive.Positioner.Props,
-    "align" | "alignOffset" | "side" | "sideOffset"
+    | "align"
+    | "alignOffset"
+    | "side"
+    | "sideOffset"
+    | "collisionBoundary"
+    | "collisionPadding"
   >) {
   return (
     <TooltipPrimitive.Portal>
@@ -45,6 +52,11 @@ function TooltipContent({
         alignOffset={alignOffset}
         side={side}
         sideOffset={sideOffset}
+        collisionBoundary={collisionBoundary}
+        collisionPadding={collisionBoundary ? 0 : collisionPadding}
+        collisionAvoidance={{
+          side: "none",
+        }}
         className="ease-out-expo isolate h-(--positioner-height) max-h-[--available-height] w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-400"
       >
         <TooltipPrimitive.Popup

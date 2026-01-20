@@ -41,9 +41,14 @@ import {
 
 interface IssueDisplayOptionsProps extends React.ComponentProps<
   typeof Popover
-> {}
+> {
+  tooltipBoundary?: HTMLElement;
+}
 
-export function IssueDisplayOptions({ ...props }: IssueDisplayOptionsProps) {
+export function IssueDisplayOptions({
+  tooltipBoundary,
+  ...props
+}: IssueDisplayOptionsProps) {
   const { team } = useParams({ from: "/_app/$organization/team/$team" });
   const {
     grouping,
@@ -83,7 +88,10 @@ export function IssueDisplayOptions({ ...props }: IssueDisplayOptionsProps) {
           <HugeiconsIcon icon={SlidersHorizontalIcon} strokeWidth={2} />
           <span>Display</span>
         </TooltipTrigger>
-        <TooltipContent className="space-x-2" side="bottom" align="end">
+        <TooltipContent
+          className="space-x-2"
+          collisionBoundary={tooltipBoundary}
+        >
           <span>Show display options</span>
           <KbdGroup>
             <Kbd>⇧</Kbd>
@@ -99,7 +107,7 @@ export function IssueDisplayOptions({ ...props }: IssueDisplayOptionsProps) {
           >
             <TabsList
               size="lg"
-              className="w-full *:data-[slot='tooltip-trigger']:flex-col *:data-[slot='tooltip-trigger']:gap-[3px]"
+              className="bg-sidebar/40 w-full *:data-[slot='tooltip-trigger']:flex-col *:data-[slot='tooltip-trigger']:gap-[3px]"
             >
               <Tooltip>
                 <TooltipTrigger render={<TabsTrigger value="list" />}>

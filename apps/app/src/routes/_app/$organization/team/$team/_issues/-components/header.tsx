@@ -28,6 +28,7 @@ export function Header({
 }: React.ComponentProps<typeof ContainerHeader> & {
   teamName: string;
 }) {
+  const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
   const { organization, team } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });
@@ -39,6 +40,7 @@ export function Header({
       inset={inset}
       className={cn("justify-between", className)}
       {...props}
+      setContainer={setContainer}
     >
       <div className="flex items-center gap-2.5">
         <div className="flex items-center gap-1">
@@ -93,7 +95,11 @@ export function Header({
           >
             <HugeiconsIcon icon={PanelRightIcon} strokeWidth={2} />
           </TooltipTrigger>
-          <TooltipContent className="space-x-2">
+          <TooltipContent
+            className="space-x-2"
+            side="bottom"
+            collisionBoundary={container ?? undefined}
+          >
             <span>{isOpen ? "Close details" : "Open details"}</span>
             <KbdGroup>
               <Kbd>Ctrl</Kbd>

@@ -1,3 +1,18 @@
+import {
+  AlertSquareIcon,
+  CheckmarkCircle01Icon,
+  CircleArrowLeftRightIcon,
+  CircleIcon,
+  DashedLine01Icon,
+  DashedLineCircleIcon,
+  FullSignalIcon,
+  LowSignalIcon,
+  MediumSignalIcon,
+  MultiplicationSignCircleIcon,
+  PlayCircleIcon,
+} from "@hugeicons/core-free-icons";
+
+import type { FilterOptions } from "@/types/inbox";
 import type { TeamIssueTab } from "@/types/team";
 import { BacklogIcon, CopyIcon, InProgressIcon } from "@/components/icons";
 
@@ -144,5 +159,98 @@ export const issueDisplayOptions = [
   {
     value: "pull-requests",
     label: "Pull requests",
+  },
+];
+
+export const issueFilterTabs = [
+  {
+    value: "assignees",
+    label: "Assignees",
+  },
+  {
+    value: "labels",
+    label: "Labels",
+  },
+  {
+    value: "priority",
+    label: "Priority",
+  },
+  {
+    value: "projects",
+    label: "Projects",
+  },
+];
+
+export const issueFilterOptions: FilterOptions[] = [
+  {
+    id: "priority",
+    label: "Issue priority",
+    multiLabel: "priorities",
+    icon: FullSignalIcon,
+    options: [
+      {
+        value: "no-priority",
+        label: "No priority",
+        icon: DashedLine01Icon,
+      },
+      {
+        value: "urgent",
+        label: "Urgent",
+        icon: AlertSquareIcon,
+      },
+      {
+        value: "high",
+        label: "High",
+        icon: FullSignalIcon,
+      },
+      {
+        value: "medium",
+        label: "Medium",
+        icon: MediumSignalIcon,
+      },
+      {
+        value: "low",
+        label: "Low",
+        icon: LowSignalIcon,
+      },
+    ],
+  },
+  {
+    id: "status-type",
+    label: "Issue status type",
+    multiLabel: "status types",
+    icon: CircleIcon,
+    options: [
+      {
+        value: "triage",
+        label: "Triage",
+        icon: CircleArrowLeftRightIcon,
+      },
+      {
+        value: "backlog",
+        label: "Backlog",
+        icon: DashedLineCircleIcon,
+      },
+      {
+        value: "unstarted",
+        label: "Unstarted",
+        icon: CircleIcon,
+      },
+      {
+        value: "started",
+        label: "Started",
+        icon: PlayCircleIcon,
+      },
+      {
+        value: "completed",
+        label: "Completed",
+        icon: CheckmarkCircle01Icon,
+      },
+      {
+        value: "cancelled",
+        label: "Cancelled",
+        icon: MultiplicationSignCircleIcon,
+      },
+    ],
   },
 ];
