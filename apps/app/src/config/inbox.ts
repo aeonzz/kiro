@@ -50,6 +50,17 @@ export const orderingOptions = [
   { value: "priority", label: "Priority" },
 ];
 
+export const displayOptions = [
+  {
+    value: "id",
+    label: "ID",
+  },
+  {
+    value: "status-and-icon",
+    label: "Status and icon",
+  },
+];
+
 export const filterOptions: FilterOptions[] = [
   {
     id: "type",

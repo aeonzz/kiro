@@ -19,7 +19,10 @@ interface IssueViewProps {
 }
 
 export function IssueView({ notification }: IssueViewProps) {
-  const { showId, showStatusAndIcon } = useActiveInboxDisplayConfig();
+  const { displayProperties } = useActiveInboxDisplayConfig();
+
+  const showId = displayProperties.includes("id");
+  const showStatusAndIcon = displayProperties.includes("status-and-icon");
 
   const read = !!notification.readAt;
 

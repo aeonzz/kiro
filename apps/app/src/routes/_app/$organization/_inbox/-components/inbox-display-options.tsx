@@ -5,7 +5,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
-import { orderingOptions } from "@/config/inbox";
+import { displayOptions, orderingOptions } from "@/config/inbox";
 import { useActiveInboxDisplayOptions } from "@/hooks/use-inbox-display-store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -14,21 +14,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Toggle } from "@/components/ui/toggle";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  OptionControlSelect,
+  OptionControlSwitch,
+} from "@/components/option-control";
 
 export function InboxDisplayOptions({
   ...props
@@ -38,14 +33,12 @@ export function InboxDisplayOptions({
     showSnoozedItems,
     showReadItems,
     showUnreadFirst,
-    showId,
-    showStatusAndIcon,
+    displayProperties,
     setOrdering,
     setShowSnoozedItems,
     setShowReadItems,
     setShowUnreadFirst,
-    setShowId,
-    setShowStatusAndIcon,
+    setDisplayProperties,
   } = useActiveInboxDisplayOptions();
 
   const selectedOrdering = orderingOptions.find((f) => f.value === ordering);
@@ -73,99 +66,38 @@ export function InboxDisplayOptions({
         </TooltipContent>
       </Tooltip>
       <PopoverContent align="end" flush>
-        <div className="border-border flex items-center justify-between gap-2 border-b px-4 py-3">
-          <div className="flex items-center gap-1.5">
-            <HugeiconsIcon
-              icon={ArrowUpDownIcon}
-              strokeWidth={2}
-              className="text-muted-foreground size-4"
-            />
-            <Label
-              htmlFor="ordering"
-              className="text-muted-foreground text-xs font-normal"
-            >
-              Ordering
-            </Label>
-          </div>
-          <Select
+        <div className="border-border space-y-2 border-b px-4 py-3">
+          <OptionControlSelect
+            id="ordering"
+            label="Ordering"
+            icon={ArrowUpDownIcon}
+            options={orderingOptions}
             value={selectedOrdering}
-            itemToStringValue={(item) => item.value}
             onValueChange={(value) => {
-              if (!value) return;
               setOrdering(value.value);
             }}
-          >
-            <SelectTrigger id="ordering" className="w-24" size="xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent
-              alignItemWithTrigger={false}
-              className="min-w-(--anchor-width)"
-            >
-              <SelectGroup className="*:data-[slot=select-item]:py-1">
-                {orderingOptions.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option}
-                    className="*:data-[slot=select-item-indicator]:right-1"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          />
         </div>
-        <div className="space-y-4 px-4 py-3">
-          <div className="flex items-start gap-3">
-            <Label
-              htmlFor="showSnoozedItems"
-              className="text-muted-foreground text-xs font-normal"
-            >
-              Show snoozed items
-            </Label>
-            <div className="flex flex-1 items-center justify-end">
-              <Switch
-                id="showSnoozedItems"
-                size="sm"
-                checked={showSnoozedItems}
-                onCheckedChange={setShowSnoozedItems}
-              />
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <Label
-              htmlFor="showReadItems"
-              className="text-muted-foreground text-xs font-normal"
-            >
-              Show read items
-            </Label>
-            <div className="flex flex-1 items-center justify-end">
-              <Switch
-                id="showReadItems"
-                size="sm"
-                checked={showReadItems}
-                onCheckedChange={setShowReadItems}
-              />
-            </div>
-          </div>
+        <div className="space-y-2 px-4 py-3">
+          <OptionControlSwitch
+            id="show-snoozed-items"
+            label="Show snoozed items"
+            checked={showSnoozedItems}
+            onCheckedChange={setShowSnoozedItems}
+          />
+          <OptionControlSwitch
+            id="show-read-items"
+            label="Show read items"
+            checked={showReadItems}
+            onCheckedChange={setShowReadItems}
+          />
           {showReadItems && (
-            <div className="flex items-start gap-3">
-              <Label
-                htmlFor="showUnreadFirst"
-                className="text-muted-foreground text-xs font-normal"
-              >
-                Show unread first
-              </Label>
-              <div className="flex flex-1 items-center justify-end">
-                <Switch
-                  id="showUnreadFirst"
-                  size="sm"
-                  checked={showUnreadFirst}
-                  onCheckedChange={setShowUnreadFirst}
-                />
-              </div>
-            </div>
+            <OptionControlSwitch
+              id="show-unread-first"
+              label="Show unread first"
+              checked={showUnreadFirst}
+              onCheckedChange={setShowUnreadFirst}
+            />
           )}
         </div>
         <div className="border-border border-t px-4 py-3">
@@ -176,25 +108,21 @@ export function InboxDisplayOptions({
             >
               Display
             </Label>
-            <div className="*:not-data-pressed:text-muted-foreground flex items-center gap-1">
-              <Toggle
-                size="sm"
-                variant="outline"
-                pressed={showId}
-                onPressedChange={setShowId}
-              >
-                ID
-              </Toggle>
-
-              <Toggle
-                size="sm"
-                variant="outline"
-                pressed={showStatusAndIcon}
-                onPressedChange={setShowStatusAndIcon}
-              >
-                Status and icon
-              </Toggle>
-            </div>
+            <ToggleGroup
+              value={displayProperties}
+              onValueChange={(val) => setDisplayProperties(val as string[])}
+              size="sm"
+              variant="outline"
+              className="flex-wrap"
+              multiple
+              spacing={1.5}
+            >
+              {displayOptions.map((option) => (
+                <ToggleGroupItem key={option.value} value={option.value}>
+                  {option.label}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
           </div>
         </div>
       </PopoverContent>

@@ -11,8 +11,7 @@ export interface InboxDisplayConfig {
   showSnoozedItems: boolean;
   showReadItems: boolean;
   showUnreadFirst: boolean;
-  showId: boolean;
-  showStatusAndIcon: boolean;
+  displayProperties: string[];
 }
 
 const DEFAULT_CONFIG: InboxDisplayConfig = {
@@ -20,8 +19,7 @@ const DEFAULT_CONFIG: InboxDisplayConfig = {
   showSnoozedItems: false,
   showReadItems: true,
   showUnreadFirst: true,
-  showId: false,
-  showStatusAndIcon: true,
+  displayProperties: ["status-and-icon", "id"],
 };
 
 interface InboxDisplayState {
@@ -66,9 +64,8 @@ export function useInboxDisplayOptions(orgId?: string) {
       orgId && store.setConfig(orgId, { showReadItems }),
     setShowUnreadFirst: (showUnreadFirst: boolean) =>
       orgId && store.setConfig(orgId, { showUnreadFirst }),
-    setShowId: (showId: boolean) => orgId && store.setConfig(orgId, { showId }),
-    setShowStatusAndIcon: (showStatusAndIcon: boolean) =>
-      orgId && store.setConfig(orgId, { showStatusAndIcon }),
+    setDisplayProperties: (displayProperties: string[]) =>
+      orgId && store.setConfig(orgId, { displayProperties }),
   };
 }
 
