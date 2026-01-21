@@ -1,9 +1,12 @@
 import * as React from "react";
+import { FilterIcon } from "@/utils/filter-icon";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useParams } from "@tanstack/react-router";
 
+import type { IconType } from "@/types/inbox";
 import { issueFilterOptions } from "@/config/team";
+import { cn } from "@/lib/utils";
 import { useIssueFilters } from "@/hooks/use-issue-filter-store";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +33,10 @@ interface IssueFilterMenuProps extends React.ComponentProps<
   typeof DropdownMenu
 > {}
 
-export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
+export function IssueFilterMenu({
+  onOpenChangeComplete,
+  ...props
+}: IssueFilterMenuProps) {
   const { team } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });
@@ -49,14 +55,21 @@ export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
     }
 
     const results: (
-      | { type: "category"; id: string; label: string; icon: any }
+      | {
+          type: "category";
+          id: string;
+          label: string;
+          icon: IconType;
+          iconFill?: string;
+        }
       | {
           type: "option";
           filterId: string;
           categoryLabel: string;
           value: string;
           label: string;
-          icon?: any;
+          icon?: IconType;
+          iconFill?: string;
         }
     )[] = [];
 
@@ -70,6 +83,7 @@ export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
           id: filter.id,
           label: filter.label,
           icon: filter.icon,
+          iconFill: filter.iconFill,
         });
       }
 
@@ -89,7 +103,16 @@ export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
   }, [search]);
 
   return (
-    <DropdownMenu {...props}>
+    <DropdownMenu
+      onOpenChangeComplete={(open) => {
+        if (!open) {
+          setSearch("");
+          setSubMenuSearch("");
+        }
+        onOpenChangeComplete?.(open);
+      }}
+      {...props}
+    >
       <Tooltip>
         <TooltipTrigger
           render={
@@ -168,7 +191,7 @@ export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
                       }}
                     >
                       <DropdownMenuSubTrigger openOnHover>
-                        <HugeiconsIcon icon={item.icon} strokeWidth={2} />
+                        <FilterIcon icon={item.icon} strokeWidth={2} />
                         {item.label}
                       </DropdownMenuSubTrigger>
                       <DropdownMenuPortal>
@@ -198,9 +221,10 @@ export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
                                   }}
                                 >
                                   {subOption.icon && (
-                                    <HugeiconsIcon
+                                    <FilterIcon
                                       icon={subOption.icon}
                                       strokeWidth={2}
+                                      className={subOption.iconFill}
                                     />
                                   )}
                                   {subOption.label}
@@ -226,10 +250,10 @@ export function IssueFilterMenu({ ...props }: IssueFilterMenuProps) {
                     className="gap-0 pr-2.5"
                   >
                     {item.icon && (
-                      <HugeiconsIcon
+                      <FilterIcon
                         icon={item.icon}
                         strokeWidth={2}
-                        className="mr-2.5"
+                        className={cn("mr-2.5", item.iconFill)}
                       />
                     )}
                     <div className="text-muted-foreground flex items-center">

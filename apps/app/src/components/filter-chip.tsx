@@ -1,8 +1,9 @@
 import * as React from "react";
+import { FilterIcon } from "@/utils/filter-icon";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
-import { FilterOption } from "@/types/inbox";
+import type { FilterOption, FilterOptions } from "@/types/inbox";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,14 +24,6 @@ import {
 
 export type FilterOperator = "is" | "is not" | "is any of";
 
-export interface FilterConfig {
-  id: string;
-  label: string;
-  icon?: any;
-  multiLabel?: string;
-  options: FilterOption[];
-}
-
 export interface GenericFilter {
   id: string; // The specific instance ID of the filter
   filterId: string; // The type of filter (e.g., 'status', 'team')
@@ -40,7 +33,7 @@ export interface GenericFilter {
 
 interface FilterChipProps extends React.ComponentProps<"div"> {
   filter: GenericFilter;
-  filterConfig?: FilterConfig; // Configuration for this specific filter type
+  filterConfig?: FilterOptions; // Configuration for this specific filter type
   onRemove: (id: string) => void;
   onUpdateOperator: (id: string, operator: FilterOperator) => void;
   onToggleValue: (id: string, option: FilterOption) => void;
@@ -88,7 +81,7 @@ export function FilterChip({
     >
       <div className="bg-muted text-muted-foreground flex items-center gap-1 px-1.5 py-1">
         {filterConfig?.icon && (
-          <HugeiconsIcon
+          <FilterIcon
             icon={filterConfig.icon}
             strokeWidth={2}
             className="@max-md/inbox-panel:hidden"
@@ -145,19 +138,21 @@ export function FilterChip({
             />
           }
         >
-          {filter.filterId === "status-type" &&
-          options.some((option) => option.icon) ? (
-            <span className="mr-1 flex items-center @max-md/inbox-panel:hidden">
+          {filterConfig?.multiIcon && options.some((option) => option.icon) ? (
+            <span className="flex items-center @max-md/inbox-panel:hidden">
               {options
                 .slice(0, 3)
                 .map(
                   (option) =>
                     option.icon && (
-                      <HugeiconsIcon
+                      <FilterIcon
                         key={option.value}
                         icon={option.icon}
                         strokeWidth={2}
-                        className="bg-muted outline-muted rounded-full outline-1 duration-200 not-first:-ml-1"
+                        className={cn(
+                          "bg-muted rounded-full outline-1 duration-200 outline-none not-first:-ml-1 group-hover/button:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] group-aria-expanded/button:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))]",
+                          option.iconFill
+                        )}
                       />
                     )
                 )}
@@ -167,11 +162,14 @@ export function FilterChip({
             options.map(
               (option) =>
                 option.icon && (
-                  <HugeiconsIcon
+                  <FilterIcon
                     key={option.value}
                     icon={option.icon}
                     strokeWidth={2}
-                    className="bg-muted outline-muted rounded-full outline-1 duration-200 not-first:-ml-1 @max-md/inbox-panel:hidden"
+                    className={cn(
+                      "rounded-full duration-200 outline-none not-first:-ml-1 @max-md/inbox-panel:hidden",
+                      option.iconFill
+                    )}
                   />
                 )
             )
@@ -199,7 +197,11 @@ export function FilterChip({
                 closeOnClick
               >
                 {option.icon && (
-                  <HugeiconsIcon icon={option.icon} strokeWidth={2} />
+                  <FilterIcon
+                    icon={option.icon}
+                    strokeWidth={2}
+                    className={option.iconFill}
+                  />
                 )}
                 {option.label}
               </DropdownMenuCheckboxItem>
@@ -222,7 +224,11 @@ export function FilterChip({
                   closeOnClick
                 >
                   {subOption.icon && (
-                    <HugeiconsIcon icon={subOption.icon} strokeWidth={2} />
+                    <FilterIcon
+                      icon={subOption.icon}
+                      strokeWidth={2}
+                      className={subOption.iconFill}
+                    />
                   )}
                   {subOption.label}
                 </DropdownMenuCheckboxItem>

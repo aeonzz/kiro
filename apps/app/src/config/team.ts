@@ -14,7 +14,15 @@ import {
 
 import type { FilterOptions } from "@/types/inbox";
 import type { TeamIssueTab } from "@/types/team";
-import { BacklogIcon, CopyIcon, InProgressIcon } from "@/components/icons";
+import {
+  BacklogIcon,
+  CancelledIcon,
+  CopyIcon,
+  DoneIcon,
+  InProgressIcon,
+  InReviewIcon,
+  TodoIcon,
+} from "@/components/icons";
 
 export const teamIssueTabs: Array<TeamIssueTab> = [
   {
@@ -183,42 +191,61 @@ export const issueFilterTabs = [
 
 export const issueFilterOptions: FilterOptions[] = [
   {
-    id: "priority",
-    label: "Issue priority",
-    multiLabel: "priorities",
-    icon: FullSignalIcon,
+    id: "status",
+    label: "Status",
+    multiLabel: "statuses",
+    multiIcon: true,
+    icon: BacklogIcon,
     options: [
       {
-        value: "no-priority",
-        label: "No priority",
-        icon: DashedLine01Icon,
+        value: "backlog",
+        label: "Backlog",
+        icon: BacklogIcon,
+        iconFill: "text-muted-foreground!",
       },
       {
-        value: "urgent",
-        label: "Urgent",
-        icon: AlertSquareIcon,
+        value: "todo",
+        label: "Todo",
+        icon: TodoIcon,
+        iconFill: "text-muted-foreground!",
       },
       {
-        value: "high",
-        label: "High",
-        icon: FullSignalIcon,
+        value: "in-progress",
+        label: "In progress",
+        icon: InProgressIcon,
+        iconFill: "text-yellow-500!",
       },
       {
-        value: "medium",
-        label: "Medium",
-        icon: MediumSignalIcon,
+        value: "in-review",
+        label: "In review",
+        icon: InReviewIcon,
+        iconFill: "text-green-500!",
       },
       {
-        value: "low",
-        label: "Low",
-        icon: LowSignalIcon,
+        value: "done",
+        label: "Done",
+        icon: DoneIcon,
+        iconFill: "text-indigo-500!",
+      },
+      {
+        value: "cancelled",
+        label: "Cancelled",
+        icon: CancelledIcon,
+        iconFill: "text-muted-foreground!",
+      },
+      {
+        value: "duplicate",
+        label: "Duplicate",
+        icon: CancelledIcon,
+        iconFill: "text-muted-foreground!",
       },
     ],
   },
   {
     id: "status-type",
-    label: "Issue status type",
+    label: "Status type",
     multiLabel: "status types",
+    multiIcon: true,
     icon: CircleIcon,
     options: [
       {
@@ -250,6 +277,39 @@ export const issueFilterOptions: FilterOptions[] = [
         value: "cancelled",
         label: "Cancelled",
         icon: MultiplicationSignCircleIcon,
+      },
+    ],
+  },
+  {
+    id: "priority",
+    label: "Issue priority",
+    multiLabel: "priorities",
+    icon: FullSignalIcon,
+    options: [
+      {
+        value: "no-priority",
+        label: "No priority",
+        icon: DashedLine01Icon,
+      },
+      {
+        value: "urgent",
+        label: "Urgent",
+        icon: AlertSquareIcon,
+      },
+      {
+        value: "high",
+        label: "High",
+        icon: FullSignalIcon,
+      },
+      {
+        value: "medium",
+        label: "Medium",
+        icon: MediumSignalIcon,
+      },
+      {
+        value: "low",
+        label: "Low",
+        icon: LowSignalIcon,
       },
     ],
   },

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { FilterIcon } from "@/utils/filter-icon";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -27,6 +28,7 @@ import { useOrganization } from "@/components/organization-context";
 
 export function InboxFilterMenu({
   align = "end",
+  onOpenChangeComplete,
   ...props
 }: React.ComponentProps<typeof DropdownMenu> & {
   align?: React.ComponentProps<typeof DropdownMenuContent>["align"];
@@ -97,9 +99,11 @@ export function InboxFilterMenu({
     <DropdownMenu
       {...props}
       onOpenChangeComplete={(open) => {
-        setSearch("");
-        setSubMenuSearch("");
-        props.onOpenChangeComplete?.(open);
+        if (!open) {
+          setSearch("");
+          setSubMenuSearch("");
+        }
+        onOpenChangeComplete?.(open);
       }}
     >
       <Tooltip>
@@ -185,7 +189,7 @@ export function InboxFilterMenu({
                       }}
                     >
                       <DropdownMenuSubTrigger openOnHover>
-                        <HugeiconsIcon icon={item.icon} strokeWidth={2} />
+                        <FilterIcon icon={item.icon} strokeWidth={2} />
                         {item.label}
                       </DropdownMenuSubTrigger>
                       <DropdownMenuPortal>
@@ -215,7 +219,7 @@ export function InboxFilterMenu({
                                   }}
                                 >
                                   {subOption.icon && (
-                                    <HugeiconsIcon
+                                    <FilterIcon
                                       icon={subOption.icon}
                                       strokeWidth={2}
                                     />
@@ -243,7 +247,7 @@ export function InboxFilterMenu({
                     className="gap-0 pr-2.5"
                   >
                     {item.icon && (
-                      <HugeiconsIcon
+                      <FilterIcon
                         icon={item.icon}
                         strokeWidth={2}
                         className="mr-2.5"

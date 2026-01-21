@@ -2,20 +2,26 @@ import type { IconSvgElement } from "@hugeicons/react";
 
 import { NotificationType } from "@/types/enums";
 import { Notification as PrismaNotification } from "@/types/schema-types";
+import type { IconProps } from "@/components/icons";
 
 import { StrictOmit } from ".";
+
+export type IconType = IconSvgElement | React.ComponentType<IconProps>;
 
 export type FilterOption = {
   value: string;
   label: string;
-  icon?: any;
+  icon?: IconType;
+  iconFill?: string;
 };
 
 export type FilterOptions = {
   id: string;
   label: string;
   multiLabel: string;
-  icon: any;
+  multiIcon?: boolean;
+  icon: IconType;
+  iconFill?: string;
   options: FilterOption[];
 };
 

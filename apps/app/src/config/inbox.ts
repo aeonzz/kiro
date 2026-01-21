@@ -179,6 +179,7 @@ export const filterOptions: FilterOptions[] = [
     id: "status-type",
     label: "Issue status type",
     multiLabel: "status types",
+    multiIcon: true,
     icon: CircleIcon,
     options: [
       {

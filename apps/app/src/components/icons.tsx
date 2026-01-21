@@ -26,9 +26,9 @@ export const BacklogIcon = ({
     <circle
       cx="12"
       cy="12"
-      r="10.5"
+      r="9"
       stroke="currentColor"
-      strokeWidth="3"
+      strokeWidth="2.5"
       strokeDasharray="3 3"
       fill="none"
     />
@@ -54,9 +54,9 @@ export const TodoIcon = ({
     <circle
       cx="12"
       cy="12"
-      r="10.5"
+      r="9"
       stroke="currentColor"
-      strokeWidth="3"
+      strokeWidth="2.5"
       fill="none"
     />
   </svg>
@@ -81,15 +81,12 @@ export const InProgressIcon = ({
     <circle
       cx="12"
       cy="12"
-      r="10.5"
+      r="9"
       stroke="currentColor"
-      strokeWidth="3"
+      strokeWidth="2.5"
       fill="none"
     />
-    <path
-      d="M12 4.5C16.1421 4.5 19.5 7.8579 19.5 12C19.5 16.1421 16.1421 19.5 12 19.5V4.5Z"
-      fill="currentColor"
-    />
+    <path d="M12 6A6 6 0 0 1 12 18V6Z" fill="currentColor" />
   </svg>
 );
 
@@ -112,15 +109,12 @@ export const InReviewIcon = ({
     <circle
       cx="12"
       cy="12"
-      r="10.5"
+      r="9"
       stroke="currentColor"
-      strokeWidth="3"
+      strokeWidth="2.5"
       fill="none"
     />
-    <path
-      d="M12 12L12 4.5C16.1421 4.5 19.5 7.8579 19.5 12C19.5 16.1421 16.1421 19.5 12 19.5C7.8579 19.5 4.5 16.1421 4.5 12Z"
-      fill="currentColor"
-    />
+    <path d="M12 12L12 6A6 6 0 1 1 6 12Z" fill="currentColor" />
   </svg>
 );
 
@@ -129,53 +123,77 @@ export const DoneIcon = ({
   size = 18,
   ref,
   ...props
-}: IconProps) => (
-  <svg
-    ref={ref}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={cn("shrink-0", className)}
-    {...props}
-  >
-    <circle cx="12" cy="12" r="12" fill="currentColor" />
-    <path
-      d="M7 12.5L10.5 16L17 8"
-      stroke="black"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
+}: IconProps) => {
+  const maskId = React.useId();
+  return (
+    <svg
+      ref={ref}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={cn("shrink-0", className)}
+      {...props}
+    >
+      <mask id={maskId}>
+        <rect width="24" height="24" fill="white" />
+        <path
+          d="M7 12.5L10.5 16L17 8"
+          stroke="black"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </mask>
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        fill="currentColor"
+        mask={`url(#${maskId})`}
+      />
+    </svg>
+  );
+};
 
 export const CancelledIcon = ({
   className,
   size = 18,
   ref,
   ...props
-}: IconProps) => (
-  <svg
-    ref={ref}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={cn("shrink-0", className)}
-    {...props}
-  >
-    <circle cx="12" cy="12" r="12" fill="currentColor" />
-    <path
-      d="M8 8L16 16M16 8L8 16"
-      stroke="black"
-      strokeWidth="3"
-      strokeLinecap="round"
-    />
-  </svg>
-);
+}: IconProps) => {
+  const maskId = React.useId();
+  return (
+    <svg
+      ref={ref}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={cn("shrink-0", className)}
+      {...props}
+    >
+      <mask id={maskId}>
+        <rect width="24" height="24" fill="white" />
+        <path
+          d="M8 8L16 16M16 8L8 16"
+          stroke="black"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+      </mask>
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        fill="currentColor"
+        mask={`url(#${maskId})`}
+      />
+    </svg>
+  );
+};
 
 export const CopyIcon = ({
   className,
