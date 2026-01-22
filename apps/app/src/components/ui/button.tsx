@@ -15,11 +15,13 @@ const buttonVariants = cva(
         flatOutline:
           "bg-transparent border border-border hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground data-activable:text-muted-foreground data-activable:data-active:dark:bg-input/30 data-activable:data-active:text-foreground data-activable:data-active:[&_svg]:text-foreground data-activable:hover:text-foreground",
         secondary:
-          "shadow-border-sm bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "shadow-border-sm bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklab,var(--secondary)95%,var(--secondary-foreground))] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         muted:
           "shadow-border-sm bg-muted text-foreground/95 aria-expanded:bg-muted aria-expanded:text-foreground/95 hover:text-foreground/95 hover:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] aria-expanded:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))]",
         ghost:
           "hover:shadow-[0_0_0_1px_var(--muted)] hover:bg-muted hover:text-foreground dark:hover:bg-muted/70 aria-expanded:bg-muted dark:aria-expanded:bg-muted/70 aria-expanded:text-foreground",
+        ghostPopup:
+          "hover:shadow-[0_0_0_1px_var(--muted)] hover:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] hover:text-foreground dark:hover:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] aria-expanded:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] dark:aria-expanded:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] aria-expanded:text-foreground",
         destructive:
           "bg-destructive/10 hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30",
         ghostDestructive:
@@ -29,8 +31,8 @@ const buttonVariants = cva(
       size: {
         default:
           "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5",
-        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5",
+        xs: "h-6 gap-1.5 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5",
+        sm: "h-7 gap-1.5 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5",
         lg: "h-9 text-xs-plus gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
         icon: "size-8",
         "icon-xs":
