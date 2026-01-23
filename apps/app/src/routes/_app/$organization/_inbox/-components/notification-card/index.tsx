@@ -82,7 +82,6 @@ export function NotificationCard({
       params: {
         organization,
       },
-      state: (prev: any) => ({ ...prev, viewMode: "full" }),
     });
   }
 
@@ -97,7 +96,13 @@ export function NotificationCard({
             )}
             isActive={isActive}
             data-read={!!notification.readAt}
-            render={<Link to={notification.link} params={{ organization }} />}
+            render={
+              <Link
+                to={notification.link}
+                params={{ organization }}
+                search={{ viewMode: "split" }}
+              />
+            }
             onClick={onClick}
             onDoubleClick={onDoubleClick}
             {...props}

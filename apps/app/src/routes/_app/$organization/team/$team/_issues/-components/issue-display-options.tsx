@@ -49,7 +49,9 @@ export function IssueDisplayOptions({
   tooltipBoundary,
   ...props
 }: IssueDisplayOptionsProps) {
-  const { team } = useParams({ from: "/_app/$organization/team/$team" });
+  const { team } = useParams({
+    from: "/_app/$organization/team/$team/_issues",
+  });
   const {
     grouping,
     ordering,

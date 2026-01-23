@@ -7,6 +7,7 @@ import {
   useLocation,
 } from "@tanstack/react-router";
 import { useDefaultLayout } from "react-resizable-panels";
+import { z } from "zod";
 
 import type { Notification } from "@/types/schema-types";
 import { notificationQueries } from "@/lib/query-factory";
@@ -22,7 +23,12 @@ import { InboxFilterList } from "./-components/inbox-filter-list";
 import { InboxHeader } from "./-components/inbox-header";
 import { NotificationList } from "./-components/notification-list";
 
+const inboxSearchSchema = z.object({
+  viewMode: z.enum(["split"]).optional(),
+});
+
 export const Route = createFileRoute("/_app/$organization/_inbox")({
+  validateSearch: inboxSearchSchema,
   loader: async ({ params: { organization }, context }) => {
     const data = await context.queryClient.ensureQueryData(
       notificationQueries.lists({
@@ -40,7 +46,7 @@ export const Route = createFileRoute("/_app/$organization/_inbox")({
 });
 
 function RouteComponent() {
-  const location = useLocation();
+  const { viewMode } = Route.useSearch();
   const { organization } = Route.useParams();
   const { session } = Route.useRouteContext();
 
@@ -56,10 +62,7 @@ function RouteComponent() {
     })
   );
 
-  const state = location.state as { viewMode?: string } | undefined;
-  const isFullView = state?.viewMode === "full";
-
-  if (isFullView) {
+  if (viewMode !== "split" && !location.pathname.endsWith("/inbox")) {
     return <Outlet />;
   }
 
