@@ -30,7 +30,7 @@ function DialogOverlay({
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        "ease-out-expo fixed inset-0 isolate bg-black/10 duration-450 data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs",
+        "ease-out-expo fixed inset-0 isolate bg-black/60 duration-450 data-ending-style:opacity-0 data-starting-style:opacity-0 ",
         className
       )}
       {...props}
@@ -172,4 +172,5 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  DialogPrimitive,
 };
