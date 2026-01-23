@@ -79,8 +79,12 @@ function SelectTrigger({
   size = "default",
   variant = "default",
   children,
+  hideIcon = false,
   ...props
-}: SelectPrimitive.Trigger.Props & VariantProps<typeof buttonVariants>) {
+}: SelectPrimitive.Trigger.Props &
+  VariantProps<typeof buttonVariants> & {
+    hideIcon?: boolean;
+  }) {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
@@ -93,15 +97,17 @@ function SelectTrigger({
       {...props}
     >
       {children}
-      <SelectPrimitive.Icon
-        render={
-          <HugeiconsIcon
-            icon={UnfoldMoreIcon}
-            strokeWidth={2}
-            className="text-muted-foreground pointer-events-none size-4"
-          />
-        }
-      />
+      {hideIcon && (
+        <SelectPrimitive.Icon
+          render={
+            <HugeiconsIcon
+              icon={UnfoldMoreIcon}
+              strokeWidth={2}
+              className="text-muted-foreground pointer-events-none size-4"
+            />
+          }
+        />
+      )}
     </SelectPrimitive.Trigger>
   );
 }
@@ -110,7 +116,7 @@ function SelectContent({
   className,
   children,
   side = "bottom",
-  sideOffset = 4,
+  sideOffset = 6,
   align = "center",
   alignOffset = 0,
   alignItemWithTrigger = true,

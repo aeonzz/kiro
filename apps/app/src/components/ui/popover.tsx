@@ -33,7 +33,7 @@ function PopoverContent({
   align = "center",
   alignOffset = 0,
   side = "bottom",
-  sideOffset = 4,
+  sideOffset = 6,
   flush = false,
   ...props
 }: PopoverPrimitive.Popup.Props &

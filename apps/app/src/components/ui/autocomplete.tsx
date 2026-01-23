@@ -108,7 +108,7 @@ function AutocompleteOverlay({
 function AutocompleteContent({
   className,
   side = "bottom",
-  sideOffset = 4,
+  sideOffset = 6,
   align = "start",
   alignOffset = 0,
   ...props

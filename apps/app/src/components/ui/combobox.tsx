@@ -122,7 +122,7 @@ function ComboboxInput({
 function ComboboxContent({
   className,
   side = "bottom",
-  sideOffset = 4,
+  sideOffset = 6,
   align = "start",
   alignOffset = 0,
   anchor,

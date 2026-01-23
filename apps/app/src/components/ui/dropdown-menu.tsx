@@ -41,7 +41,7 @@ function DropdownMenuContent({
   align = "start",
   alignOffset,
   side = "bottom",
-  sideOffset = 4,
+  sideOffset = 6,
   disableAnchorTracking,
   collisionBoundary,
   className,
