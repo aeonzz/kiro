@@ -35,7 +35,7 @@ function ContainerHeader({
       <div
         ref={setContainer}
         className={cn(
-          "mx-2 flex items-center gap-1 py-1.5 group-data-inset/header:mx-8",
+          "mx-2 flex items-center gap-1 py-1.5 group-data-inset/header:mx-6",
           className
         )}
       >

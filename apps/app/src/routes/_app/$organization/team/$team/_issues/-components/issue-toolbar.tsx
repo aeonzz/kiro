@@ -43,7 +43,7 @@ export function IssueToolbar({
     >
       <div
         ref={setContainer}
-        className="mx-8 flex items-start justify-between gap-2 py-2"
+        className="mx-6 flex items-start justify-between gap-2 py-2"
       >
         <div className="flex flex-1 flex-wrap gap-2">
           {filters.map((filter) => (

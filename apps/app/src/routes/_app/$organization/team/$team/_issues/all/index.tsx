@@ -2,12 +2,12 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { teamQueries } from "@/lib/query-factory";
-import { Container, ContainerContent } from "@/components/container";
+import { ContainerContent } from "@/components/container";
 import { Error } from "@/components/error";
 
 import { DetailsSidePanel } from "../-components/details-side-panel";
 import { FilterTabs } from "../-components/filter-tabs";
-import { Header } from "../-components/header";
+import { IssueList } from "../-components/issue-list";
 
 export const Route = createFileRoute(
   "/_app/$organization/team/$team/_issues/all/"
@@ -45,7 +45,7 @@ function RouteComponent() {
 
   return (
     <ContainerContent className="flex">
-      <div className="flex-1"></div>
+      <IssueList />
       <DetailsSidePanel title="All issues" team={data.name}>
         <FilterTabs />
       </DetailsSidePanel>

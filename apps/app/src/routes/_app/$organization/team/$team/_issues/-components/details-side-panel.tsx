@@ -21,12 +21,19 @@ export function DetailsSidePanel({
   title,
   team,
   children,
+  width = "350px",
   ...props
 }: DetailsSidePanelProps) {
   const isOpen = useIssueDetailsPanelStore((state) => state.isOpen);
 
   return (
-    <SidePanel isOpen={isOpen} id="details-panel" side="right" {...props}>
+    <SidePanel
+      isOpen={isOpen}
+      id="details-panel"
+      side="right"
+      width={width}
+      {...props}
+    >
       <div className="space-y-4 p-4 pr-8">
         <Badge variant="secondary" className="rounded-none">
           {title}
