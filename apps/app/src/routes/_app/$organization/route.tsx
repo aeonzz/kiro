@@ -8,6 +8,8 @@ import { SidebarControl } from "@/components/app-sidebar/sidebar-control";
 import { useOrganization } from "@/components/organization-context";
 import { SettingsSidebar } from "@/components/settings/settings-sidebar";
 
+import { CreateIssueDialog } from "./-components/-create-issue-dialog";
+
 export const Route = createFileRoute("/_app/$organization")({
   component: RouteComponent,
 });
@@ -42,6 +44,7 @@ function RouteComponent() {
         </SidebarInset>
       </SidebarProvider>
       <SidebarControl />
+      <CreateIssueDialog />
     </React.Fragment>
   );
 }

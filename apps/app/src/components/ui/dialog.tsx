@@ -30,7 +30,7 @@ function DialogOverlay({
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        "ease-out-expo fixed inset-0 isolate bg-black/60 duration-450 data-ending-style:opacity-0 data-starting-style:opacity-0 ",
+        "ease-out-expo fixed inset-0 isolate bg-black/60 duration-450 data-ending-style:opacity-0 data-starting-style:opacity-0",
         className
       )}
       {...props}
@@ -57,26 +57,30 @@ function DialogViewport({
 function DialogContent({
   className,
   children,
-  showCloseButton = true,
+  hideCloseIcon = false,
+  flush = false,
   ...props
 }: DialogPrimitive.Popup.Props & {
-  showCloseButton?: boolean;
+  hideCloseIcon?: boolean;
+  flush?: boolean;
 }) {
   return (
     <DialogPortal>
       <DialogOverlay />
       <DialogViewport>
         <DialogPrimitive.Popup
+          data-flush={flush}
           data-slot="dialog-content"
           className={cn(
-            "bg-background shadow-border-md ease-out-expo fixed left-1/2 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-[30%] gap-4 rounded-xl p-4 text-sm transition-all duration-450 outline-none sm:max-w-sm",
+            "group/dialog-content bg-background shadow-border-md ease-out-expo fixed left-1/2 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-[30%] rounded-lg text-sm transition-all duration-450 outline-none sm:max-w-sm",
             "top-[calc(30%+1rem*var(--nested-dialogs))] scale-[calc(1-0.05*var(--nested-dialogs))] data-ending-style:top-[30%] data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:top-[30%] data-starting-style:scale-95 data-starting-style:opacity-0",
+            flush ? "gap-0 p-0" : "gap-4 p-4",
             className
           )}
           {...props}
         >
           {children}
-          {showCloseButton && (
+          {!hideCloseIcon && (
             <DialogPrimitive.Close
               data-slot="dialog-close"
               render={
@@ -101,7 +105,10 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-2", className)}
+      className={cn(
+        "flex flex-col gap-2 group-data-[flush=true]/dialog-content:px-4 group-data-[flush=true]/dialog-content:pt-4",
+        className
+      )}
       {...props}
     />
   );
@@ -119,7 +126,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        "bg-muted/50 border-t-border -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 sm:flex-row sm:justify-end",
+        "border-t-border flex flex-col-reverse gap-2 rounded-b-lg p-4 group-data-[flush=true]/dialog-content:border-t sm:flex-row sm:justify-end",
         className
       )}
       {...props}

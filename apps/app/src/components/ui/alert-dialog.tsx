@@ -67,7 +67,7 @@ function AlertDialogContent({
           data-slot="alert-dialog-content"
           data-size={size}
           className={cn(
-            "bg-background group/alert-dialog-content shadow-border-md ease-out-expo fixed top-1/2 left-1/2 grid w-full -translate-x-1/2 -translate-y-[30%] gap-4 rounded-xl p-4 transition-all duration-450 outline-none data-[size=default]:max-w-sm data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-md",
+            "bg-background group/alert-dialog-content shadow-border-md ease-out-expo fixed top-1/2 left-1/2 grid w-full -translate-x-1/2 -translate-y-[30%] gap-4 rounded-lg p-4 transition-all duration-450 outline-none data-[size=default]:max-w-sm data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-md",
             "top-[calc(30%+1rem*var(--nested-dialogs))] scale-[calc(1-0.05*var(--nested-dialogs))] data-ending-style:top-[30%] data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:top-[30%] data-starting-style:scale-95 data-starting-style:opacity-0",
             className
           )}
@@ -102,7 +102,7 @@ function AlertDialogFooter({
     <div
       data-slot="alert-dialog-footer"
       className={cn(
-        "bg-muted/50 border-t-border -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end",
+        "border-t-border -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-lg border-t p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end",
         className
       )}
       {...props}

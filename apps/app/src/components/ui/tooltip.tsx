@@ -18,7 +18,13 @@ function TooltipProvider({
 }
 
 function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
-  return <TooltipPrimitive.Root data-slot="tooltip" {...props} />;
+  return (
+    <TooltipPrimitive.Root
+      data-slot="tooltip"
+      disableHoverablePopup
+      {...props}
+    />
+  );
 }
 
 function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
@@ -33,6 +39,9 @@ function TooltipContent({
   alignOffset = 0,
   collisionBoundary,
   collisionPadding,
+  collisionAvoidance = {
+    side: "none",
+  },
   children,
   ...props
 }: TooltipPrimitive.Popup.Props &
@@ -44,6 +53,7 @@ function TooltipContent({
     | "sideOffset"
     | "collisionBoundary"
     | "collisionPadding"
+    | "collisionAvoidance"
   >) {
   return (
     <TooltipPrimitive.Portal>
@@ -54,9 +64,7 @@ function TooltipContent({
         sideOffset={sideOffset}
         collisionBoundary={collisionBoundary}
         collisionPadding={collisionBoundary ? 0 : collisionPadding}
-        collisionAvoidance={{
-          side: "none",
-        }}
+        collisionAvoidance={collisionAvoidance}
         className="ease-out-expo isolate h-(--positioner-height) max-h-[--available-height] w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-400"
       >
         <TooltipPrimitive.Popup

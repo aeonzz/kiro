@@ -53,13 +53,14 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
 }
 
 const buttonVariants = cva(
-  "data-placeholder:text-muted-foreground focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 text-xs-plus flex w-fit items-center justify-between gap-1.5 rounded-lg py-2 pr-2 pl-2.5 leading-4 whitespace-nowrap transition-colors outline-none select-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none aria-invalid:ring-1 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "data-placeholder:text-muted-foreground focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 text-xs-plus flex w-fit items-center justify-between gap-1.5 rounded-lg py-2 pr-2 pl-2.5 leading-4 whitespace-nowrap transition-[colors,shadow] outline-none select-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none aria-invalid:ring-1 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         default:
-          "shadow-border-sm dark:bg-input/30 dark:hover:bg-input/50 bg-transparent",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+          "shadow-border-sm bg-muted text-foreground/95 aria-expanded:bg-muted aria-expanded:text-foreground/95 hover:text-foreground/95 hover:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] aria-expanded:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))]",
+        ghost:
+          "hover:shadow-[0_0_0_1px_var(--muted)] hover:bg-muted hover:text-foreground dark:hover:bg-muted/70 aria-expanded:bg-muted dark:aria-expanded:bg-muted/70 aria-expanded:text-foreground aria-expanded:shadow-[0_0_0_1px_var(--muted)]",
       },
       size: {
         default: "h-8",
@@ -97,7 +98,7 @@ function SelectTrigger({
       {...props}
     >
       {children}
-      {hideIcon && (
+      {!hideIcon && (
         <SelectPrimitive.Icon
           render={
             <HugeiconsIcon

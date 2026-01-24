@@ -1,4 +1,5 @@
 import * as React from "react";
+import { createIssueDialogHandle } from "@/routes/_app/$organization/-components/-create-issue-dialog";
 import { Pen01Icon, TabletPenIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, useLocation } from "@tanstack/react-router";
@@ -23,6 +24,7 @@ import {
 import { useOrganization } from "../organization-context";
 import { Button } from "../ui/button";
 import { DialogTrigger } from "../ui/dialog";
+import { Kbd } from "../ui/kbd";
 import {
   Sidebar,
   SidebarContent,
@@ -33,6 +35,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "../ui/sidebar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { UserMenu } from "../user-menu";
 import { sidebarCustomizationHandle } from "./sidebar-control";
 import { TeamNav } from "./team-nav";
@@ -97,11 +100,25 @@ export function AppSidebar({
     <Sidebar variant={variant} {...props}>
       {!isPending && (
         <React.Fragment>
-          <SidebarHeader className="flex-row">
+          <SidebarHeader className="flex-row items-center">
             <UserMenu />
-            <Button variant="secondary" size="icon">
-              <HugeiconsIcon icon={Pen01Icon} strokeWidth={2} />
-            </Button>
+
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <DialogTrigger
+                    handle={createIssueDialogHandle}
+                    render={<Button variant="secondary" size="icon-sm" />}
+                  />
+                }
+              >
+                <HugeiconsIcon icon={Pen01Icon} strokeWidth={2} />
+              </TooltipTrigger>
+              <TooltipContent className="space-x-2" side="bottom">
+                <span>Create new issue</span>
+                <Kbd>C</Kbd>
+              </TooltipContent>
+            </Tooltip>
           </SidebarHeader>
           <ContextMenu>
             <ContextMenuTrigger
