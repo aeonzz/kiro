@@ -7,6 +7,9 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  ssr: {
+    noExternal: [/katex/, /lowlight/, /platejs/],
+  },
   plugins: [
     tsConfigPaths({
       projects: ["./tsconfig.json"],
