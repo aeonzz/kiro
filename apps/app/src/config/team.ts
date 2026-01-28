@@ -211,13 +211,13 @@ export const issueFilterOptions: FilterOptions[] = [
       },
       {
         value: "in-progress",
-        label: "In progress",
+        label: "In Progress",
         icon: InProgressIcon,
         iconFill: "text-yellow-500!",
       },
       {
         value: "in-review",
-        label: "In review",
+        label: "In Review",
         icon: InReviewIcon,
         iconFill: "text-green-500!",
       },

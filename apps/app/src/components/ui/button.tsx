@@ -19,9 +19,9 @@ const buttonVariants = cva(
         muted:
           "shadow-border-sm bg-muted text-foreground/95 aria-expanded:bg-muted aria-expanded:text-foreground/95 hover:text-foreground/95 hover:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] aria-expanded:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))]",
         ghost:
-          "hover:shadow-[0_0_0_1px_var(--muted)] hover:bg-muted hover:text-foreground dark:hover:bg-muted/70 aria-expanded:bg-muted dark:aria-expanded:bg-muted/70 aria-expanded:text-foreground aria-expanded:shadow-[0_0_0_1px_var(--muted)]",
+          "hover:shadow-[0_0_0_1px_var(--accent)] hover:bg-accent hover:text-foreground dark:hover:bg-accent/70 dark:hover:shadow-[0_0_0_1px_var(--accent)]/70 aria-expanded:bg-accent dark:aria-expanded:bg-accent/70 aria-expanded:text-foreground aria-expanded:shadow-[0_0_0_1px_var(--accent)] dark:aria-expanded:shadow-[0_0_0_1px_var(--accent)]/70",
         ghostPopup:
-          "hover:shadow-[0_0_0_1px_var(--muted)] hover:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] hover:text-foreground dark:hover:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] aria-expanded:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] dark:aria-expanded:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] aria-expanded:text-foreground",
+          "hover:shadow-[0_0_0_1px_var(--accent)] hover:bg-accent hover:text-foreground dark:hover:bg-[color-mix(in_oklab,var(--accent)98%,var(--accent-foreground))] aria-expanded:bg-accent dark:aria-expanded:bg-[color-mix(in_oklab,var(--accent)98%,var(--accent-foreground))] aria-expanded:text-foreground aria-expanded:shadow-[0_0_0_1px_var(--accent)]",
         destructive:
           "bg-destructive/10 hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30",
         ghostDestructive:

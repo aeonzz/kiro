@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { Combobox as ComboboxPrimitive } from "@base-ui/react";
 import {
@@ -17,6 +15,8 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+
+import { Kbd } from "./kbd";
 
 const Combobox = ComboboxPrimitive.Root;
 
@@ -119,6 +119,42 @@ function ComboboxInput({
   );
 }
 
+function ComboboxPopupInput({
+  className,
+  children,
+  disabled = false,
+  kbd,
+  ...props
+}: ComboboxPrimitive.Input.Props & {
+  kbd?: string;
+}) {
+  return (
+    <React.Fragment>
+      <InputGroup
+        className={cn(
+          "my-1 h-7 px-1 shadow-none has-[[data-slot=input-group-control]:focus-visible]:ring-0",
+          className
+        )}
+      >
+        <ComboboxPrimitive.Input
+          render={
+            <InputGroupInput
+              className="placeholder:text-xs-plus placeholder:text-muted-foreground/60 focus:placeholder:text-muted-foreground text-xs-plus w-0 font-normal"
+              disabled={disabled}
+            />
+          }
+          {...props}
+        />
+        <InputGroupAddon align="inline-end">
+          {kbd && <Kbd>{kbd}</Kbd>}
+        </InputGroupAddon>
+        {children}
+      </InputGroup>
+      <ComboboxSeparator className="mb-0" />
+    </React.Fragment>
+  );
+}
+
 function ComboboxContent({
   className,
   side = "bottom",
@@ -147,7 +183,7 @@ function ComboboxContent({
           data-slot="combobox-content"
           data-chips={!!anchor}
           className={cn(
-            "bg-popover text-popover-foreground shadow-border-md *:data-[slot=input-group]:bg-input/30 *:data-[slot=input-group]:border-input/30 group/combobox-content ease-out-expo relative max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) min-w-[calc(var(--anchor-width)+--spacing(7))] origin-(--transform-origin) overflow-hidden rounded-lg duration-450 data-[chips=true]:min-w-(--anchor-width) *:data-[slot=input-group]:m-1 *:data-[slot=input-group]:mb-0 *:data-[slot=input-group]:h-8 *:data-[slot=input-group]:shadow-none",
+            "bg-popover text-popover-foreground shadow-border-md group/combobox-content ease-out-expo relative max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) min-w-[calc(var(--anchor-width)+--spacing(7))] origin-(--transform-origin) overflow-hidden rounded-lg duration-450 data-[chips=true]:min-w-(--anchor-width)",
             "data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
             className
           )}
@@ -174,29 +210,35 @@ function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
 function ComboboxItem({
   className,
   children,
+  inset,
   ...props
-}: ComboboxPrimitive.Item.Props) {
+}: ComboboxPrimitive.Item.Props & {
+  inset?: boolean;
+}) {
   return (
     <ComboboxPrimitive.Item
       data-slot="combobox-item"
+      data-inset={inset}
       className={cn(
-        "data-highlighted:bg-accent data-highlighted:text-accent-foreground not-data-[variant=destructive]:data-highlighted:**:text-accent-foreground text-xs-plus relative flex w-full items-center gap-2 rounded-md py-2 pr-8 pl-2.5 outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "group/combobox-item data-highlighted:bg-accent data-highlighted:text-accent-foreground text-xs-plus [&_svg]:text-muted-foreground data-highlighted:[&_svg]:text-accent-foreground relative flex w-full items-center gap-2 rounded-md py-2 pr-8 pl-2.5 outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pr-2.5 data-inset:pl-7 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
     >
-      {children}
-      <ComboboxPrimitive.ItemIndicator
-        render={
-          <span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center" />
-        }
+      <span
+        className={cn(
+          "pointer-events-none absolute flex items-center justify-center",
+          inset
+            ? "border-border group-data-selected/combobox-item:bg-primary group-data-checked/combobox-item:[&_svg]:text-primary-foreground left-2 size-3.5 rounded-sm border not-group-data-checked/combobox-item:opacity-0 group-data-highlighted/combobox-item:opacity-100 [&_svg]:size-3!"
+            : "right-2"
+        )}
+        data-slot="combobox-item-indicator"
       >
-        <HugeiconsIcon
-          icon={Tick02Icon}
-          strokeWidth={2}
-          className="pointer-events-none"
-        />
-      </ComboboxPrimitive.ItemIndicator>
+        <ComboboxPrimitive.ItemIndicator>
+          <HugeiconsIcon icon={Tick02Icon} strokeWidth={2} />
+        </ComboboxPrimitive.ItemIndicator>
+      </span>
+      {children}
     </ComboboxPrimitive.Item>
   );
 }
@@ -331,6 +373,7 @@ export {
   ComboboxMenuPortal,
   ComboboxOverlay,
   ComboboxInput,
+  ComboboxPopupInput,
   ComboboxContent,
   ComboboxList,
   ComboboxItem,

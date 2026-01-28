@@ -134,7 +134,7 @@ export function ActionBarClose({
 
   return (
     <Button
-      variant="ghostPopup"
+      variant="ghost"
       size="icon-sm"
       className={cn("shrink-0", className)}
       onClick={(e) => {
