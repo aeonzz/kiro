@@ -64,7 +64,7 @@ export function OptionControlSelect<
             onValueChange?.(val);
           }}
         >
-          <SelectTrigger id={id} className="w-full" size="xs">
+          <SelectTrigger id={id} className="w-full" size="xs" variant="secondary">
             <SelectValue />
           </SelectTrigger>
           <SelectContent

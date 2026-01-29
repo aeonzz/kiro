@@ -228,7 +228,7 @@ export function IssueDisplayOptions({
           <ToggleGroup
             value={displayProperties}
             onValueChange={(val) => setDisplayProperties(val as string[])}
-            size="sm"
+            size="xs"
             variant="outline"
             className="flex-wrap"
             multiple

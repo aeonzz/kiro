@@ -26,6 +26,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useOrganization } from "@/components/organization-context";
 
 interface HeaderProps extends StrictOmit<
   React.ComponentProps<typeof DialogHeader>,
@@ -33,14 +34,18 @@ interface HeaderProps extends StrictOmit<
 > {
   expand: boolean;
   setExpand: (expand: boolean) => void;
+  isDirty: boolean;
 }
 
 export function Header({
   className,
   expand,
   setExpand,
+  isDirty,
   ...props
 }: HeaderProps) {
+  const { teams } = useOrganization();
+
   return (
     <DialogHeader
       className={cn(
@@ -51,7 +56,11 @@ export function Header({
     >
       <DialogTitle className="sr-only">Create Issue</DialogTitle>
       <div className="flex items-center gap-1.5">
-        <Select defaultValue="team1">
+        <Select
+          value={teams[0]}
+          disabled={teams.length <= 1}
+          itemToStringLabel={(item) => item.name}
+        >
           <Tooltip>
             <TooltipTrigger
               render={<SelectTrigger size="xs" hideIcon className="pl-1" />}
@@ -80,9 +89,21 @@ export function Header({
             className="w-44"
           >
             <SelectGroup>
-              <SelectItem value="team1">Team 1</SelectItem>
-              <SelectItem value="team2">Team 2</SelectItem>
-              <SelectItem value="team3">Team 3</SelectItem>
+              {teams.map((team) => (
+                <SelectItem key={team.id} value={team}>
+                  <div className="bg-muted shadow-border-sm size-4 rounded-sm p-0.5">
+                    <HugeiconsIcon
+                      icon={User02FreeIcons}
+                      strokeWidth={2}
+                      className="size-3"
+                    />
+                  </div>
+                  {team.name}
+                  <span className="text-xs-plus text-muted-foreground leading-4 font-normal">
+                    {team.slug}
+                  </span>
+                </SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -94,6 +115,29 @@ export function Header({
         <span className="text-xs-plus leading-4 font-normal">New Issue</span>
       </div>
       <div className="flex items-center gap-1.5">
+        {isDirty && (
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onClick={() => setExpand(!expand)}
+                />
+              }
+            >
+              Save as draft
+            </TooltipTrigger>
+            <TooltipContent className="space-x-2" side="bottom">
+              <span>Save draft</span>
+              <KbdGroup>
+                <Kbd>Ctrl</Kbd>
+                <Kbd>⇧</Kbd>
+                <Kbd>S</Kbd>
+              </KbdGroup>
+            </TooltipContent>
+          </Tooltip>
+        )}
         <Tooltip>
           <TooltipTrigger
             render={
