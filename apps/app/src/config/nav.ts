@@ -6,6 +6,7 @@ import {
   Folder01Icon,
   InboxIcon,
   LayerIcon,
+  LicenseDraftIcon,
   SecurityIcon,
   Settings01Icon,
   SlidersHorizontalIcon,
@@ -48,6 +49,12 @@ export const sidebarMenuItems: NavItem[] = [
     title: "My Issues",
     url: "/$organization/my-issues/assigned",
     icon: CenterFocusIcon,
+    disabledVisibilityOptions: [NavItemVisibility.Auto],
+  },
+  {
+    title: "Drafts",
+    url: "/$organization/drafts",
+    icon: LicenseDraftIcon,
     disabledVisibilityOptions: [NavItemVisibility.Auto],
   },
 ];

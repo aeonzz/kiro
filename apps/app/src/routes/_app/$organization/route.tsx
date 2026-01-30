@@ -5,10 +5,9 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Spinner } from "@/components/ui/spinner";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarControl } from "@/components/app-sidebar/sidebar-control";
+import { CreateIssueDialog } from "@/components/create-issue-dialog";
 import { useOrganization } from "@/components/organization-context";
 import { SettingsSidebar } from "@/components/settings/settings-sidebar";
-
-import { CreateIssueDialog } from "./-components/-create-issue-dialog";
 
 export const Route = createFileRoute("/_app/$organization")({
   component: RouteComponent,

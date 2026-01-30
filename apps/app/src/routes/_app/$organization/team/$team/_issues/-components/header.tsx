@@ -42,9 +42,9 @@ export function Header({
       {...props}
       setContainer={setContainer}
     >
-      <div className="flex items-center gap-2.5 px-1.5">
+      <div className="flex items-center gap-2.5">
         <div className="flex items-center gap-1.5">
-          <div className="bg-muted rounded-sm p-0.5 size-4.5">
+          <div className="bg-muted size-4.5 rounded-sm p-0.5">
             <HugeiconsIcon
               icon={User02FreeIcons}
               strokeWidth={2}

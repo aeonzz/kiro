@@ -1,5 +1,4 @@
 import * as React from "react";
-import { createIssueDialogHandle } from "@/routes/_app/$organization/-components/-create-issue-dialog";
 import { Pen01Icon, TabletPenIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, useLocation } from "@tanstack/react-router";
@@ -10,6 +9,7 @@ import {
   sidebarWorkspaceItems,
 } from "@/config/nav";
 import { isNavLinkActive, resolveOrgUrl } from "@/lib/utils";
+import { useIssueDrafts } from "@/hooks/use-issue-draft-store";
 import { usePreferencesStore } from "@/hooks/use-preference-store";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
 import {
@@ -20,6 +20,7 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { createIssueDialogHandle } from "@/components/create-issue-dialog";
 
 import { useOrganization } from "../organization-context";
 import { Button } from "../ui/button";
@@ -32,6 +33,7 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "../ui/sidebar";
@@ -62,6 +64,7 @@ export function AppSidebar({
   );
   const setTeamsOpenStore = usePreferencesStore((state) => state.setTeamsOpen);
   const { mutateAsync } = useUserPreferences();
+  const { drafts } = useIssueDrafts(activeOrganization?.slug);
 
   const setWorkspaceOpen = (open: boolean) => {
     setWorkspaceOpenStore(open);
@@ -141,6 +144,13 @@ export function AppSidebar({
                               activeOrganization?.slug
                             );
 
+                            if (
+                              item.title === "Drafts" &&
+                              drafts.length === 0
+                            ) {
+                              return isActive;
+                            }
+
                             return (
                               isActive ||
                               (visibility !== NavItemVisibility.Hide &&
@@ -177,6 +187,12 @@ export function AppSidebar({
                                   />
                                   <span>{item.title}</span>
                                 </SidebarMenuButton>
+                                {item.title === "Drafts" &&
+                                  drafts.length > 0 && (
+                                    <SidebarMenuBadge>
+                                      {drafts.length}
+                                    </SidebarMenuBadge>
+                                  )}
                               </SidebarMenuItem>
                             );
                           })}

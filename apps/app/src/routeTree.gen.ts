@@ -27,6 +27,7 @@ import { Route as AppOrganizationSettingsIndexRouteImport } from './routes/_app/
 import { Route as AppOrganizationProjectsIndexRouteImport } from './routes/_app/$organization/projects/index'
 import { Route as AppOrganizationMyIssuesIndexRouteImport } from './routes/_app/$organization/my-issues/index'
 import { Route as AppOrganizationMembersIndexRouteImport } from './routes/_app/$organization/members/index'
+import { Route as AppOrganizationDraftsIndexRouteImport } from './routes/_app/$organization/drafts/index'
 import { Route as AppOrganizationViewsIssuesRouteImport } from './routes/_app/$organization/views/issues'
 import { Route as AppOrganizationSettingsNewTeamRouteImport } from './routes/_app/$organization/settings/new-team'
 import { Route as AppOrganizationProjectsAllRouteImport } from './routes/_app/$organization/projects/all'
@@ -148,6 +149,12 @@ const AppOrganizationMembersIndexRoute =
   AppOrganizationMembersIndexRouteImport.update({
     id: '/members/',
     path: '/members/',
+    getParentRoute: () => AppOrganizationRouteRoute,
+  } as any)
+const AppOrganizationDraftsIndexRoute =
+  AppOrganizationDraftsIndexRouteImport.update({
+    id: '/drafts/',
+    path: '/drafts/',
     getParentRoute: () => AppOrganizationRouteRoute,
   } as any)
 const AppOrganizationViewsIssuesRoute =
@@ -317,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/$organization/projects/all': typeof AppOrganizationProjectsAllRoute
   '/$organization/settings/new-team': typeof AppOrganizationSettingsNewTeamRoute
   '/$organization/views/issues': typeof AppOrganizationViewsIssuesRoute
+  '/$organization/drafts/': typeof AppOrganizationDraftsIndexRoute
   '/$organization/members/': typeof AppOrganizationMembersIndexRoute
   '/$organization/my-issues/': typeof AppOrganizationMyIssuesIndexRoute
   '/$organization/projects/': typeof AppOrganizationProjectsIndexRoute
@@ -357,6 +365,7 @@ export interface FileRoutesByTo {
   '/$organization/projects/all': typeof AppOrganizationProjectsAllRoute
   '/$organization/settings/new-team': typeof AppOrganizationSettingsNewTeamRoute
   '/$organization/views/issues': typeof AppOrganizationViewsIssuesRoute
+  '/$organization/drafts': typeof AppOrganizationDraftsIndexRoute
   '/$organization/members': typeof AppOrganizationMembersIndexRoute
   '/$organization/my-issues': typeof AppOrganizationMyIssuesIndexRoute
   '/$organization/projects': typeof AppOrganizationProjectsIndexRoute
@@ -402,6 +411,7 @@ export interface FileRoutesById {
   '/_app/$organization/projects/all': typeof AppOrganizationProjectsAllRoute
   '/_app/$organization/settings/new-team': typeof AppOrganizationSettingsNewTeamRoute
   '/_app/$organization/views/issues': typeof AppOrganizationViewsIssuesRoute
+  '/_app/$organization/drafts/': typeof AppOrganizationDraftsIndexRoute
   '/_app/$organization/members/': typeof AppOrganizationMembersIndexRoute
   '/_app/$organization/my-issues/': typeof AppOrganizationMyIssuesIndexRoute
   '/_app/$organization/projects/': typeof AppOrganizationProjectsIndexRoute
@@ -447,6 +457,7 @@ export interface FileRouteTypes {
     | '/$organization/projects/all'
     | '/$organization/settings/new-team'
     | '/$organization/views/issues'
+    | '/$organization/drafts/'
     | '/$organization/members/'
     | '/$organization/my-issues/'
     | '/$organization/projects/'
@@ -487,6 +498,7 @@ export interface FileRouteTypes {
     | '/$organization/projects/all'
     | '/$organization/settings/new-team'
     | '/$organization/views/issues'
+    | '/$organization/drafts'
     | '/$organization/members'
     | '/$organization/my-issues'
     | '/$organization/projects'
@@ -531,6 +543,7 @@ export interface FileRouteTypes {
     | '/_app/$organization/projects/all'
     | '/_app/$organization/settings/new-team'
     | '/_app/$organization/views/issues'
+    | '/_app/$organization/drafts/'
     | '/_app/$organization/members/'
     | '/_app/$organization/my-issues/'
     | '/_app/$organization/projects/'
@@ -692,6 +705,13 @@ declare module '@tanstack/react-router' {
       path: '/members'
       fullPath: '/$organization/members/'
       preLoaderRoute: typeof AppOrganizationMembersIndexRouteImport
+      parentRoute: typeof AppOrganizationRouteRoute
+    }
+    '/_app/$organization/drafts/': {
+      id: '/_app/$organization/drafts/'
+      path: '/drafts'
+      fullPath: '/$organization/drafts/'
+      preLoaderRoute: typeof AppOrganizationDraftsIndexRouteImport
       parentRoute: typeof AppOrganizationRouteRoute
     }
     '/_app/$organization/views/issues': {
@@ -979,6 +999,7 @@ interface AppOrganizationRouteRouteChildren {
   AppOrganizationMyIssuesAssignedRoute: typeof AppOrganizationMyIssuesAssignedRoute
   AppOrganizationProjectsAllRoute: typeof AppOrganizationProjectsAllRoute
   AppOrganizationViewsIssuesRoute: typeof AppOrganizationViewsIssuesRoute
+  AppOrganizationDraftsIndexRoute: typeof AppOrganizationDraftsIndexRoute
   AppOrganizationMembersIndexRoute: typeof AppOrganizationMembersIndexRoute
   AppOrganizationMyIssuesIndexRoute: typeof AppOrganizationMyIssuesIndexRoute
   AppOrganizationProjectsIndexRoute: typeof AppOrganizationProjectsIndexRoute
@@ -999,6 +1020,7 @@ const AppOrganizationRouteRouteChildren: AppOrganizationRouteRouteChildren = {
   AppOrganizationMyIssuesAssignedRoute: AppOrganizationMyIssuesAssignedRoute,
   AppOrganizationProjectsAllRoute: AppOrganizationProjectsAllRoute,
   AppOrganizationViewsIssuesRoute: AppOrganizationViewsIssuesRoute,
+  AppOrganizationDraftsIndexRoute: AppOrganizationDraftsIndexRoute,
   AppOrganizationMembersIndexRoute: AppOrganizationMembersIndexRoute,
   AppOrganizationMyIssuesIndexRoute: AppOrganizationMyIssuesIndexRoute,
   AppOrganizationProjectsIndexRoute: AppOrganizationProjectsIndexRoute,

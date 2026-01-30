@@ -1,7 +1,16 @@
 import * as React from "react";
 import { issueLabelOptions } from "@/config";
-import { LabelIcon } from "@hugeicons/core-free-icons";
+import {
+  ArrowExpand01Icon,
+  ArrowShrink02Icon,
+  Cancel01Icon,
+  GreaterThanIcon,
+  LabelIcon,
+  User02FreeIcons,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useForm, useStore } from "@tanstack/react-form";
+import { useParams } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import type { Value } from "platejs";
 import { Plate, usePlateEditor } from "platejs/react";
@@ -9,6 +18,11 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { issueFilterOptions } from "@/config/team";
+import {
+  useIssueDrafts,
+  useIssueDraftStore,
+  type IssueDraft,
+} from "@/hooks/use-issue-draft-store";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,22 +36,33 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogFooter,
+  DialogHeader,
   DialogPrimitive,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { CopyButton } from "@/components/copy-button";
 import { EditorKit } from "@/components/editor/editor-kit";
 import { Editor, EditorContainer } from "@/components/editor/ui/editor";
 import { ItemsCombobox } from "@/components/items-combobox";
-
-import { Header } from "./header";
+import { useOrganization } from "@/components/organization-context";
 
 const formSchema = z.object({
   title: z.string().max(512),
@@ -53,8 +78,20 @@ const MotionPopup = motion.create(DialogPrimitive.Popup);
 
 export function CreateIssueDialog() {
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const { teams } = useOrganization();
   const [confirmationOpen, setConfirmationOpen] = React.useState(false);
   const [expand, setExpand] = React.useState(false);
+  const { organization } = useParams({ strict: false });
+  const { drafts, saveDraft } = useIssueDrafts(organization);
+  const triggerDraftId = useIssueDraftStore((state) => state.triggerDraftId);
+  const setTriggerDraftId = useIssueDraftStore(
+    (state) => state.setTriggerDraftId
+  );
+
+  const triggerDraft = React.useMemo(
+    () => drafts.find((d) => d.id === triggerDraftId),
+    [drafts, triggerDraftId]
+  );
   const statusOptions =
     issueFilterOptions.find((option) => option.id === "status")?.options ?? [];
 
@@ -71,11 +108,11 @@ export function CreateIssueDialog() {
 
   const form = useForm({
     defaultValues: {
-      title: "",
+      title: triggerDraft?.title ?? "",
       description: editor.children,
-      status: statusOptions[0].value,
-      priority: priorityOptions[0].value,
-      labels: [] as Array<string>,
+      status: triggerDraft?.status ?? statusOptions[0].value,
+      priority: triggerDraft?.priority ?? priorityOptions[0].value,
+      labels: triggerDraft?.labels ?? ([] as Array<string>),
     },
     validators: {
       onSubmit: formSchema,
@@ -90,11 +127,18 @@ export function CreateIssueDialog() {
 
       toast("Issue created", {
         description: (
-          <pre className="bg-sidebar mt-2 max-h-40 max-w-full overflow-auto rounded-md p-4">
-            <code className="text-sidebar-foreground">
-              {JSON.stringify(value, null, 2)}
-            </code>
-          </pre>
+          <div className="relative">
+            <CopyButton
+              value={JSON.stringify(value, null, 2)}
+              className="absolute top-3 right-3"
+              variant="ghost"
+            />
+            <pre className="bg-sidebar pointer-events-auto mt-2 max-h-40 max-w-full overflow-auto rounded-md p-4">
+              <code className="text-sidebar-foreground pointer-events-auto">
+                {JSON.stringify(value, null, 2)}
+              </code>
+            </pre>
+          </div>
         ),
         classNames: {
           content: "w-full",
@@ -102,6 +146,21 @@ export function CreateIssueDialog() {
       });
     },
   });
+
+  React.useEffect(() => {
+    const isDefaultDescription =
+      form.state.values.description?.length === 1 &&
+      form.state.values.description[0].type === "p" &&
+      form.state.values.description[0].children?.length === 1 &&
+      form.state.values.description[0].children[0].text === "";
+
+    if (dialogOpen && triggerDraft && isDefaultDescription) {
+      editor.tf.withoutNormalizing(() => {
+        editor.tf.insertNodes(triggerDraft.description, { at: [0] });
+        editor.tf.removeNodes({ at: [triggerDraft.description.length] });
+      });
+    }
+  }, [triggerDraft, dialogOpen, editor, form]);
 
   const isDirty = useStore(
     form.store,
@@ -112,8 +171,69 @@ export function CreateIssueDialog() {
       )
   );
 
+  function handleOpenChange(open: boolean) {
+    const hasTitle = form.state.values.title.trim().length > 0;
+    const description = form.state.values.description;
+    const isDefaultDescription =
+      description?.length === 1 &&
+      description[0].type === "p" &&
+      description[0].children?.length === 1 &&
+      description[0].children[0].text === "";
+    const hasDescription = !isDefaultDescription;
+    if (!triggerDraftId) {
+      if (!open && (hasTitle || hasDescription)) {
+        setConfirmationOpen(true);
+      } else {
+        setDialogOpen(open);
+      }
+    } else {
+      if (!open && hasTitle && !isDefaultDescription) {
+        saveDraft({
+          id: triggerDraftId,
+          title: form.state.values.title,
+          description: form.state.values.description,
+          status: form.state.values.status,
+          priority: form.state.values.priority,
+          labels: form.state.values.labels,
+        });
+      }
+      setDialogOpen(open);
+    }
+  }
+
+  function handleSaveDraft() {
+    const draftId = Math.random().toString(36).substring(2, 9);
+    saveDraft({
+      id: draftId,
+      title: form.state.values.title,
+      description: form.state.values.description,
+      status: form.state.values.status,
+      priority: form.state.values.priority,
+      labels: form.state.values.labels,
+    });
+    setDialogOpen(false);
+    setConfirmationOpen(false);
+    const id = toast.success("Issue draft saved", {
+      action: (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="ml-auto"
+          onClick={() => {
+            setDialogOpen(true);
+            setTriggerDraftId(draftId);
+            toast.dismiss(id);
+          }}
+        >
+          Open draft
+        </Button>
+      ),
+    });
+  }
+
   return (
     <Dialog
+      triggerId={triggerDraftId}
       handle={createIssueDialogHandle}
       open={dialogOpen}
       onOpenChangeComplete={(open) => {
@@ -121,21 +241,10 @@ export function CreateIssueDialog() {
           setExpand(false);
           form.reset();
           editor.tf.reset();
+          setTriggerDraftId(null);
         }
       }}
-      onOpenChange={(open) => {
-        const hasTitle = form.state.values.title.trim().length > 0;
-        const hasDescription = form.state.values.description?.some(
-          (node: any) =>
-            node.children?.some((child: any) => child.text?.trim().length > 0)
-        );
-
-        if (!open && (hasTitle || hasDescription)) {
-          setConfirmationOpen(true);
-        } else {
-          setDialogOpen(open);
-        }
-      }}
+      onOpenChange={handleOpenChange}
     >
       <DialogContent
         flush
@@ -158,7 +267,136 @@ export function CreateIssueDialog() {
         }
         hideCloseIcon
       >
-        <Header expand={expand} setExpand={setExpand} isDirty={isDirty} />
+        <DialogHeader className="h-fit flex-row items-center justify-between px-3! pt-3! pb-1">
+          <DialogTitle className="sr-only">Create Issue</DialogTitle>
+          <div className="flex items-center gap-1.5">
+            <Select
+              value={teams[0]}
+              disabled={teams.length <= 1}
+              itemToStringLabel={(item) => item.name}
+            >
+              <Tooltip>
+                <TooltipTrigger
+                  render={<SelectTrigger size="xs" hideIcon className="pl-1" />}
+                >
+                  <div className="bg-muted shadow-border-sm size-4 rounded-sm p-0.5">
+                    <HugeiconsIcon
+                      icon={User02FreeIcons}
+                      strokeWidth={2}
+                      className="size-3"
+                    />
+                  </div>
+                  <SelectValue placeholder="Select a team" />
+                </TooltipTrigger>
+                <TooltipContent className="space-x-2" side="bottom">
+                  <span>Set team</span>
+                  <KbdGroup>
+                    <Kbd>Ctrl</Kbd>
+                    <Kbd>⇧</Kbd>
+                    <Kbd>M</Kbd>
+                  </KbdGroup>
+                </TooltipContent>
+              </Tooltip>
+              <SelectContent
+                alignItemWithTrigger={false}
+                align="start"
+                className="w-44"
+              >
+                <SelectGroup>
+                  {teams.map((team) => (
+                    <SelectItem key={team.id} value={team}>
+                      <div className="bg-muted shadow-border-sm size-4 rounded-sm p-0.5">
+                        <HugeiconsIcon
+                          icon={User02FreeIcons}
+                          strokeWidth={2}
+                          className="size-3"
+                        />
+                      </div>
+                      {team.name}
+                      <span className="text-xs-plus text-muted-foreground leading-4 font-normal">
+                        {team.slug}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <HugeiconsIcon
+              icon={GreaterThanIcon}
+              strokeWidth={2}
+              className="size-2.5"
+            />
+            <span className="text-xs-plus leading-4 font-normal">
+              New Issue
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            {isDirty && !triggerDraftId && (
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="outline"
+                      size="xs"
+                      onClick={handleSaveDraft}
+                    />
+                  }
+                >
+                  Save as draft
+                </TooltipTrigger>
+                <TooltipContent className="space-x-2" side="bottom">
+                  <span>Save draft</span>
+                  <KbdGroup>
+                    <Kbd>Ctrl</Kbd>
+                    <Kbd>⇧</Kbd>
+                    <Kbd>S</Kbd>
+                  </KbdGroup>
+                </TooltipContent>
+              </Tooltip>
+            )}
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => setExpand(!expand)}
+                  />
+                }
+              >
+                <HugeiconsIcon
+                  icon={expand ? ArrowShrink02Icon : ArrowExpand01Icon}
+                  strokeWidth={2}
+                  className="size-3.5"
+                />
+              </TooltipTrigger>
+              <TooltipContent className="space-x-2" side="bottom">
+                <span>{expand ? "Collapse" : "Expand"}</span>
+                <KbdGroup>
+                  <Kbd>Ctrl</Kbd>
+                  <Kbd>⇧</Kbd>
+                  <Kbd>F</Kbd>
+                </KbdGroup>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <DialogClose
+                    render={<Button variant="ghost" size="icon-sm" />}
+                  />
+                }
+              >
+                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
+                <span className="sr-only">Close</span>
+              </TooltipTrigger>
+              <TooltipContent className="space-x-2" side="bottom">
+                <span>Close</span>
+                <Kbd>Escape</Kbd>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </DialogHeader>
         <form
           id="create-issue-form"
           className="flex min-h-0 flex-1 flex-col"
@@ -341,7 +579,9 @@ export function CreateIssueDialog() {
             </AlertDialogAction>
             <div className="flex gap-2">
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction>Save</AlertDialogAction>
+              <AlertDialogAction onClick={handleSaveDraft}>
+                Save
+              </AlertDialogAction>
             </div>
           </AlertDialogFooter>
         </AlertDialogContent>
