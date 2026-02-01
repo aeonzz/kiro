@@ -19,11 +19,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useOrganization } from "@/components/organization-context";
 
 export function InboxFilterMenu({
@@ -106,41 +101,33 @@ export function InboxFilterMenu({
         onOpenChangeComplete?.(open);
       }}
     >
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon-xs"
-                  className="[&_svg:not([class*='size-'])]:size-4"
-                />
-              }
-            />
-          }
+      <Button
+        variant="ghost"
+        size="icon-xs"
+        className="[&_svg:not([class*='size-'])]:size-4"
+        tooltip={{
+          content: "Filter notifications by",
+          kbd: ["F"],
+        }}
+        render={DropdownMenuTrigger}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          color="currentColor"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            color="currentColor"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M3 6H21" />
-            <path d="M6 12H18" />
-            <path d="M9 18H15" />
-          </svg>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <span>Filter notifications by</span>
-        </TooltipContent>
-      </Tooltip>
+          <path d="M3 6H21" />
+          <path d="M6 12H18" />
+          <path d="M9 18H15" />
+        </svg>
+      </Button>
       <DropdownMenuContent
         disableAnchorTracking={true}
         align={align}

@@ -13,16 +13,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Container,
-  ContainerContent,
-  ContainerHeader,
-} from "@/components/container";
+import { Container, ContainerHeader } from "@/components/container";
 
 import { IssueDraftList } from "./-components/issue-draft-list";
 
@@ -40,22 +31,17 @@ function RouteComponent() {
         <h2>Drafts</h2>
         {drafts.length > 0 && (
           <AlertDialog>
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <AlertDialogTrigger
-                    render={
-                      <Button className="ml-auto" variant="ghost" size="xs" />
-                    }
-                  />
-                }
-              >
-                Discard all
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <span>Discard all drafts</span>
-              </TooltipContent>
-            </Tooltip>
+            <Button
+              className="ml-auto"
+              variant="ghost"
+              size="xs"
+              tooltip={{
+                content: "Discard all drafts",
+              }}
+              render={AlertDialogTrigger}
+            >
+              Discard all
+            </Button>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Discard all drafts?</AlertDialogTitle>

@@ -5,13 +5,7 @@ import { issueFilterOptions } from "@/config/team";
 import { cn } from "@/lib/utils";
 import { useIssueFilters } from "@/hooks/use-issue-filter-store";
 import { Button } from "@/components/ui/button";
-import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { FilterChip } from "@/components/filter-chip";
 
 import { IssueDisplayOptions } from "./issue-display-options";
@@ -74,31 +68,17 @@ export function IssueToolbar({
           {filters.length > 0 && (
             <React.Fragment>
               <Separator orientation="vertical" className="my-1" />
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="xs"
-                      onClick={() => clearFilters()}
-                    />
-                  }
-                >
-                  Clear
-                </TooltipTrigger>
-                <TooltipContent
-                  className="space-x-2"
-                  side="bottom"
-                  collisionBoundary={container ?? undefined}
-                >
-                  <span>Clear all filters</span>
-                  <KbdGroup>
-                    <Kbd>Alt</Kbd>
-                    <Kbd>⇧</Kbd>
-                    <Kbd>F</Kbd>
-                  </KbdGroup>
-                </TooltipContent>
-              </Tooltip>
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => clearFilters()}
+                tooltip={{
+                  content: "Clear all filters",
+                  kbd: ["Alt", "⇧", "F"],
+                }}
+              >
+                Clear
+              </Button>
             </React.Fragment>
           )}
         </div>

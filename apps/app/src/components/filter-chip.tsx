@@ -16,11 +16,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 export type FilterOperator = "is" | "is not" | "is any of";
 
@@ -241,23 +236,17 @@ export function FilterChip({
             )}
         </DropdownMenuContent>
       </DropdownMenu>
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <Button
-              variant="muted"
-              size="icon-xs"
-              className="text-muted-foreground rounded-none border-none shadow-none"
-              onClick={() => onRemove(filter.id)}
-            />
-          }
-        >
-          <HugeiconsIcon icon={Cancel01Icon} size={12} strokeWidth={2} />
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <span>Remove filter</span>
-        </TooltipContent>
-      </Tooltip>
+      <Button
+        variant="muted"
+        size="icon-xs"
+        className="text-muted-foreground rounded-none border-none shadow-none"
+        onClick={() => onRemove(filter.id)}
+        tooltip={{
+          content: "Remove filter",
+        }}
+      >
+        <HugeiconsIcon icon={Cancel01Icon} size={12} strokeWidth={2} />
+      </Button>
     </div>
   );
 }

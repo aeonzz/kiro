@@ -21,7 +21,6 @@ import { issueFilterOptions } from "@/config/team";
 import {
   useIssueDrafts,
   useIssueDraftStore,
-  type IssueDraft,
 } from "@/hooks/use-issue-draft-store";
 import {
   AlertDialog,
@@ -53,11 +52,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { TooltipContent } from "@/components/ui/tooltip";
 import { CopyButton } from "@/components/copy-button";
 import { EditorKit } from "@/components/editor/editor-kit";
 import { Editor, EditorContainer } from "@/components/editor/ui/editor";
@@ -271,32 +266,28 @@ export function CreateIssueDialog() {
           <DialogTitle className="sr-only">Create Issue</DialogTitle>
           <div className="flex items-center gap-1.5">
             <Select
-              value={teams[0]}
               disabled={teams.length <= 1}
+              value={teams[0]}
               itemToStringLabel={(item) => item.name}
             >
-              <Tooltip>
-                <TooltipTrigger
-                  render={<SelectTrigger size="xs" hideIcon className="pl-1" />}
-                >
-                  <div className="bg-muted shadow-border-sm size-4 rounded-sm p-0.5">
-                    <HugeiconsIcon
-                      icon={User02FreeIcons}
-                      strokeWidth={2}
-                      className="size-3"
-                    />
-                  </div>
-                  <SelectValue placeholder="Select a team" />
-                </TooltipTrigger>
-                <TooltipContent className="space-x-2" side="bottom">
-                  <span>Set team</span>
-                  <KbdGroup>
-                    <Kbd>Ctrl</Kbd>
-                    <Kbd>⇧</Kbd>
-                    <Kbd>M</Kbd>
-                  </KbdGroup>
-                </TooltipContent>
-              </Tooltip>
+              <SelectTrigger
+                size="xs"
+                hideIcon
+                className="pl-1"
+                tooltip={{
+                  content: "Set team",
+                  kbd: ["Ctrl", "⇧", "M"],
+                }}
+              >
+                <div className="bg-muted shadow-border-sm size-4 rounded-sm p-0.5">
+                  <HugeiconsIcon
+                    icon={User02FreeIcons}
+                    strokeWidth={2}
+                    className="size-3"
+                  />
+                </div>
+                <SelectValue placeholder="Select a team" />
+              </SelectTrigger>
               <SelectContent
                 alignItemWithTrigger={false}
                 align="start"
@@ -332,69 +323,47 @@ export function CreateIssueDialog() {
           </div>
           <div className="flex items-center gap-1.5">
             {isDirty && !triggerDraftId && (
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button
-                      variant="outline"
-                      size="xs"
-                      onClick={handleSaveDraft}
-                    />
-                  }
-                >
-                  Save as draft
-                </TooltipTrigger>
-                <TooltipContent className="space-x-2" side="bottom">
-                  <span>Save draft</span>
-                  <KbdGroup>
-                    <Kbd>Ctrl</Kbd>
-                    <Kbd>⇧</Kbd>
-                    <Kbd>S</Kbd>
-                  </KbdGroup>
-                </TooltipContent>
-              </Tooltip>
+              <Button
+                variant="outline"
+                size="xs"
+                tooltip={{
+                  content: "Save draft",
+                  kbd: ["Ctrl", "⇧", "S"],
+                }}
+                onClick={handleSaveDraft}
+              >
+                Save as draft
+              </Button>
             )}
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => setExpand(!expand)}
-                  />
-                }
-              >
-                <HugeiconsIcon
-                  icon={expand ? ArrowShrink02Icon : ArrowExpand01Icon}
-                  strokeWidth={2}
-                  className="size-3.5"
+
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setExpand(!expand)}
+              tooltip={{
+                content: expand ? "Collapse" : "Expand",
+                kbd: ["Ctrl", "⇧", "F"],
+              }}
+            >
+              <HugeiconsIcon
+                icon={expand ? ArrowShrink02Icon : ArrowExpand01Icon}
+                strokeWidth={2}
+                className="size-3.5"
+              />
+              <span className="sr-only">Expand</span>
+            </Button>
+            <DialogClose
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  tooltip={{ content: "Close", kbd: ["Escape"] }}
                 />
-              </TooltipTrigger>
-              <TooltipContent className="space-x-2" side="bottom">
-                <span>{expand ? "Collapse" : "Expand"}</span>
-                <KbdGroup>
-                  <Kbd>Ctrl</Kbd>
-                  <Kbd>⇧</Kbd>
-                  <Kbd>F</Kbd>
-                </KbdGroup>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <DialogClose
-                    render={<Button variant="ghost" size="icon-sm" />}
-                  />
-                }
-              >
-                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
-                <span className="sr-only">Close</span>
-              </TooltipTrigger>
-              <TooltipContent className="space-x-2" side="bottom">
-                <span>Close</span>
-                <Kbd>Escape</Kbd>
-              </TooltipContent>
-            </Tooltip>
+              }
+            >
+              <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
+              <span className="sr-only">Close</span>
+            </DialogClose>
           </div>
         </DialogHeader>
         <form
@@ -510,51 +479,47 @@ export function CreateIssueDialog() {
           <form.Subscribe
             selector={(state) => state.isSubmitting}
             children={(isSubmitting) => (
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button
-                      type="submit"
-                      form="create-issue-form"
-                      size="sm"
-                      className="px-4"
-                      disabled={isSubmitting}
-                    />
-                  }
-                >
-                  <span>Create issue</span>
-                </TooltipTrigger>
-                <TooltipContent
-                  className="flex flex-col gap-1.5"
-                  collisionAvoidance={{
-                    side: "flip",
-                  }}
-                >
-                  <div className="space-x-2">
-                    <KbdGroup>
-                      <Kbd>Ctrl</Kbd>
-                      <Kbd>Enter</Kbd>
-                    </KbdGroup>
-                    <span>to save issue</span>
-                  </div>
-                  <div className="space-x-2">
-                    <KbdGroup>
-                      <Kbd>Ctrl</Kbd>
-                      <Kbd>Alt</Kbd>
-                      <Kbd>Enter</Kbd>
-                    </KbdGroup>
-                    <span>to save and open issue</span>
-                  </div>
-                  <div className="space-x-2">
-                    <KbdGroup>
-                      <Kbd>Ctrl</Kbd>
-                      <Kbd>⇧</Kbd>
-                      <Kbd>Enter</Kbd>
-                    </KbdGroup>
-                    <span>to save and draft new</span>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
+              <Button
+                type="submit"
+                form="create-issue-form"
+                size="sm"
+                className="px-4"
+                disabled={isSubmitting}
+                tooltip={
+                  <TooltipContent
+                    className="flex flex-col gap-1.5"
+                    collisionAvoidance={{
+                      side: "flip",
+                    }}
+                  >
+                    <div className="space-x-2">
+                      <KbdGroup>
+                        <Kbd>Ctrl</Kbd>
+                        <Kbd>Enter</Kbd>
+                      </KbdGroup>
+                      <span>to save issue</span>
+                    </div>
+                    <div className="space-x-2">
+                      <KbdGroup>
+                        <Kbd>Ctrl</Kbd>
+                        <Kbd>Alt</Kbd>
+                        <Kbd>Enter</Kbd>
+                      </KbdGroup>
+                      <span>to save and open issue</span>
+                    </div>
+                    <div className="space-x-2">
+                      <KbdGroup>
+                        <Kbd>Ctrl</Kbd>
+                        <Kbd>⇧</Kbd>
+                        <Kbd>Enter</Kbd>
+                      </KbdGroup>
+                      <span>to save and draft new</span>
+                    </div>
+                  </TooltipContent>
+                }
+              >
+                Create issue
+              </Button>
             )}
           />
         </DialogFooter>

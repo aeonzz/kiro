@@ -1,7 +1,11 @@
+import { mergeProps } from "@base-ui/react";
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
+
+import { Kbd, KbdGroup } from "./kbd";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 const buttonVariants = cva(
   "focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-lg bg-clip-padding text-xs font-medium focus-visible:ring-1 aria-invalid:ring-1 [&_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-[color,border-color,background-color,opacity,box-shadow] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none [&_svg]:text-muted-foreground hover:[&_svg]:text-foreground aria-expanded:[&_svg]:text-foreground",
@@ -49,27 +53,73 @@ const buttonVariants = cva(
   }
 );
 
+export type ButtonTooltip = {
+  content: string | React.ReactNode;
+  kbd?: Array<string>;
+  tooltipProps?: React.ComponentProps<typeof TooltipContent>;
+};
+
 function Button({
+  render,
   className,
   activable,
   isActive,
   variant = "default",
   size = "default",
+  tooltip,
   ...props
 }: ButtonPrimitive.Props &
   VariantProps<typeof buttonVariants> & {
+    tooltip?: string | React.ReactNode | ButtonTooltip;
     activable?: boolean;
     isActive?: boolean;
   }) {
-  return (
+  const button = (
     <ButtonPrimitive
-      data-activable={activable}
-      data-slot="button"
-      data-active={isActive}
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
+      {...mergeProps(
+        {
+          className: cn(buttonVariants({ variant, size }), className),
+          "data-activable": activable || undefined,
+          "data-active": isActive || undefined,
+          "data-slot": "button",
+        },
+        props
+      )}
+      render={render}
     />
   );
+
+  if (tooltip) {
+    const tooltipContentProps =
+      typeof tooltip === "object" && tooltip !== null && "content" in tooltip
+        ? (tooltip as ButtonTooltip)
+        : { content: tooltip as React.ReactNode };
+
+    const { tooltipProps, ...rest } = tooltipContentProps;
+    const { className: tooltipClassName, ...restTooltipProps } =
+      tooltipProps || {};
+
+    return (
+      <Tooltip>
+        <TooltipTrigger render={button} />
+        <TooltipContent
+          className={cn("space-x-2", tooltipClassName)}
+          {...restTooltipProps}
+        >
+          <span>{rest.content}</span>
+          {rest.kbd && (
+            <KbdGroup>
+              {rest.kbd.map((key) => (
+                <Kbd key={key}>{key}</Kbd>
+              ))}
+            </KbdGroup>
+          )}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return button;
 }
 
 export { Button, buttonVariants };

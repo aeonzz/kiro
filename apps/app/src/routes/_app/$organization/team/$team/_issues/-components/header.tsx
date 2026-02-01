@@ -11,13 +11,7 @@ import { teamIssueTabs } from "@/config/team";
 import { cn, isNavLinkActive } from "@/lib/utils";
 import { useIssueDetailsPanelStore } from "@/hooks/use-issue-details-panel-store";
 import { Button } from "@/components/ui/button";
-import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { ContainerHeader } from "@/components/container";
 
 export function Header({
@@ -68,6 +62,14 @@ export function Header({
                 false
               )}
               nativeButton={false}
+              tooltip={{
+                content: `Open ${tab.title}`,
+                kbd: [tab.shortcut],
+                tooltipProps: {
+                  side: "bottom",
+                  collisionBoundary: container ?? undefined,
+                },
+              }}
               render={<Link to={tab.url} params={{ organization, team }} />}
             >
               <tab.icon className="size-3.5" />
@@ -81,32 +83,23 @@ export function Header({
           <HugeiconsIcon icon={Notification01Icon} strokeWidth={2} />
         </Button>
         <Separator orientation="vertical" className="my-1" />
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <Button
-                size="icon-xs"
-                variant="ghost"
-                activable
-                aria-expanded={isOpen}
-                onClick={toggle}
-              />
-            }
-          >
-            <HugeiconsIcon icon={PanelRightIcon} strokeWidth={2} />
-          </TooltipTrigger>
-          <TooltipContent
-            className="space-x-2"
-            side="bottom"
-            collisionBoundary={container ?? undefined}
-          >
-            <span>{isOpen ? "Close details" : "Open details"}</span>
-            <KbdGroup>
-              <Kbd>Ctrl</Kbd>
-              <Kbd>I</Kbd>
-            </KbdGroup>
-          </TooltipContent>
-        </Tooltip>
+        <Button
+          size="icon-xs"
+          variant="ghost"
+          activable
+          aria-expanded={isOpen}
+          onClick={toggle}
+          tooltip={{
+            content: isOpen ? "Close details" : "Open details",
+            kbd: ["Ctrl", "I"],
+            tooltipProps: {
+              side: "bottom",
+              collisionBoundary: container ?? undefined,
+            },
+          }}
+        >
+          <HugeiconsIcon icon={PanelRightIcon} strokeWidth={2} />
+        </Button>
       </div>
     </ContainerHeader>
   );

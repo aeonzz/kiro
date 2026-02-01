@@ -19,7 +19,6 @@ import {
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
 import { Button } from "@/components/ui/button";
-import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { Label } from "@/components/ui/label";
 import {
   Popover,
@@ -28,11 +27,6 @@ import {
 } from "@/components/ui/popover";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 import {
   OptionControlSelect,
@@ -81,26 +75,21 @@ export function IssueDisplayOptions({
 
   return (
     <Popover {...props}>
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <PopoverTrigger render={<Button variant="outline" size="xs" />} />
-          }
-        >
-          <HugeiconsIcon icon={SlidersHorizontalIcon} strokeWidth={2} />
-          <span>Display</span>
-        </TooltipTrigger>
-        <TooltipContent
-          className="space-x-2"
-          collisionBoundary={tooltipBoundary}
-        >
-          <span>Show display options</span>
-          <KbdGroup>
-            <Kbd>⇧</Kbd>
-            <Kbd>V</Kbd>
-          </KbdGroup>
-        </TooltipContent>
-      </Tooltip>
+      <Button
+        variant="outline"
+        size="xs"
+        tooltip={{
+          content: "Show display options",
+          kbd: ["⇧", "V"],
+          tooltipProps: {
+            collisionBoundary: tooltipBoundary,
+          },
+        }}
+        render={PopoverTrigger}
+      >
+        <HugeiconsIcon icon={SlidersHorizontalIcon} strokeWidth={2} />
+        <span>Display</span>
+      </Button>
       <PopoverContent align="end" flush>
         <div className="border-border space-y-5 border-b px-4 py-3">
           <Tabs
@@ -109,34 +98,22 @@ export function IssueDisplayOptions({
           >
             <TabsList
               size="lg"
-              className="bg-sidebar/40 w-full *:data-[slot='tooltip-trigger']:flex-col *:data-[slot='tooltip-trigger']:gap-[3px]"
+              className="bg-sidebar/40 w-full *:data-[slot='tabs-trigger']:flex-col *:data-[slot='tabs-trigger']:gap-[3px]"
             >
-              <Tooltip>
-                <TooltipTrigger render={<TabsTrigger value="list" />}>
-                  <HugeiconsIcon icon={Menu07Icon} strokeWidth={2} />
-                  List
-                </TooltipTrigger>
-                <TooltipContent className="space-x-2" side="bottom">
-                  <span>Toggle layout view</span>
-                  <KbdGroup>
-                    <Kbd>Ctrl</Kbd>
-                    <Kbd>B</Kbd>
-                  </KbdGroup>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger render={<TabsTrigger value="board" />}>
-                  <HugeiconsIcon icon={MenuSquareIcon} strokeWidth={2} />
-                  Board
-                </TooltipTrigger>
-                <TooltipContent className="space-x-2" side="bottom">
-                  <span>Toggle layout view</span>
-                  <KbdGroup>
-                    <Kbd>Ctrl</Kbd>
-                    <Kbd>B</Kbd>
-                  </KbdGroup>
-                </TooltipContent>
-              </Tooltip>
+              <TabsTrigger
+                value="list"
+                tooltip={{ content: "Toggle layout view", kbd: ["Ctrl", "B"] }}
+              >
+                <HugeiconsIcon icon={Menu07Icon} strokeWidth={2} />
+                List
+              </TabsTrigger>
+              <TabsTrigger
+                value="board"
+                tooltip={{ content: "Toggle layout view", kbd: ["Ctrl", "B"] }}
+              >
+                <HugeiconsIcon icon={MenuSquareIcon} strokeWidth={2} />
+                Board
+              </TabsTrigger>
             </TabsList>
           </Tabs>
           <div className="space-y-2">
@@ -163,31 +140,21 @@ export function IssueDisplayOptions({
                 setOrdering(value.value);
               }}
             >
-              <Tooltip>
-                <TooltipTrigger
-                  onClick={() =>
-                    setDirection(direction === "asc" ? "desc" : "asc")
-                  }
-                  render={
-                    <Button
-                      variant="outline"
-                      size="icon-xs"
-                      className="[&>svg]:text-foreground"
-                    />
-                  }
-                >
-                  <HugeiconsIcon
-                    icon={Sorting01Icon}
-                    strokeWidth={2}
-                    className={cn(direction === "asc" && "scale-y-[-1]")}
-                  />
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <span>
-                    {direction === "asc" ? "Ascending" : "Descending"}
-                  </span>
-                </TooltipContent>
-              </Tooltip>
+              <Button
+                variant="outline"
+                size="icon-xs"
+                className="[&>svg]:text-foreground"
+                onClick={() =>
+                  setDirection(direction === "asc" ? "desc" : "asc")
+                }
+                tooltip={direction === "asc" ? "Ascending" : "Descending"}
+              >
+                <HugeiconsIcon
+                  icon={Sorting01Icon}
+                  strokeWidth={2}
+                  className={cn(direction === "asc" && "scale-y-[-1]")}
+                />
+              </Button>
             </OptionControlSelect>
           </div>
         </div>
@@ -252,23 +219,15 @@ export function IssueDisplayOptions({
         </div>
         {!isDefault && (
           <div className="border-border flex items-center justify-end border-t px-2 py-1.5">
-            <Tooltip>
-              <TooltipTrigger
-                onClick={reset}
-                render={
-                  <Button
-                    variant="ghost"
-                    size="xs"
-                    className="dark:hover:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))]"
-                  />
-                }
-              >
-                Reset
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <span>Reset to default</span>
-              </TooltipContent>
-            </Tooltip>
+            <Button
+              variant="ghost"
+              size="xs"
+              onClick={reset}
+              className="dark:hover:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))]"
+              tooltip="Reset display options"
+            >
+              Reset
+            </Button>
           </div>
         )}
       </PopoverContent>

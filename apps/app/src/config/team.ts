@@ -29,16 +29,19 @@ export const teamIssueTabs: Array<TeamIssueTab> = [
     title: "All issues",
     url: "/$organization/team/$team/all",
     icon: CopyIcon,
+    shortcut: "1",
   },
   {
     title: "Active",
     url: "/$organization/team/$team/active",
     icon: InProgressIcon,
+    shortcut: "2",
   },
   {
     title: "Backlog",
     url: "/$organization/team/$team/backlog",
     icon: BacklogIcon,
+    shortcut: "3",
   },
 ];
 

@@ -26,11 +26,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DialogTrigger } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { createIssueDialogHandle } from "@/components/create-issue-dialog";
 import { EditorKit } from "@/components/editor/editor-kit";
 import { Editor, EditorContainer } from "@/components/editor/ui/editor";
@@ -92,29 +87,20 @@ export function IssueDraftCard({
               </span>
             </div>
             <AlertDialog>
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <AlertDialogTrigger
-                      render={
-                        <Button
-                          variant="ghostPopup"
-                          size="icon-sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
-                          className="absolute top-1/2 right-4 -translate-y-1/2 opacity-0 group-hover/card:opacity-100"
-                        />
-                      }
-                    />
-                  }
-                >
-                  <HugeiconsIcon icon={DeleteIcon} strokeWidth={2} />
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <span>Discard draft</span>
-                </TooltipContent>
-              </Tooltip>
+              <Button
+                variant="ghostPopup"
+                size="icon-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                className="absolute top-1/2 right-4 -translate-y-1/2 opacity-0 group-hover/card:opacity-100"
+                tooltip={{
+                  content: "Discard draft",
+                }}
+                render={AlertDialogTrigger}
+              >
+                <HugeiconsIcon icon={DeleteIcon} strokeWidth={2} />
+              </Button>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Discard this draft?</AlertDialogTitle>

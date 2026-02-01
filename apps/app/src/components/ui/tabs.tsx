@@ -3,6 +3,10 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+import type { ButtonTooltip } from "./button";
+import { Kbd, KbdGroup } from "./kbd";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
+
 function Tabs({
   className,
   orientation = "horizontal",
@@ -58,8 +62,16 @@ function TabsList({
   );
 }
 
-function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
-  return (
+function TabsTrigger({
+  className,
+  render,
+  tooltip,
+  children,
+  ...props
+}: TabsPrimitive.Tab.Props & {
+  tooltip?: string | React.ReactNode | ButtonTooltip;
+}) {
+  const trigger = (
     <TabsPrimitive.Tab
       data-slot="tabs-trigger"
       className={cn(
@@ -70,8 +82,42 @@ function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </TabsPrimitive.Tab>
   );
+
+  if (tooltip) {
+    const tooltipContentProps =
+      typeof tooltip === "object" && tooltip !== null && "content" in tooltip
+        ? (tooltip as ButtonTooltip)
+        : { content: tooltip as React.ReactNode };
+
+    const { tooltipProps, ...rest } = tooltipContentProps;
+    const { className: tooltipClassName, ...restTooltipProps } =
+      tooltipProps || {};
+
+    return (
+      <Tooltip>
+        <TooltipTrigger render={trigger} />
+        <TooltipContent
+          className={cn("space-x-2", tooltipClassName)}
+          {...restTooltipProps}
+        >
+          <span>{rest.content}</span>
+          {rest.kbd && (
+            <KbdGroup>
+              {rest.kbd.map((key) => (
+                <Kbd key={key}>{key}</Kbd>
+              ))}
+            </KbdGroup>
+          )}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return trigger;
 }
 
 function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {

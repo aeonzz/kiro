@@ -22,12 +22,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Kbd } from "@/components/ui/kbd";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface IssueFilterMenuProps extends React.ComponentProps<
   typeof DropdownMenu
@@ -113,42 +107,33 @@ export function IssueFilterMenu({
       }}
       {...props}
     >
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size={filters.length === 0 ? "xs" : "icon-xs"}
-                />
-              }
-            />
-          }
+      <Button
+        variant="ghost"
+        size={filters.length === 0 ? "xs" : "icon-xs"}
+        tooltip={{
+          content: "Add filter",
+          kbd: ["F"],
+        }}
+        render={DropdownMenuTrigger}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          color="currentColor"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            color="currentColor"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M3 6H21" />
-            <path d="M6 12H18" />
-            <path d="M9 18H15" />
-          </svg>
-          {filters.length === 0 && <span>Filter</span>}
-        </TooltipTrigger>
-        <TooltipContent side="bottom" className="space-x-2">
-          <span>Add filter</span>
-          <Kbd>F</Kbd>
-        </TooltipContent>
-      </Tooltip>
+          <path d="M3 6H21" />
+          <path d="M6 12H18" />
+          <path d="M9 18H15" />
+        </svg>
+        {filters.length === 0 && <span>Filter</span>}
+      </Button>
       <DropdownMenuContent
         disableAnchorTracking={true}
         finalFocus={false}

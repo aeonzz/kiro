@@ -1,6 +1,5 @@
-"use client";
-
 import * as React from "react";
+import { mergeProps } from "@base-ui/react";
 import { Select as SelectPrimitive } from "@base-ui/react/select";
 import {
   ArrowDown01Icon,
@@ -12,6 +11,10 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
+
+import type { ButtonTooltip } from "./button";
+import { Kbd, KbdGroup } from "./kbd";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 const Select = SelectPrimitive.Root;
 
@@ -83,21 +86,29 @@ function SelectTrigger({
   variant = "default",
   children,
   hideIcon = false,
+  tooltip,
+  render,
   ...props
 }: SelectPrimitive.Trigger.Props &
   VariantProps<typeof buttonVariants> & {
+    tooltip?: string | React.ReactNode | ButtonTooltip;
     hideIcon?: boolean;
   }) {
-  return (
+  const trigger = (
     <SelectPrimitive.Trigger
-      data-slot="select-trigger"
-      data-size={size}
-      className={cn(
-        buttonVariants({ size, variant }),
-        "peer/select-trigger",
-        className
+      {...mergeProps(
+        {
+          className: cn(
+            buttonVariants({ variant, size }),
+            "peer/select-trigger",
+            className
+          ),
+          "data-slot": "select-trigger",
+          "data-size": size,
+        },
+        props
       )}
-      {...props}
+      render={render}
     >
       {children}
       {!hideIcon && (
@@ -113,6 +124,38 @@ function SelectTrigger({
       )}
     </SelectPrimitive.Trigger>
   );
+
+  if (tooltip) {
+    const tooltipContentProps =
+      typeof tooltip === "object" && tooltip !== null && "content" in tooltip
+        ? (tooltip as ButtonTooltip)
+        : { content: tooltip as React.ReactNode };
+
+    const { tooltipProps, ...rest } = tooltipContentProps;
+    const { className: tooltipClassName, ...restTooltipProps } =
+      tooltipProps || {};
+
+    return (
+      <Tooltip>
+        <TooltipTrigger render={trigger} />
+        <TooltipContent
+          className={cn("space-x-2", tooltipClassName)}
+          {...restTooltipProps}
+        >
+          <span>{rest.content}</span>
+          {rest.kbd && (
+            <KbdGroup>
+              {rest.kbd.map((key) => (
+                <Kbd key={key}>{key}</Kbd>
+              ))}
+            </KbdGroup>
+          )}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return trigger;
 }
 
 function SelectContent({

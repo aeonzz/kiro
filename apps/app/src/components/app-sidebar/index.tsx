@@ -111,23 +111,17 @@ export function AppSidebar({
         <React.Fragment>
           <SidebarHeader className="flex-row items-center">
             <UserMenu />
-
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <DialogTrigger
-                    handle={createIssueDialogHandle}
-                    render={<Button variant="secondary" size="icon-sm" />}
-                  />
-                }
-              >
-                <HugeiconsIcon icon={Pen01Icon} strokeWidth={2} />
-              </TooltipTrigger>
-              <TooltipContent className="space-x-2" side="bottom">
-                <span>Create new issue</span>
-                <Kbd>C</Kbd>
-              </TooltipContent>
-            </Tooltip>
+            <Button
+              variant="secondary"
+              size="icon-sm"
+              render={<DialogTrigger handle={createIssueDialogHandle} />}
+              tooltip={{
+                content: "Create new issue",
+                kbd: ["C"],
+              }}
+            >
+              <HugeiconsIcon icon={Pen01Icon} strokeWidth={2} />
+            </Button>
           </SidebarHeader>
           <ContextMenu>
             <ContextMenuTrigger

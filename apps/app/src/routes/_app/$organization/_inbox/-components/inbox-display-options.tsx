@@ -16,11 +16,6 @@ import {
 } from "@/components/ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   OptionControlSelect,
   OptionControlSwitch,
 } from "@/components/option-control";
@@ -45,26 +40,18 @@ export function InboxDisplayOptions({
 
   return (
     <Popover {...props}>
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <PopoverTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon-xs"
-                  className="[&_svg:not([class*='size-'])]:size-4"
-                />
-              }
-            />
-          }
-        >
-          <HugeiconsIcon icon={SlidersHorizontalIcon} strokeWidth={2} />
-        </TooltipTrigger>
-        <TooltipContent>
-          <span>Show display options</span>
-        </TooltipContent>
-      </Tooltip>
+      <Button
+        variant="ghost"
+        size="icon-xs"
+        className="[&_svg:not([class*='size-'])]:size-4"
+        tooltip={{
+          content: "Show display options",
+          kbd: ["⇧", "V"],
+        }}
+        render={PopoverTrigger}
+      >
+        <HugeiconsIcon icon={SlidersHorizontalIcon} strokeWidth={2} />
+      </Button>
       <PopoverContent align="end" flush>
         <div className="border-border space-y-2 border-b px-4 py-3">
           <OptionControlSelect
