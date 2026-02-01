@@ -7,7 +7,6 @@ import {
   InboxIcon,
   LayerIcon,
   LicenseDraftIcon,
-  SecurityIcon,
   Settings01Icon,
   SlidersHorizontalIcon,
   UserGroupIcon,
@@ -21,6 +20,7 @@ export enum NavItemVisibility {
   Show = "show",
   Hide = "hide",
   Auto = "auto",
+  Badged = "badged",
 }
 
 export const visibilityOptions: VisibilityOption[] = [
@@ -30,11 +30,15 @@ export const visibilityOptions: VisibilityOption[] = [
   },
   {
     value: "hide",
-    label: "Never show",
+    label: "Don't show",
   },
   {
     value: "auto",
     label: "Hide in more menu",
+  },
+  {
+    value: "badged",
+    label: "Show when badged",
   },
 ];
 
@@ -43,18 +47,26 @@ export const sidebarMenuItems: NavItem[] = [
     title: "Inbox",
     url: "/$organization/inbox",
     icon: InboxIcon,
-    disabledVisibilityOptions: [NavItemVisibility.Auto, NavItemVisibility.Hide],
+    disabledVisibilityOptions: [
+      NavItemVisibility.Auto,
+      NavItemVisibility.Hide,
+      NavItemVisibility.Badged,
+    ],
   },
   {
     title: "My Issues",
     url: "/$organization/my-issues/assigned",
     icon: CenterFocusIcon,
-    disabledVisibilityOptions: [NavItemVisibility.Auto],
+    disabledVisibilityOptions: [
+      NavItemVisibility.Auto,
+      NavItemVisibility.Badged,
+    ],
   },
   {
     title: "Drafts",
     url: "/$organization/drafts",
     icon: LicenseDraftIcon,
+    visibility: NavItemVisibility.Badged,
     disabledVisibilityOptions: [NavItemVisibility.Auto],
   },
 ];

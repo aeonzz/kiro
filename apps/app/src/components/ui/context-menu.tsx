@@ -35,7 +35,7 @@ function ContextMenuOverlay({
   return (
     <ContextMenuPrimitive.Backdrop
       data-slot="context-menu-overlay"
-      className={cn("absolute inset-0 z-50", className)}
+      className={cn("absolute inset-0", className)}
       {...props}
     />
   );
@@ -57,7 +57,7 @@ function ContextMenuContent({
     <ContextMenuPortal>
       <ContextMenuOverlay />
       <ContextMenuPrimitive.Positioner
-        className="isolate z-50 outline-none"
+        className="isolate outline-none"
         align={align}
         alignOffset={alignOffset}
         side={side}
@@ -66,7 +66,7 @@ function ContextMenuContent({
         <ContextMenuPrimitive.Popup
           data-slot="context-menu-content"
           className={cn(
-            "bg-popover text-popover-foreground shadow-border-md ease-out-expo z-50 max-h-(--available-height) w-(--anchor-width) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg p-1 duration-450 outline-none data-closed:overflow-hidden data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+            "bg-popover text-popover-foreground shadow-border-md ease-out-expo max-h-(--available-height) w-(--anchor-width) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg p-1 duration-450 outline-none data-closed:overflow-hidden data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
             className
           )}
           {...props}
@@ -94,7 +94,7 @@ function ContextMenuLabel({
       data-slot="context-menu-label"
       data-inset={inset}
       className={cn(
-        "text-muted-foreground px-2.5 py-2 text-xs font-medium data-inset:pl-8",
+        "text-muted-foreground px-2.5 pt-1.5 pb-1 text-xs font-medium data-inset:pl-8",
         className
       )}
       {...props}

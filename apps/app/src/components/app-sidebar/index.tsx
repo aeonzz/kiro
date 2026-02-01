@@ -91,13 +91,19 @@ export function AppSidebar({
         activeOrganization?.slug
       );
 
+      if (isActive) return false;
+
+      if (visibility === NavItemVisibility.Badged) {
+        if (item.title === "Drafts" && drafts.length === 0) return true;
+        return false;
+      }
+
       return (
-        !isActive &&
-        (visibility === NavItemVisibility.Hide ||
-          visibility === NavItemVisibility.Auto)
+        visibility === NavItemVisibility.Hide ||
+        visibility === NavItemVisibility.Auto
       );
     });
-  }, [sidebarConfig, pathname, activeOrganization?.slug]);
+  }, [sidebarConfig, pathname, activeOrganization?.slug, drafts.length]);
 
   return (
     <Sidebar variant={variant} {...props}>
@@ -144,11 +150,11 @@ export function AppSidebar({
                               activeOrganization?.slug
                             );
 
-                            if (
-                              item.title === "Drafts" &&
-                              drafts.length === 0
-                            ) {
-                              return isActive;
+                            if (visibility === NavItemVisibility.Badged) {
+                              if (isActive) return true;
+                              if (item.title === "Drafts" && drafts.length > 0)
+                                return true;
+                              return false;
                             }
 
                             return (

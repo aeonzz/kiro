@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
@@ -44,6 +42,7 @@ import {
   ContextMenuContent,
   ContextMenuGroup,
   ContextMenuItem,
+  ContextMenuLabel,
   ContextMenuRadioGroup,
   ContextMenuRadioItem,
   ContextMenuSeparator,
@@ -632,7 +631,8 @@ function SidebarMenuButton({
             <HugeiconsIcon icon={ViewIcon} strokeWidth={2} />
             <span>Visibility</span>
           </ContextMenuSubTrigger>
-          <ContextMenuSubContent>
+          <ContextMenuSubContent className="min-w-44" alignOffset={0}>
+            <ContextMenuLabel>Visibility</ContextMenuLabel>
             <ContextMenuRadioGroup
               value={currentVisibility}
               onValueChange={handleVisibilityChange}
@@ -645,7 +645,11 @@ function SidebarMenuButton({
                     )
                 )
                 .map((option) => (
-                  <ContextMenuRadioItem key={option.value} value={option.value}>
+                  <ContextMenuRadioItem
+                    key={option.value}
+                    value={option.value}
+                    closeOnClick
+                  >
                     {option.label}
                   </ContextMenuRadioItem>
                 ))}
@@ -664,6 +668,7 @@ function SidebarMenuButton({
     </SidebarMenuItemContext>
   );
 }
+
 function SidebarMenuAction({
   className,
   render,
