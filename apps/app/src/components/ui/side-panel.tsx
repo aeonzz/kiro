@@ -21,7 +21,7 @@ export function SidePanel({
       data-side={side}
       data-state={isOpen ? "open" : "closed"}
       className={cn(
-        "bg-background ease-out-expo border-border relative h-full overflow-hidden transition-all duration-300",
+        "bg-background ease-out-expo border-border relative h-full shrink-0 overflow-hidden transition-all duration-300",
         "data-[state=closed]:w-0 data-[state=open]:w-(--side-panel-width)",
         side === "right"
           ? "data-[state=open]:border-l"

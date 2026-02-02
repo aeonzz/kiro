@@ -149,27 +149,27 @@ export const filterOptions: FilterOptions[] = [
     icon: FullSignalIcon,
     options: [
       {
-        value: "no-priority",
+        value: "NO_PRIORITY",
         label: "No priority",
         icon: DashedLine01Icon,
       },
       {
-        value: "urgent",
+        value: "URGENT",
         label: "Urgent",
         icon: AlertSquareIcon,
       },
       {
-        value: "high",
+        value: "HIGH",
         label: "High",
         icon: FullSignalIcon,
       },
       {
-        value: "medium",
+        value: "MEDIUM",
         label: "Medium",
         icon: MediumSignalIcon,
       },
       {
-        value: "low",
+        value: "LOW",
         label: "Low",
         icon: LowSignalIcon,
       },
@@ -183,32 +183,32 @@ export const filterOptions: FilterOptions[] = [
     icon: CircleIcon,
     options: [
       {
-        value: "triage",
+        value: "TRIAGE",
         label: "Triage",
         icon: CircleArrowLeftRightIcon,
       },
       {
-        value: "backlog",
+        value: "BACKLOG",
         label: "Backlog",
         icon: DashedLineCircleIcon,
       },
       {
-        value: "unstarted",
+        value: "UNSTARTED",
         label: "Unstarted",
         icon: CircleIcon,
       },
       {
-        value: "started",
+        value: "STARTED",
         label: "Started",
         icon: PlayCircleIcon,
       },
       {
-        value: "completed",
+        value: "COMPLETED",
         label: "Completed",
         icon: CheckmarkCircle01Icon,
       },
       {
-        value: "cancelled",
+        value: "CANCELLED",
         label: "Cancelled",
         icon: MultiplicationSignCircleIcon,
       },

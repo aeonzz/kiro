@@ -56,7 +56,7 @@ import { TooltipContent } from "@/components/ui/tooltip";
 import { CopyButton } from "@/components/copy-button";
 import { EditorKit } from "@/components/editor/editor-kit";
 import { Editor, EditorContainer } from "@/components/editor/ui/editor";
-import { ItemsCombobox } from "@/components/items-combobox";
+import { ItemsCombobox, MultiItemsCombobox } from "@/components/items-combobox";
 import { useOrganization } from "@/components/organization-context";
 
 const formSchema = z.object({
@@ -427,7 +427,17 @@ export function CreateIssueDialog() {
                     field.handleChange(value?.value || statusOptions[0].value)
                   }
                   placeholder="Change status..."
-                  tooltipContent="Change status"
+                  triggerProps={{
+                    tooltip: {
+                      content: "Change status",
+                      kbd: ["S"],
+                      tooltipProps: {
+                        collisionAvoidance: {
+                          side: "flip"
+                        }
+                      }
+                    },
+                  }}
                   kbd="S"
                 />
               )}
@@ -446,7 +456,17 @@ export function CreateIssueDialog() {
                     field.handleChange(value?.value || priorityOptions[0].value)
                   }
                   placeholder="Set priority to..."
-                  tooltipContent="Set priority"
+                  triggerProps={{
+                    tooltip: {
+                      content: "Set priority",
+                      kbd: ["P"],
+                      tooltipProps: {
+                        collisionAvoidance: {
+                          side: "flip"
+                        }
+                      }
+                    },
+                  }}
                   kbd="P"
                 />
               )}
@@ -454,7 +474,7 @@ export function CreateIssueDialog() {
             <form.Field
               name="labels"
               children={(field) => (
-                <ItemsCombobox
+                <MultiItemsCombobox
                   id={field.name}
                   name={field.name}
                   items={issueLabelOptions}
@@ -464,7 +484,6 @@ export function CreateIssueDialog() {
                   onValueChange={(value) =>
                     field.handleChange(value.map((v) => v.value))
                   }
-                  multiple
                   placeholder="Add labels..."
                   tooltipContent="Set labels"
                   kbd="L"

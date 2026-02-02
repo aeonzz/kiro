@@ -13,6 +13,7 @@ export type FilterOption = {
   label: string;
   icon?: IconType;
   iconFill?: string;
+  avatarUrl?: string;
 };
 
 export type FilterOptions = {

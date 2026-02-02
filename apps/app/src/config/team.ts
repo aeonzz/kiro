@@ -201,43 +201,43 @@ export const issueFilterOptions: FilterOptions[] = [
     icon: BacklogIcon,
     options: [
       {
-        value: "backlog",
+        value: "BACKLOG",
         label: "Backlog",
         icon: BacklogIcon,
         iconFill: "text-muted-foreground!",
       },
       {
-        value: "todo",
+        value: "UNSTARTED",
         label: "Todo",
         icon: TodoIcon,
         iconFill: "text-muted-foreground!",
       },
       {
-        value: "in-progress",
+        value: "STARTED",
         label: "In Progress",
         icon: InProgressIcon,
         iconFill: "text-yellow-500!",
       },
       {
-        value: "in-review",
+        value: "IN_REVIEW",
         label: "In Review",
         icon: InReviewIcon,
         iconFill: "text-green-500!",
       },
       {
-        value: "done",
+        value: "COMPLETED",
         label: "Done",
         icon: DoneIcon,
         iconFill: "text-indigo-500!",
       },
       {
-        value: "cancelled",
+        value: "CANCELLED",
         label: "Cancelled",
         icon: CancelledIcon,
         iconFill: "text-muted-foreground!",
       },
       {
-        value: "duplicate",
+        value: "DUPLICATE",
         label: "Duplicate",
         icon: CancelledIcon,
         iconFill: "text-muted-foreground!",
@@ -290,27 +290,27 @@ export const issueFilterOptions: FilterOptions[] = [
     icon: FullSignalIcon,
     options: [
       {
-        value: "no-priority",
+        value: "NO_PRIORITY",
         label: "No priority",
         icon: DashedLine01Icon,
       },
       {
-        value: "urgent",
+        value: "URGENT",
         label: "Urgent",
         icon: AlertSquareIcon,
       },
       {
-        value: "high",
+        value: "HIGH",
         label: "High",
         icon: FullSignalIcon,
       },
       {
-        value: "medium",
+        value: "MEDIUM",
         label: "Medium",
         icon: MediumSignalIcon,
       },
       {
-        value: "low",
+        value: "LOW",
         label: "Low",
         icon: LowSignalIcon,
       },

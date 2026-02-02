@@ -44,7 +44,7 @@ function RouteComponent() {
   }
 
   return (
-    <ContainerContent className="flex">
+    <ContainerContent className="flex flex-1">
       <IssueList />
       <DetailsSidePanel title="All issues" team={data.name}>
         <FilterTabs />
