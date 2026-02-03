@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FilterIcon } from "@/utils/filter-icon";
+import { Icon } from "@/utils/icon";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -76,7 +76,7 @@ export function FilterChip({
     >
       <div className="bg-muted text-muted-foreground flex items-center gap-1 px-1.5 py-1">
         {filterConfig?.icon && (
-          <FilterIcon
+          <Icon
             icon={filterConfig.icon}
             strokeWidth={2}
             className="@max-md/inbox-panel:hidden"
@@ -140,13 +140,13 @@ export function FilterChip({
                 .map(
                   (option) =>
                     option.icon && (
-                      <FilterIcon
+                      <Icon
                         key={option.value}
                         icon={option.icon}
                         strokeWidth={2}
+                        color={option.color}
                         className={cn(
-                          "bg-muted rounded-full outline-1 duration-200 outline-none not-first:-ml-1 group-hover/button:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] group-aria-expanded/button:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))]",
-                          option.iconFill
+                          "bg-muted rounded-full outline-1 duration-200 outline-none not-first:-ml-1 group-hover/button:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] group-aria-expanded/button:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))]"
                         )}
                       />
                     )
@@ -157,14 +157,12 @@ export function FilterChip({
             options.map(
               (option) =>
                 option.icon && (
-                  <FilterIcon
+                  <Icon
                     key={option.value}
                     icon={option.icon}
                     strokeWidth={2}
-                    className={cn(
-                      "rounded-full duration-200 outline-none not-first:-ml-1 @max-md/inbox-panel:hidden",
-                      option.iconFill
-                    )}
+                    color={option.color}
+                    className="rounded-full duration-200 outline-none not-first:-ml-1 @max-md/inbox-panel:hidden"
                   />
                 )
             )
@@ -192,10 +190,10 @@ export function FilterChip({
                 closeOnClick
               >
                 {option.icon && (
-                  <FilterIcon
+                  <Icon
                     icon={option.icon}
                     strokeWidth={2}
-                    className={option.iconFill}
+                    color={option.color}
                   />
                 )}
                 {option.label}
@@ -219,10 +217,10 @@ export function FilterChip({
                   closeOnClick
                 >
                   {subOption.icon && (
-                    <FilterIcon
+                    <Icon
                       icon={subOption.icon}
                       strokeWidth={2}
-                      className={subOption.iconFill}
+                      color={subOption.color}
                     />
                   )}
                   {subOption.label}

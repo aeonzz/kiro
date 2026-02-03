@@ -1,6 +1,6 @@
 import * as React from "react";
 import { issueLabelOptions } from "@/config";
-import { FilterIcon } from "@/utils/filter-icon";
+import { Icon } from "@/utils/icon";
 
 import type { FilterOption } from "@/types/inbox";
 import { cn } from "@/lib/utils";
@@ -43,10 +43,11 @@ export function LabelCombobox({ issueId, issueLabels }: LabelComboboxProps) {
             }
           >
             {item.icon && (
-              <FilterIcon
+              <Icon
                 icon={item.icon}
                 strokeWidth={2}
-                className={cn("shrink-0", item.iconFill)}
+                className="shrink-0"
+                color={item.color}
               />
             )}
             <span className="truncate">{item.label}</span>

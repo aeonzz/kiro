@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { StrictOmit } from "@/types";
-import { FilterIcon } from "@/utils/filter-icon";
+import { Icon } from "@/utils/icon";
 import { User02Icon, UserCircleIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -80,10 +80,10 @@ export function ItemsCombobox<T extends FilterOption>({
                         </AvatarFallback>
                       </Avatar>
                     ) : value.icon ? (
-                      <FilterIcon
+                      <Icon
                         icon={value.icon}
                         strokeWidth={2}
-                        className={value.iconFill}
+                        color={value.color}
                       />
                     ) : (
                       <HugeiconsIcon
@@ -103,10 +103,10 @@ export function ItemsCombobox<T extends FilterOption>({
                         </AvatarFallback>
                       </Avatar>
                     ) : value.icon ? (
-                      <FilterIcon
+                      <Icon
                         icon={value.icon}
                         strokeWidth={2}
-                        className={value.iconFill}
+                        color={value.color}
                       />
                     ) : (
                       <HugeiconsIcon
@@ -177,7 +177,7 @@ export function MultiItemsCombobox<T extends FilterOption>({
             if (selectedItems.length === 0) {
               return (
                 <span className="inline-flex items-center gap-1">
-                  {icon && <FilterIcon icon={icon} strokeWidth={2} />}
+                  {icon && <Icon icon={icon} strokeWidth={2} />}
                   {label}
                 </span>
               );
@@ -189,14 +189,12 @@ export function MultiItemsCombobox<T extends FilterOption>({
                   {selectedItems.map((option) => (
                     <React.Fragment key={option.value}>
                       {option.icon && (
-                        <FilterIcon
+                        <Icon
                           key={option.value}
                           icon={option.icon}
                           strokeWidth={2}
-                          className={cn(
-                            "size-4 not-first:-ml-3",
-                            option.iconFill
-                          )}
+                          color={option.color}
+                          className="size-4 not-first:-ml-3"
                         />
                       )}
                     </React.Fragment>
@@ -213,10 +211,10 @@ export function MultiItemsCombobox<T extends FilterOption>({
             return (
               <span className="-ml-0.5 inline-flex items-center gap-1">
                 {selectedValue.icon && (
-                  <FilterIcon
+                  <Icon
                     icon={selectedValue.icon}
                     strokeWidth={2}
-                    className={selectedValue.iconFill}
+                    color={selectedValue.color}
                   />
                 )}
                 {selectedValue.label}
@@ -283,10 +281,11 @@ export function BadgedMultiItemsCombobox<T extends FilterOption>({
                     className="bg-background border-muted-foreground/20 hover:bg-muted/50 text-muted-foreground hover:text-foreground group-data-popup-open:bg-muted/50 group-data-popup-open:text-foreground h-6 gap-1.5 px-2 font-normal"
                   >
                     {item.icon && (
-                      <FilterIcon
+                      <Icon
                         icon={item.icon}
                         strokeWidth={2}
-                        className={cn("size-3", item.iconFill)}
+                        color={item.color}
+                        className="size-3"
                       />
                     )}
                     {item.label}
@@ -320,7 +319,7 @@ export function ItemsComboboxContent({
       <ComboboxPopupInput placeholder={placeholder} kbd={kbd} />
       <ComboboxEmpty>No items found.</ComboboxEmpty>
       <ComboboxList>
-        {(item: any) => (
+        {(item: FilterOption) => (
           <ComboboxItem key={item.value} value={item}>
             {item.avatarUrl ? (
               <Avatar className="size-4!">
@@ -330,11 +329,7 @@ export function ItemsComboboxContent({
                 </AvatarFallback>
               </Avatar>
             ) : item.icon ? (
-              <FilterIcon
-                icon={item.icon}
-                strokeWidth={2}
-                className={item.iconFill}
-              />
+              <Icon icon={item.icon} strokeWidth={2} color={item.color} />
             ) : (
               <HugeiconsIcon
                 icon={User02Icon}

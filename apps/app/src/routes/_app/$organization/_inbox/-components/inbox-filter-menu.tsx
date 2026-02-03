@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FilterIcon } from "@/utils/filter-icon";
+import { Icon } from "@/utils/icon";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -176,7 +176,7 @@ export function InboxFilterMenu({
                       }}
                     >
                       <DropdownMenuSubTrigger openOnHover>
-                        <FilterIcon icon={item.icon} strokeWidth={2} />
+                        <Icon icon={item.icon} strokeWidth={2} />
                         {item.label}
                       </DropdownMenuSubTrigger>
                       <DropdownMenuPortal>
@@ -206,7 +206,7 @@ export function InboxFilterMenu({
                                   }}
                                 >
                                   {subOption.icon && (
-                                    <FilterIcon
+                                    <Icon
                                       icon={subOption.icon}
                                       strokeWidth={2}
                                     />
@@ -234,7 +234,7 @@ export function InboxFilterMenu({
                     className="gap-0 pr-2.5"
                   >
                     {item.icon && (
-                      <FilterIcon
+                      <Icon
                         icon={item.icon}
                         strokeWidth={2}
                         className="mr-2.5"

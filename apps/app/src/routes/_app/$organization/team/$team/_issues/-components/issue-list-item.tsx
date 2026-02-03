@@ -1,7 +1,8 @@
 import * as React from "react";
 import { issueLabelOptions } from "@/config";
 import { MOCK_USERS } from "@/mocks/users";
-import { FilterIcon } from "@/utils/filter-icon";
+import { formatDate } from "@/utils/format-date";
+import { Icon } from "@/utils/icon";
 import {
   EditUser02Icon,
   FullSignalIcon,
@@ -10,11 +11,12 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, useParams } from "@tanstack/react-router";
-import { format, isSameYear, parseISO } from "date-fns";
+import { format } from "date-fns";
 
 import type { Issue } from "@/types/issue";
 import { issueFilterOptions } from "@/config/team";
 import { cn } from "@/lib/utils";
+import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
 import { useIssueStore } from "@/hooks/use-issue-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -56,7 +58,24 @@ export function IssueListItem({
   issue,
 }: IssueListItemProps) {
   const updateIssue = useIssueStore((state) => state.updateIssue);
-  const { organization } = useParams({ from: "/_app/$organization" });
+
+  const { organization, team } = useParams({
+    from: "/_app/$organization/team/$team/_issues",
+  });
+
+  const {
+    grouping,
+    ordering,
+    direction,
+    completedIssues,
+    showSubIssues,
+    showEmptyGroups,
+    displayProperties,
+  } = useActiveIssueDisplayOptions(team);
+
+  const handleUpdateIssue = (updates: Partial<Issue>) => {
+    updateIssue(issue.id, updates);
+  };
 
   const priorityOptions =
     issueFilterOptions.find((option) => option.id === "priority")?.options ??
@@ -78,7 +97,7 @@ export function IssueListItem({
       value: "unassigned",
       label: "No assignee",
       icon: User02Icon,
-      iconFill: "text-muted-foreground",
+      color: "text-muted-foreground",
     },
     ...MOCK_USERS.map((user) => ({
       value: user.id,
@@ -86,11 +105,6 @@ export function IssueListItem({
       avatarUrl: user.avatarUrl,
     })),
   ];
-
-  const date = parseISO(issue.createdAt);
-  const formattedDate = isSameYear(date, new Date())
-    ? format(date, "MMM d")
-    : format(date, "MMM yyyy");
 
   return (
     <ContextMenu>
@@ -139,72 +153,32 @@ export function IssueListItem({
             </TooltipContent>
           </Tooltip>
         </div>
-        <div
-          onClick={(e) => e.stopPropagation()}
-          onPointerDown={(e) => e.stopPropagation()}
-          className="flex items-center justify-center"
-        >
-          <ItemsCombobox
-            items={priorityOptions}
-            value={priorityOptions.find(
-              (option) => option.value === issue.priority
-            )}
-            onValueChange={(value) => {
-              if (value) {
-                updateIssue(issue.id, {
-                  priority: value.value as Issue["priority"],
-                });
-              }
-            }}
-            placeholder="Set priority to..."
-            kbd="P"
-            isIcon
-            triggerProps={{
-              variant: "ghost",
-              tooltip: {
-                content: "Set priority",
-                kbd: ["P"],
-                tooltipProps: {
-                  collisionAvoidance: {
-                    side: "flip",
-                  },
-                },
-              },
-            }}
-            contentProps={{
-              side: "right",
-            }}
-          />
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs-plus text-muted-foreground w-13 justify-self-start leading-none tracking-wide">
-            {issue.id}
-          </span>
+        {displayProperties.includes("priority") && (
           <div
             onClick={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
             className="flex items-center justify-center"
           >
             <ItemsCombobox
-              items={statusOptions}
-              value={statusOptions.find(
-                (option) => option.value === issue.status
+              items={priorityOptions}
+              value={priorityOptions.find(
+                (option) => option.value === issue.priority
               )}
               onValueChange={(value) => {
                 if (value) {
-                  updateIssue(issue.id, {
-                    status: value.value as Issue["status"],
+                  handleUpdateIssue({
+                    priority: value.value as Issue["priority"],
                   });
                 }
               }}
-              placeholder="Set status to..."
-              kbd="S"
+              placeholder="Set priority to..."
+              kbd="P"
               isIcon
               triggerProps={{
                 variant: "ghost",
                 tooltip: {
-                  content: "Set status",
-                  kbd: ["S"],
+                  content: "Set priority",
+                  kbd: ["P"],
                   tooltipProps: {
                     collisionAvoidance: {
                       side: "flip",
@@ -217,6 +191,52 @@ export function IssueListItem({
               }}
             />
           </div>
+        )}
+        <div className="flex items-center gap-1.5">
+          {displayProperties.includes("id") && (
+            <span className="text-xs-plus text-muted-foreground w-13 justify-self-start leading-none tracking-wide">
+              {issue.id}
+            </span>
+          )}
+          {displayProperties.includes("status") && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="flex items-center justify-center"
+            >
+              <ItemsCombobox
+                items={statusOptions}
+                value={statusOptions.find(
+                  (option) => option.value === issue.status
+                )}
+                onValueChange={(value) => {
+                  if (value) {
+                    handleUpdateIssue({
+                      status: value.value as Issue["status"],
+                    });
+                  }
+                }}
+                placeholder="Set status to..."
+                kbd="S"
+                isIcon
+                triggerProps={{
+                  variant: "ghost",
+                  tooltip: {
+                    content: "Set status",
+                    kbd: ["S"],
+                    tooltipProps: {
+                      collisionAvoidance: {
+                        side: "flip",
+                      },
+                    },
+                  },
+                }}
+                contentProps={{
+                  side: "right",
+                }}
+              />
+            </div>
+          )}
         </div>
         <span
           title={issue.title}
@@ -225,59 +245,81 @@ export function IssueListItem({
           {issue.title}
         </span>
         <div className="ml-auto flex items-center gap-1">
-          <div
-            onClick={(e) => e.stopPropagation()}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="flex items-center"
-          >
-            <LabelCombobox issueId={issue.id} issueLabels={issueLabels} />
-          </div>
-          <div
-            onClick={(e) => e.stopPropagation()}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="flex items-center justify-center"
-          >
-            <ItemsCombobox
-              items={assigneesOptions}
-              defaultValue={
-                assigneesOptions.find(
-                  (option) => option.value === issue.assigneeId
-                ) ?? assigneesOptions[0]
-              }
-              placeholder="Assign to..."
-              kbd="A"
-              isIcon
-              triggerProps={{
-                variant: "ghost",
-                tooltip: {
-                  content: "Assign to",
-                  kbd: ["A"],
-                  tooltipProps: {
-                    collisionAvoidance: {
-                      side: "flip",
+          {displayProperties.includes("labels") && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="flex items-center"
+            >
+              <LabelCombobox issueId={issue.id} issueLabels={issueLabels} />
+            </div>
+          )}
+          {displayProperties.includes("assignee") && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="flex items-center justify-center"
+            >
+              <ItemsCombobox
+                items={assigneesOptions}
+                defaultValue={
+                  assigneesOptions.find(
+                    (option) => option.value === issue.assigneeId
+                  ) ?? assigneesOptions[0]
+                }
+                placeholder="Assign to..."
+                kbd="A"
+                isIcon
+                triggerProps={{
+                  variant: "ghost",
+                  tooltip: {
+                    content: "Assign to",
+                    kbd: ["A"],
+                    tooltipProps: {
+                      collisionAvoidance: {
+                        side: "flip",
+                      },
                     },
                   },
-                },
-              }}
-              contentProps={{
-                side: "right",
-              }}
-            />
-          </div>
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <span className="text-muted-foreground w-16 text-end text-xs tabular-nums">
-                  {formattedDate}
+                }}
+                contentProps={{
+                  side: "right",
+                }}
+              />
+            </div>
+          )}
+          {displayProperties.includes("created") && (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <span className="text-muted-foreground w-16 text-end text-xs tabular-nums">
+                    {formatDate(issue.createdAt)}
+                  </span>
+                }
+              />
+              <TooltipContent>
+                <span className="text-micro tabular-nums">
+                  Created {format(issue.createdAt, "PPpp")}
                 </span>
-              }
-            />
-            <TooltipContent>
-              <span className="text-micro tabular-nums">
-                Created {format(date, "PPpp")}
-              </span>
-            </TooltipContent>
-          </Tooltip>
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {displayProperties.includes("updated") && (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <span className="text-muted-foreground w-16 text-end text-xs tabular-nums">
+                    {formatDate(issue.updatedAt)}
+                  </span>
+                }
+              />
+              <TooltipContent>
+                <span className="text-micro tabular-nums">
+                  Created {format(issue.updatedAt, "PPpp")}
+                </span>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent className="min-w-52">
@@ -292,7 +334,7 @@ export function IssueListItem({
                 value={issue.status}
                 onValueChange={(value) => {
                   if (value) {
-                    updateIssue(issue.id, {
+                    handleUpdateIssue({
                       status: value as Issue["status"],
                     });
                   }
@@ -305,10 +347,7 @@ export function IssueListItem({
                     closeOnClick
                   >
                     {option.icon && (
-                      <FilterIcon
-                        icon={option.icon}
-                        className={cn(option.iconFill)}
-                      />
+                      <Icon icon={option.icon} color={option.color} />
                     )}
                     {option.label}
                   </ContextMenuRadioItem>
@@ -326,7 +365,7 @@ export function IssueListItem({
                 value={issue.assigneeId}
                 onValueChange={(value) => {
                   if (value) {
-                    updateIssue(issue.id, {
+                    handleUpdateIssue({
                       assigneeId: value as Issue["assigneeId"],
                     });
                   }
@@ -346,11 +385,7 @@ export function IssueListItem({
                         </AvatarFallback>
                       </Avatar>
                     ) : (
-                      <FilterIcon
-                        icon={option.icon}
-                        strokeWidth={2}
-                        className={option.iconFill}
-                      />
+                      <Icon icon={option.icon} strokeWidth={2} />
                     )}
                     {option.label}
                   </ContextMenuRadioItem>
@@ -368,7 +403,7 @@ export function IssueListItem({
                 value={issue.priority}
                 onValueChange={(value) => {
                   if (value) {
-                    updateIssue(issue.id, {
+                    handleUpdateIssue({
                       priority: value as Issue["priority"],
                     });
                   }
@@ -381,10 +416,7 @@ export function IssueListItem({
                     closeOnClick
                   >
                     {option.icon && (
-                      <FilterIcon
-                        icon={option.icon}
-                        className={cn(option.iconFill)}
-                      />
+                      <Icon icon={option.icon} color={option.color} />
                     )}
                     {option.label}
                   </ContextMenuRadioItem>
@@ -405,11 +437,11 @@ export function IssueListItem({
                     checked={issue.labelIds.includes(option.value)}
                     onCheckedChange={(checked) => {
                       if (checked) {
-                        updateIssue(issue.id, {
+                        handleUpdateIssue({
                           labelIds: [...issue.labelIds, option.value],
                         });
                       } else {
-                        updateIssue(issue.id, {
+                        handleUpdateIssue({
                           labelIds: issue.labelIds.filter(
                             (labelId) => labelId !== option.value
                           ),
@@ -418,10 +450,7 @@ export function IssueListItem({
                     }}
                   >
                     {option.icon && (
-                      <FilterIcon
-                        icon={option.icon}
-                        className={cn(option.iconFill)}
-                      />
+                      <Icon icon={option.icon} color={option.color} />
                     )}
                     {option.label}
                   </ContextMenuCheckboxItem>

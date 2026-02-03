@@ -156,20 +156,12 @@ export const issueDisplayOptions = [
     label: "Labels",
   },
   {
-    value: "time-in-status",
-    label: "Time in status",
-  },
-  {
     value: "created",
     label: "Created",
   },
   {
     value: "updated",
     label: "Updated",
-  },
-  {
-    value: "pull-requests",
-    label: "Pull requests",
   },
 ];
 
@@ -204,43 +196,43 @@ export const issueFilterOptions: FilterOptions[] = [
         value: "BACKLOG",
         label: "Backlog",
         icon: BacklogIcon,
-        iconFill: "text-muted-foreground!",
+        color: "var(--muted-foreground)",
       },
       {
         value: "UNSTARTED",
         label: "Todo",
         icon: TodoIcon,
-        iconFill: "text-muted-foreground!",
+        color: "var(--muted-foreground)",
       },
       {
         value: "STARTED",
         label: "In Progress",
         icon: InProgressIcon,
-        iconFill: "text-yellow-500!",
+        color: "oklch(79.5% 0.184 86.047)",
       },
       {
         value: "IN_REVIEW",
         label: "In Review",
         icon: InReviewIcon,
-        iconFill: "text-green-500!",
+        color: "oklch(72.3% 0.219 149.579)",
       },
       {
         value: "COMPLETED",
         label: "Done",
         icon: DoneIcon,
-        iconFill: "text-indigo-500!",
+        color: "oklch(58.5% 0.233 277.117)",
       },
       {
         value: "CANCELLED",
         label: "Cancelled",
         icon: CancelledIcon,
-        iconFill: "text-muted-foreground!",
+        color: "var(--muted-foreground)",
       },
       {
         value: "DUPLICATE",
         label: "Duplicate",
         icon: CancelledIcon,
-        iconFill: "text-muted-foreground!",
+        color: "var(--muted-foreground)",
       },
     ],
   },

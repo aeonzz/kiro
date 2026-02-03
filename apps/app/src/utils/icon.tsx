@@ -5,30 +5,38 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import type { IconType } from "@/types/inbox";
 
 // Helper component to render both HugeIcons and custom icon components
-export function FilterIcon({
-  icon,
-  strokeWidth = 2,
-  className,
-}: {
+export interface IconComponentProps {
   icon: IconType;
   strokeWidth?: number;
   className?: string;
-}) {
-  // Check if it's a HugeIcon (IconSvgElement) or a custom component
-  // HugeIcons are arrays, custom components are functions
+  style?: React.CSSProperties;
+  color?: string;
+}
+
+export function Icon({
+  icon,
+  strokeWidth = 2,
+  className,
+  color,
+  style,
+}: IconComponentProps) {
+  const iconStyle = color ? { color, ...style } : style;
+
   if (Array.isArray(icon)) {
     return (
       <HugeiconsIcon
         icon={icon as IconSvgElement}
         strokeWidth={strokeWidth}
         className={className}
+        style={iconStyle}
       />
     );
   }
 
-  const Icon = icon as React.ComponentType<{
+  const CustomIcon = icon as React.ComponentType<{
     size?: number;
     className?: string;
+    style?: React.CSSProperties;
   }>;
-  return <Icon size={18} className={className} />;
+  return <CustomIcon size={18} className={className} style={iconStyle} />;
 }

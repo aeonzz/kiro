@@ -12,7 +12,7 @@ export type FilterOption = {
   value: string;
   label: string;
   icon?: IconType;
-  iconFill?: string;
+  color?: string;
   avatarUrl?: string;
 };
 
@@ -22,7 +22,6 @@ export type FilterOptions = {
   multiLabel: string;
   multiIcon?: boolean;
   icon: IconType;
-  iconFill?: string;
   options: FilterOption[];
 };
 

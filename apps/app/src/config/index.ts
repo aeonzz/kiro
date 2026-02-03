@@ -5,18 +5,18 @@ export const issueLabelOptions = [
     value: "bug",
     label: "Bug",
     icon: DotIcon,
-    iconFill: "text-red-400!",
+    color: "oklch(70.4% 0.191 22.216)",
   },
   {
     value: "improvement",
     label: "Improvement",
     icon: DotIcon,
-    iconFill: "text-purple-400!",
+    color: "oklch(71.4% 0.203 305.504)",
   },
   {
     value: "feature",
     label: "Feature",
     icon: DotIcon,
-    iconFill: "text-sky-400!",
+    color: "oklch(74.6% 0.16 232.661)",
   },
 ];

@@ -433,9 +433,9 @@ export function CreateIssueDialog() {
                       kbd: ["S"],
                       tooltipProps: {
                         collisionAvoidance: {
-                          side: "flip"
-                        }
-                      }
+                          side: "flip",
+                        },
+                      },
                     },
                   }}
                   kbd="S"
@@ -462,9 +462,9 @@ export function CreateIssueDialog() {
                       kbd: ["P"],
                       tooltipProps: {
                         collisionAvoidance: {
-                          side: "flip"
-                        }
-                      }
+                          side: "flip",
+                        },
+                      },
                     },
                   }}
                   kbd="P"

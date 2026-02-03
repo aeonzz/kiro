@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FilterIcon } from "@/utils/filter-icon";
+import { Icon } from "@/utils/icon";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useParams } from "@tanstack/react-router";
@@ -54,7 +54,6 @@ export function IssueFilterMenu({
           id: string;
           label: string;
           icon: IconType;
-          iconFill?: string;
         }
       | {
           type: "option";
@@ -63,7 +62,6 @@ export function IssueFilterMenu({
           value: string;
           label: string;
           icon?: IconType;
-          iconFill?: string;
         }
     )[] = [];
 
@@ -77,7 +75,6 @@ export function IssueFilterMenu({
           id: filter.id,
           label: filter.label,
           icon: filter.icon,
-          iconFill: filter.iconFill,
         });
       }
 
@@ -176,7 +173,7 @@ export function IssueFilterMenu({
                       }}
                     >
                       <DropdownMenuSubTrigger openOnHover>
-                        <FilterIcon icon={item.icon} strokeWidth={2} />
+                        <Icon icon={item.icon} strokeWidth={2} />
                         {item.label}
                       </DropdownMenuSubTrigger>
                       <DropdownMenuPortal>
@@ -206,10 +203,10 @@ export function IssueFilterMenu({
                                   }}
                                 >
                                   {subOption.icon && (
-                                    <FilterIcon
+                                    <Icon
                                       icon={subOption.icon}
                                       strokeWidth={2}
-                                      className={subOption.iconFill}
+                                      color={subOption.color}
                                     />
                                   )}
                                   {subOption.label}
@@ -235,10 +232,10 @@ export function IssueFilterMenu({
                     className="gap-0 pr-2.5"
                   >
                     {item.icon && (
-                      <FilterIcon
+                      <Icon
                         icon={item.icon}
                         strokeWidth={2}
-                        className={cn("mr-2.5", item.iconFill)}
+                        className="mr-2.5"
                       />
                     )}
                     <div className="text-muted-foreground flex items-center">
