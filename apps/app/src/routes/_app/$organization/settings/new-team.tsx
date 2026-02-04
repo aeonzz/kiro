@@ -1,4 +1,5 @@
 import * as React from "react";
+import { getTeamByIdFn } from "@/services/team/server-fn";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -78,7 +79,7 @@ function RouteComponent() {
               to: `/$organization/settings/teams/$name`,
               params: {
                 organization: activeOrganization.slug,
-                name: data.slug,
+                name: data.slug || "",
               },
             });
           },
@@ -157,9 +158,26 @@ function RouteComponent() {
             />
             <form.Field
               name="slug"
+              validators={{
+                onChangeAsyncDebounceMs: 500,
+                onChangeAsync: async ({ value }) => {
+                  if (!activeOrganization || !value) return;
+                  const team = await getTeamByIdFn({
+                    data: {
+                      organizationSlug: activeOrganization.slug,
+                      slug: value,
+                    },
+                  });
+                  if (team) {
+                    return `The team ${team.name} is already using this identifier.`;
+                  }
+                },
+              }}
               children={(field) => {
                 const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
+                  field.state.meta.isTouched &&
+                  (field.state.meta.errors.length > 0 ||
+                    !field.state.meta.isValid);
                 return (
                   <SettingsItem data-invalid={isInvalid}>
                     <SettingsItemContent>
@@ -202,12 +220,16 @@ function RouteComponent() {
       </SettingsGroup>
       <div className="mt-4 flex justify-end">
         <form.Subscribe
-          selector={(state) => state.isSubmitting}
-          children={(isSubmitting) => (
+          selector={(state) => [
+            state.canSubmit,
+            state.isSubmitting,
+            state.isValidating,
+          ]}
+          children={([canSubmit, isSubmitting, isValidating]) => (
             <Button
               type="submit"
               form="create-team-form"
-              disabled={isSubmitting}
+              disabled={!canSubmit || isSubmitting || isValidating}
             >
               Create team
             </Button>

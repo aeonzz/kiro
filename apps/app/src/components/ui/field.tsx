@@ -174,22 +174,28 @@ function FieldSeparator({
 function FieldError({
   className,
   children,
-  errors,
+  errors: _errors,
   ...props
 }: React.ComponentProps<"div"> & {
-  errors?: Array<{ message?: string } | undefined>;
+  errors?: Array<any>;
 }) {
   const content = useMemo(() => {
     if (children) {
       return children;
     }
 
+    const errors = _errors?.map((error) =>
+      typeof error === "string" ? { message: error } : error
+    );
+
     if (!errors?.length) {
       return null;
     }
 
     const uniqueErrors = [
-      ...new Map(errors.map((error) => [error?.message, error])).values(),
+      ...new Map(
+        errors.filter(Boolean).map((error) => [error?.message, error])
+      ).values(),
     ];
 
     if (uniqueErrors?.length == 1) {
@@ -204,7 +210,7 @@ function FieldError({
         )}
       </ul>
     );
-  }, [children, errors]);
+  }, [children, _errors]);
 
   if (!content) {
     return null;

@@ -1,5 +1,6 @@
 import { prisma } from "@kiro/db";
-import { generateId } from "better-auth";
+
+import { auth } from "@/lib/auth";
 
 import type {
   CreateTeamSchemaType,
@@ -8,27 +9,14 @@ import type {
   UpdateTeamSchemaType,
 } from "./schema";
 
-export async function createTeamService({
-  userId,
-  data,
-}: {
-  userId: string;
-  data: CreateTeamSchemaType;
-}) {
+export async function createTeamService(
+  data: CreateTeamSchemaType,
+  headers: Headers
+) {
   try {
-    return await prisma.team.create({
-      data: {
-        id: generateId(),
-        createdAt: new Date(),
-        teammembers: {
-          create: {
-            id: generateId(),
-            createdAt: new Date(),
-            userId,
-          },
-        },
-        ...data,
-      },
+    return await auth.api.createTeam({
+      body: { ...data },
+      headers,
     });
   } catch (err) {
     throw err;

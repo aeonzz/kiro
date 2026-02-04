@@ -16,6 +16,7 @@ import {
   getTeamsService,
   updateTeamService,
 } from "./service";
+import { getRequestHeaders } from "@tanstack/react-start/server";
 
 export const getTeamByIdFn = createServerFn({ method: "GET" })
   .middleware([loggerMiddleware, authMiddleware])
@@ -39,12 +40,9 @@ export const getTeamsFn = createServerFn({ method: "GET" })
 export const createTeamFn = createServerFn({ method: "POST" })
   .middleware([loggerMiddleware, authMiddleware])
   .inputValidator(createTeamSchema)
-  .handler(async ({ data, context }) => {
-    const session = context.session;
-    return createTeamService({
-      userId: session.user.id,
-      data,
-    });
+  .handler(async ({ data }) => {
+    const headers = getRequestHeaders();
+    return createTeamService(data, headers);
   });
 
 export const updateTeamFn = createServerFn({ method: "POST" })

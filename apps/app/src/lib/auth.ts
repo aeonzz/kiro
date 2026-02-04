@@ -8,7 +8,6 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
-
   session: {
     cookieCache: {
       enabled: true,
@@ -27,25 +26,112 @@ export const auth = betterAuth({
     organization({
       teams: {
         enabled: true,
-        maximumTeams: 10,
+        maximumTeams: 3,
         allowRemovingAllTeams: false,
+        maximumMembersPerTeam: 10,
+        defaultTeam: {
+          enabled: true,
+          customCreateDefaultTeam: async (organization) => {
+            const team = await prisma.team.create({
+              data: {
+                id: crypto.randomUUID(),
+                organizationId: organization.id,
+                name: organization.name,
+                slug: organization.name.slice(0, 3).toUpperCase(),
+                createdAt: new Date(),
+              },
+            });
+            return {
+              ...team,
+              updatedAt: team.updatedAt ?? undefined,
+            };
+          },
+        },
       },
-      // organizationHooks: {
-      //   afterCreateOrganization: async ({ organization }) => {
-      //     try {
-      //       await auth.api.createTeam({
-      //         body: {
-      //           organizationId: organization.id,
-      //           name: organization.name,
-      //         },
-      //       });
-      //     } catch (error) {
-      //       throw new APIError("INTERNAL_SERVER_ERROR", {
-      //         message: "Failed to create team",
-      //       });
-      //     }
-      //   },
-      // },
+      schema: {
+        team: {
+          additionalFields: {
+            slug: {
+              type: "string",
+              unique: true,
+              required: true,
+              input: true,
+            },
+          },
+        },
+      },
+      organizationHooks: {
+        afterCreateTeam: async ({ team, user }) => {
+          if (!user) return;
+
+          try {
+            await prisma.$transaction([
+              prisma.teamMember.create({
+                data: {
+                  id: crypto.randomUUID(),
+                  teamId: team.id,
+                  userId: user.id,
+                  createdAt: new Date(),
+                },
+              }),
+              prisma.workflowState.createMany({
+                data: [
+                  {
+                    teamId: team.id,
+                    name: "Backlog",
+                    type: "BACKLOG",
+                    position: 1,
+                  },
+                  {
+                    teamId: team.id,
+                    name: "Todo",
+                    type: "UNSTARTED",
+                    position: 2,
+                  },
+                  {
+                    teamId: team.id,
+                    name: "In Progress",
+                    type: "STARTED",
+                    position: 3,
+                  },
+                  {
+                    teamId: team.id,
+                    name: "Done",
+                    type: "COMPLETED",
+                    position: 4,
+                  },
+                  {
+                    teamId: team.id,
+                    name: "Canceled",
+                    type: "CANCELED",
+                    position: 5,
+                  },
+                ],
+              }),
+            ]);
+          } catch (error) {
+            console.error("Failed to setup team:", error);
+            throw new APIError("INTERNAL_SERVER_ERROR", {
+              message: "Failed to create team members or workflow states.",
+            });
+          }
+        },
+      },
     }),
   ],
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          await auth.api.createOrganization({
+            body: {
+              name: user.name,
+              slug: user.name,
+              userId: user.id,
+            },
+          });
+        },
+      },
+    },
+  },
 });
