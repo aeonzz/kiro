@@ -1,4 +1,10 @@
 import {
+  clearIssueDraftsFn,
+  deleteIssueDraftFn,
+  getIssueDraftsFn,
+  saveIssueDraftFn,
+} from "@/services/issue/server-fn";
+import {
   deleteNotificationFn,
   getUserNotificationsFn,
   readNotificationFn,
@@ -7,6 +13,7 @@ import {
 import {
   createOrganizationFn,
   getOrganizationFn,
+  listOrganizationsFn,
   updateOrganizationFn,
 } from "@/services/organization/server-fn";
 import {
@@ -59,6 +66,11 @@ export const organizationQueries = {
     queryOptions({
       queryKey: [...organizationQueries.details(), slug],
       queryFn: () => getOrganizationFn({ data: { slug } }),
+    }),
+  list: () =>
+    queryOptions({
+      queryKey: [...organizationQueries.all(), "list"],
+      queryFn: () => listOrganizationsFn(),
     }),
   mutations: {
     create: () => ({
@@ -161,6 +173,29 @@ export const notificationQueries = {
     restore: () => ({
       mutationKey: [...notificationQueries.all(), "restore"],
       mutationFn: restoreNotificationFn,
+    }),
+  },
+};
+
+export const issueDraftQueries = {
+  all: () => ["issue-drafts"],
+  lists: ({ organizationSlug }: { organizationSlug: string }) =>
+    queryOptions({
+      queryKey: [...issueDraftQueries.all(), "list", organizationSlug],
+      queryFn: () => getIssueDraftsFn({ data: { slug: organizationSlug } }),
+    }),
+  mutations: {
+    save: () => ({
+      mutationKey: [...issueDraftQueries.all(), "save"],
+      mutationFn: saveIssueDraftFn,
+    }),
+    delete: () => ({
+      mutationKey: [...issueDraftQueries.all(), "delete"],
+      mutationFn: deleteIssueDraftFn,
+    }),
+    clear: () => ({
+      mutationKey: [...issueDraftQueries.all(), "clear"],
+      mutationFn: clearIssueDraftsFn,
     }),
   },
 };

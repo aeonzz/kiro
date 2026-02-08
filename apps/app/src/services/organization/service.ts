@@ -50,7 +50,11 @@ export async function getOrganizationService({
             user: true,
           },
         },
-        teams: true,
+        teams: {
+          include: {
+            workflowStates: true,
+          },
+        },
         invitations: {
           include: {
             user: true,
@@ -91,6 +95,44 @@ export async function updateOrganizationService({
         organizationId: id,
       },
       headers,
+    });
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function listUserOrganizationsService({
+  userId,
+}: {
+  userId: string;
+}) {
+  try {
+    return await prisma.organization.findMany({
+      where: {
+        members: {
+          some: {
+            userId,
+          },
+        },
+      },
+      include: {
+        teams: {
+          include: {
+            workflowStates: true,
+            projects: true,
+          },
+        },
+        members: {
+          where: {
+            userId,
+          },
+        },
+        issueDrafts: {
+          where: {
+            creatorId: userId,
+          },
+        },
+      },
     });
   } catch (err) {
     throw err;

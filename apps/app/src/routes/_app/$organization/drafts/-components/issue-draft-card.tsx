@@ -2,16 +2,15 @@ import * as React from "react";
 import type { StrictOmit } from "@/types";
 import { DeleteIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useParams } from "@tanstack/react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNowStrict } from "date-fns";
+import { Value } from "platejs";
 import { Plate, usePlateEditor } from "platejs/react";
 
+import { IssueDraft } from "@/types/schema-types";
+import { issueDraftQueries, organizationQueries } from "@/lib/query-factory";
 import { cn } from "@/lib/utils";
-import {
-  useIssueDrafts,
-  useIssueDraftStore,
-  type IssueDraft,
-} from "@/hooks/use-issue-draft-store";
+import { useIssueDraftStore } from "@/hooks/use-issue-draft-store";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,28 +41,48 @@ export function IssueDraftCard({
   className,
   ...props
 }: IssueDraftCardProps) {
-  const { organization } = useParams({ strict: false });
-  const { deleteDraft } = useIssueDrafts(organization);
+  const qc = useQueryClient();
   const setTriggerDraftId = useIssueDraftStore(
     (state) => state.setTriggerDraftId
   );
 
+  const description = React.useMemo(() => {
+    if (!draft.description) return [{ children: [{ text: "" }], type: "p" }];
+    try {
+      return JSON.parse(draft.description) as Value;
+    } catch (e) {
+      console.error("Failed to parse draft description:", e);
+      return [{ children: [{ text: draft.description }], type: "p" }];
+    }
+  }, [draft.description]);
+
   const editor = usePlateEditor({
+    id: draft.id,
     plugins: EditorKit,
-    value: draft.description,
+    value: description,
+  });
+
+  const mutation = useMutation({
+    ...issueDraftQueries.mutations.delete(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: issueDraftQueries.all() });
+      qc.invalidateQueries({
+        queryKey: organizationQueries.all(),
+      });
+    },
   });
 
   React.useEffect(() => {
-    if (editor && draft.description) {
+    if (editor && description) {
       editor.tf.withoutNormalizing(() => {
         const children = [...editor.children];
         for (let i = children.length - 1; i >= 0; i--) {
           editor.tf.removeNodes({ at: [i] });
         }
-        editor.tf.insertNodes(draft.description, { at: [0] });
+        editor.tf.insertNodes(description, { at: [0] });
       });
     }
-  }, [draft.description, editor]);
+  }, [description, editor]);
 
   return (
     <DialogTrigger
@@ -113,7 +132,11 @@ export function IssueDraftCard({
                   <AlertDialogAction
                     onClick={(e) => {
                       e.stopPropagation();
-                      deleteDraft(draft.id);
+                      mutation.mutate({
+                        data: {
+                          draftId: draft.id,
+                        },
+                      });
                     }}
                     variant="destructive"
                   >

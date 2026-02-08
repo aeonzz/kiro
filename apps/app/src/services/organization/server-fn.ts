@@ -11,6 +11,7 @@ import {
 import {
   createOrganizationService,
   getOrganizationService,
+  listUserOrganizationsService,
   updateOrganizationService,
 } from "./service";
 
@@ -46,5 +47,13 @@ export const updateOrganizationFn = createServerFn({ method: "POST" })
     return updateOrganizationService({
       data,
       headers,
+    });
+  });
+
+export const listOrganizationsFn = createServerFn({ method: "GET" })
+  .middleware([loggerMiddleware, authMiddleware])
+  .handler(async ({ context }) => {
+    return listUserOrganizationsService({
+      userId: context.session.user.id,
     });
   });

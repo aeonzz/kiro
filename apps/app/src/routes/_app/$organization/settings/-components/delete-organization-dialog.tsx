@@ -27,8 +27,8 @@ export function DeleteOrganizationDialog() {
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
   const [checked, setChecked] = React.useState(false);
-  const { activeOrganization, userRole } = useOrganization();
-  const isOwner = userRole === "owner";
+  const { activeOrganization } = useOrganization();
+  const isOwner = activeOrganization?.userRole === "owner";
 
   const leaveMutation = useMutation({
     ...organizationQueries.mutations.leaveOrganization(),

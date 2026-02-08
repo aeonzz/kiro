@@ -1,6 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 
-import { useIssueDrafts } from "@/hooks/use-issue-draft-store";
+import { issueDraftQueries, organizationQueries } from "@/lib/query-factory";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,22 +19,48 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Container, ContainerHeader } from "@/components/container";
+import { Error } from "@/components/error";
 
 import { IssueDraftList } from "./-components/issue-draft-list";
 
 export const Route = createFileRoute("/_app/$organization/drafts/")({
+  loader: async ({ params: { organization }, context }) => {
+    const data = await context.queryClient.ensureQueryData(
+      issueDraftQueries.lists({
+        organizationSlug: organization,
+      })
+    );
+
+    if (!data) {
+      throw notFound();
+    }
+  },
+  errorComponent: Error,
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const { organization } = Route.useParams();
-  const { clearDrafts, drafts } = useIssueDrafts(organization);
+  const qc = useQueryClient();
+
+  const { data } = useSuspenseQuery(
+    issueDraftQueries.lists({
+      organizationSlug: organization,
+    })
+  );
+
+  const clearMutation = useMutation({
+    ...issueDraftQueries.mutations.clear(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: issueDraftQueries.all() });
+    },
+  });
 
   return (
     <Container>
       <ContainerHeader inset>
         <h2>Drafts</h2>
-        {drafts.length > 0 && (
+        {data.length > 0 && (
           <AlertDialog>
             <Button
               className="ml-auto"
@@ -52,7 +83,21 @@ function RouteComponent() {
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => clearDrafts()}
+                  onClick={() =>
+                    clearMutation.mutate(
+                      { data: { slug: organization } },
+                      {
+                        onSuccess: () => {
+                          qc.invalidateQueries({
+                            queryKey: issueDraftQueries.all(),
+                          });
+                          qc.invalidateQueries({
+                            queryKey: organizationQueries.all(),
+                          });
+                        },
+                      }
+                    )
+                  }
                   variant="destructive"
                 >
                   Discard all
@@ -62,7 +107,7 @@ function RouteComponent() {
           </AlertDialog>
         )}
       </ContainerHeader>
-      <IssueDraftList drafts={drafts} />
+      <IssueDraftList drafts={data} />
     </Container>
   );
 }

@@ -1,0 +1,28 @@
+enum WorkflowType {
+    BACKLOG
+    UNSTARTED
+    STARTED
+    COMPLETED
+    CANCELED
+}
+
+model WorkflowState {
+    id          String       @id @default(uuid())
+    name        String
+    color       String       @default("#e2e2e2")
+    icon        String?
+    type        WorkflowType
+    description String?
+    position    Float
+
+    teamId String
+    team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+    issues Issue[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([teamId])
+    @@map("workflow_state")
+}

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { issueLabelOptions } from "@/config";
+import { getWorkflowIcon } from "@/utils/workflow-icon";
 import {
   ArrowExpand01Icon,
   ArrowShrink02Icon,
@@ -10,6 +11,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useForm, useStore } from "@tanstack/react-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import type { Value } from "platejs";
@@ -18,10 +20,9 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { issueFilterOptions } from "@/config/team";
-import {
-  useIssueDrafts,
-  useIssueDraftStore,
-} from "@/hooks/use-issue-draft-store";
+import { issueDraftQueries, organizationQueries } from "@/lib/query-factory";
+import { useIssueDraftStore } from "@/hooks/use-issue-draft-store";
+import { useAuthenticatedSession } from "@/hooks/use-session";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -65,6 +66,8 @@ const formSchema = z.object({
   priority: z.string(),
   labels: z.array(z.string()),
   description: z.custom<Value>(),
+  projectId: z.string().nullable(),
+  teamId: z.string(),
 });
 
 export const createIssueDialogHandle = DialogPrimitive.createHandle();
@@ -73,22 +76,31 @@ const MotionPopup = motion.create(DialogPrimitive.Popup);
 
 export function CreateIssueDialog() {
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const { teams } = useOrganization();
+  const qc = useQueryClient();
+  const { user } = useAuthenticatedSession();
+  const { activeOrganization, isPending } = useOrganization();
   const [confirmationOpen, setConfirmationOpen] = React.useState(false);
   const [expand, setExpand] = React.useState(false);
-  const { organization } = useParams({ strict: false });
-  const { drafts, saveDraft } = useIssueDrafts(organization);
   const triggerDraftId = useIssueDraftStore((state) => state.triggerDraftId);
   const setTriggerDraftId = useIssueDraftStore(
     (state) => state.setTriggerDraftId
   );
 
+  const drafts = activeOrganization?.issueDrafts ?? [];
+
   const triggerDraft = React.useMemo(
     () => drafts.find((d) => d.id === triggerDraftId),
     [drafts, triggerDraftId]
   );
-  const statusOptions =
-    issueFilterOptions.find((option) => option.id === "status")?.options ?? [];
+
+  const parsedDescription = React.useMemo(() => {
+    if (!triggerDraft?.description) return null;
+    try {
+      return JSON.parse(triggerDraft.description) as Value;
+    } catch {
+      return null;
+    }
+  }, [triggerDraft]);
 
   const priorityOptions =
     issueFilterOptions.find((option) => option.id === "priority")?.options ??
@@ -101,13 +113,22 @@ export function CreateIssueDialog() {
   const height = expand ? "100%" : "auto";
   const width = expand ? "820px" : "768px";
 
+  const mutation = useMutation({
+    ...issueDraftQueries.mutations.save(),
+  });
+
   const form = useForm({
     defaultValues: {
       title: triggerDraft?.title ?? "",
-      description: editor.children,
-      status: triggerDraft?.status ?? statusOptions[0].value,
+      description: parsedDescription ?? editor.children,
+      status:
+        triggerDraft?.status ??
+        activeOrganization?.teams[0]?.workflowStates?.[0]?.id ??
+        "",
       priority: triggerDraft?.priority ?? priorityOptions[0].value,
-      labels: triggerDraft?.labels ?? ([] as Array<string>),
+      labels: (triggerDraft?.labels as string[]) ?? ([] as Array<string>),
+      teamId: triggerDraft?.teamId ?? activeOrganization?.teams[0]?.id ?? "",
+      projectId: triggerDraft?.projectId ?? null,
     },
     validators: {
       onSubmit: formSchema,
@@ -142,20 +163,66 @@ export function CreateIssueDialog() {
     },
   });
 
-  React.useEffect(() => {
-    const isDefaultDescription =
-      form.state.values.description?.length === 1 &&
-      form.state.values.description[0].type === "p" &&
-      form.state.values.description[0].children?.length === 1 &&
-      form.state.values.description[0].children[0].text === "";
+  const selectedTeamId = useStore(form.store, (state) => state.values.teamId);
+  const selectedTeam = React.useMemo(
+    () =>
+      activeOrganization?.teams.find((t) => t.id === selectedTeamId) ??
+      activeOrganization?.teams[0],
+    [activeOrganization, selectedTeamId]
+  );
 
-    if (dialogOpen && triggerDraft && isDefaultDescription) {
-      editor.tf.withoutNormalizing(() => {
-        editor.tf.insertNodes(triggerDraft.description, { at: [0] });
-        editor.tf.removeNodes({ at: [triggerDraft.description.length] });
+  const statusOptions = React.useMemo(() => {
+    return (
+      selectedTeam?.workflowStates?.map((state) => ({
+        value: state.id,
+        label: state.name,
+        icon: getWorkflowIcon(state.type),
+        color: state.color,
+      })) ?? []
+    );
+  }, [selectedTeam]);
+
+  const projectOptions = React.useMemo(() => {
+    const options =
+      selectedTeam?.projects?.map((p) => ({
+        value: p.id,
+        label: p.name,
+      })) ?? [];
+
+    return [{ value: "", label: "No project" }, ...options];
+  }, [selectedTeam]);
+
+  React.useEffect(() => {
+    if (dialogOpen && triggerDraftId && triggerDraft) {
+      form.reset({
+        title: triggerDraft.title ?? "",
+        description: parsedDescription ?? editor.children,
+        status:
+          triggerDraft.status ??
+          activeOrganization?.teams[0]?.workflowStates?.[0]?.id ??
+          "",
+        priority: triggerDraft.priority ?? priorityOptions[0].value,
+        labels: (triggerDraft.labels as string[]) ?? [],
+        teamId: triggerDraft.teamId ?? activeOrganization?.teams[0]?.id ?? "",
+        projectId: triggerDraft.projectId ?? null,
       });
+
+      if (parsedDescription) {
+        editor.tf.setValue(parsedDescription);
+      } else {
+        editor.tf.reset();
+      }
     }
-  }, [triggerDraft, dialogOpen, editor, form]);
+  }, [
+    dialogOpen,
+    triggerDraftId,
+    triggerDraft,
+    parsedDescription,
+    form,
+    editor,
+    activeOrganization,
+    priorityOptions,
+  ]);
 
   const isDirty = useStore(
     form.store,
@@ -182,48 +249,73 @@ export function CreateIssueDialog() {
         setDialogOpen(open);
       }
     } else {
-      if (!open && hasTitle && !isDefaultDescription) {
-        saveDraft({
-          id: triggerDraftId,
+      if (!open && hasTitle && !isDefaultDescription && activeOrganization) {
+        mutation.mutate({
+          data: {
+            id: triggerDraftId,
+            title: form.state.values.title,
+            description: form.state.values.description,
+            status: form.state.values.status,
+            priority: form.state.values.priority,
+            labels: form.state.values.labels,
+            teamId: form.state.values.teamId,
+            projectId: form.state.values.projectId,
+            creatorId: user.id,
+            organizationId: activeOrganization.id,
+          },
+        });
+      }
+      setDialogOpen(open);
+      qc.invalidateQueries({ queryKey: issueDraftQueries.all() });
+      qc.invalidateQueries({ queryKey: organizationQueries.all() });
+    }
+  }
+
+  function handleSaveDraft() {
+    if (!activeOrganization) return;
+    mutation.mutate(
+      {
+        data: {
           title: form.state.values.title,
           description: form.state.values.description,
           status: form.state.values.status,
           priority: form.state.values.priority,
           labels: form.state.values.labels,
-        });
+          teamId: form.state.values.teamId,
+          projectId: form.state.values.projectId,
+          creatorId: user.id,
+          organizationId: activeOrganization.id,
+        },
+      },
+      {
+        onSuccess: (data) => {
+          setDialogOpen(false);
+          setConfirmationOpen(false);
+          qc.invalidateQueries({ queryKey: issueDraftQueries.all() });
+          qc.invalidateQueries({ queryKey: organizationQueries.all() });
+          const id = toast.success("Issue draft saved", {
+            action: (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="ml-auto"
+                onClick={() => {
+                  setDialogOpen(true);
+                  setTriggerDraftId(data.id);
+                  toast.dismiss(id);
+                }}
+              >
+                Open draft
+              </Button>
+            ),
+          });
+        },
       }
-      setDialogOpen(open);
-    }
+    );
   }
 
-  function handleSaveDraft() {
-    const draftId = Math.random().toString(36).substring(2, 9);
-    saveDraft({
-      id: draftId,
-      title: form.state.values.title,
-      description: form.state.values.description,
-      status: form.state.values.status,
-      priority: form.state.values.priority,
-      labels: form.state.values.labels,
-    });
-    setDialogOpen(false);
-    setConfirmationOpen(false);
-    const id = toast.success("Issue draft saved", {
-      action: (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="ml-auto"
-          onClick={() => {
-            setDialogOpen(true);
-            setTriggerDraftId(draftId);
-            toast.dismiss(id);
-          }}
-        >
-          Open draft
-        </Button>
-      ),
-    });
+  if (isPending) {
+    return null;
   }
 
   return (
@@ -266,9 +358,22 @@ export function CreateIssueDialog() {
           <DialogTitle className="sr-only">Create Issue</DialogTitle>
           <div className="flex items-center gap-1.5">
             <Select
-              disabled={teams.length <= 1}
-              value={teams[0]}
+              disabled={(activeOrganization?.teams?.length ?? 0) <= 1}
+              value={selectedTeam}
               itemToStringLabel={(item) => item.name}
+              onValueChange={(value) => {
+                if (value) {
+                  form.setFieldValue("teamId", value.id);
+
+                  const currentStatus = form.getFieldValue("status");
+                  const isValidStatus = value.workflowStates.some(
+                    (s) => s.id === currentStatus
+                  );
+                  if (!isValidStatus) {
+                    form.setFieldValue("status", value.workflowStates[0]?.id);
+                  }
+                }
+              }}
             >
               <SelectTrigger
                 size="xs"
@@ -294,7 +399,7 @@ export function CreateIssueDialog() {
                 className="w-44"
               >
                 <SelectGroup>
-                  {teams.map((team) => (
+                  {activeOrganization?.teams.map((team) => (
                     <SelectItem key={team.id} value={team}>
                       <div className="bg-muted shadow-border-sm size-4 rounded-sm p-0.5">
                         <HugeiconsIcon
@@ -442,6 +547,39 @@ export function CreateIssueDialog() {
                 />
               )}
             />
+            {projectOptions.length > 1 && (
+              <form.Field
+                name="projectId"
+                children={(field) => (
+                  <ItemsCombobox
+                    id={field.name}
+                    name={field.name}
+                    items={projectOptions}
+                    value={
+                      projectOptions.find(
+                        (option) => option.value === field.state.value
+                      ) ?? projectOptions[0]
+                    }
+                    onValueChange={(value) =>
+                      field.handleChange(value?.value || "")
+                    }
+                    placeholder="Set project..."
+                    triggerProps={{
+                      tooltip: {
+                        content: "Set project",
+                        kbd: ["G"],
+                        tooltipProps: {
+                          collisionAvoidance: {
+                            side: "flip",
+                          },
+                        },
+                      },
+                    }}
+                    kbd="G"
+                  />
+                )}
+              />
+            )}
             <form.Field
               name="priority"
               children={(field) => (

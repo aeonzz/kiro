@@ -1,0 +1,19 @@
+model Cycle {
+    id        String   @id @default(uuid())
+    number    Int
+    name      String?
+    startDate DateTime
+    endDate   DateTime
+
+    teamId String
+    team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+    issues Issue[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([teamId, number])
+    @@index([teamId])
+    @@map("cycle")
+}

@@ -9,7 +9,6 @@ import {
   sidebarWorkspaceItems,
 } from "@/config/nav";
 import { isNavLinkActive, resolveOrgUrl } from "@/lib/utils";
-import { useIssueDrafts } from "@/hooks/use-issue-draft-store";
 import { usePreferencesStore } from "@/hooks/use-preference-store";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
 import {
@@ -55,7 +54,7 @@ export function AppSidebar({
   const pathname = useLocation({
     select: (location) => location.pathname,
   });
-  const { teams, activeOrganization } = useOrganization();
+  const { activeOrganization } = useOrganization();
   const sidebarConfig = usePreferencesStore((state) => state.sidebarConfig);
   const workspaceOpen = usePreferencesStore((state) => state.workspaceOpen);
   const teamsOpen = usePreferencesStore((state) => state.teamsOpen);
@@ -64,7 +63,7 @@ export function AppSidebar({
   );
   const setTeamsOpenStore = usePreferencesStore((state) => state.setTeamsOpen);
   const { mutateAsync } = useUserPreferences();
-  const { drafts } = useIssueDrafts(activeOrganization?.slug);
+  const drafts = activeOrganization?.issueDrafts ?? [];
 
   const setWorkspaceOpen = (open: boolean) => {
     setWorkspaceOpenStore(open);
@@ -206,7 +205,7 @@ export function AppSidebar({
                     activeOrganizationSlug={activeOrganization?.slug}
                   />
                   <TeamNav
-                    teams={teams}
+                    teams={activeOrganization?.teams ?? []}
                     pathname={pathname}
                     open={teamsOpen}
                     onOpenChange={setTeamsOpen}

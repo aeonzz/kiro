@@ -3,8 +3,8 @@ import type { StrictOmit } from "@/types";
 import { NoteIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
+import { IssueDraft } from "@/types/schema-types";
 import { cn } from "@/lib/utils";
-import type { IssueDraft } from "@/hooks/use-issue-draft-store";
 import { ContainerContent } from "@/components/container";
 
 import { IssueDraftCard } from "./issue-draft-card";

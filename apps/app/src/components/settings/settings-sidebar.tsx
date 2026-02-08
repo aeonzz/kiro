@@ -36,7 +36,7 @@ export function SettingsSidebar({
   const pathname = useLocation({
     select: (location) => location.pathname,
   });
-  const { activeOrganization, teams } = useOrganization();
+  const { activeOrganization } = useOrganization();
 
   return (
     <Sidebar variant={variant} {...props}>
@@ -99,7 +99,7 @@ export function SettingsSidebar({
               <SidebarGroupLabel>Teams</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {teams.map((team) => {
+                  {activeOrganization?.teams.map((team) => {
                     return (
                       <SidebarMenuItem key={team.id}>
                         <SidebarMenuButton

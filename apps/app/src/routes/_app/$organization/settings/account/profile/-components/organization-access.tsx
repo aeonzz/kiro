@@ -18,8 +18,8 @@ import { deleteOrganizationDialogHandle } from "../../../-components/delete-orga
 export function OrganizationAccess({
   ...props
 }: React.ComponentProps<typeof SettingsGroup>) {
-  const { userRole } = useOrganization();
-  const isOwner = userRole === "owner";
+  const { activeOrganization } = useOrganization();
+  const isOwner = activeOrganization?.userRole === "owner";
 
   return (
     <SettingsGroup {...props}>

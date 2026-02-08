@@ -2,7 +2,6 @@ import * as React from "react";
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { Spinner } from "@/components/ui/spinner";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarControl } from "@/components/app-sidebar/sidebar-control";
 import { CreateIssueDialog } from "@/components/create-issue-dialog";
@@ -35,7 +34,7 @@ function RouteComponent() {
         <SidebarInset className="min-h-0 overflow-hidden">
           {isPending ? (
             <div className="flex h-full items-center justify-center">
-              <Spinner />
+              <div className="from-muted-foreground to-muted flex size-8 animate-pulse items-center justify-center rounded-full bg-radial-[at_25%_25%] to-75%" />
             </div>
           ) : (
             <Outlet />

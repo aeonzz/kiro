@@ -49,7 +49,7 @@ export function General({
   });
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { teams } = useOrganization();
+  const { activeOrganization } = useOrganization();
 
   const mutation = useMutation({
     ...teamQueries.mutations.update(),
@@ -181,7 +181,7 @@ export function General({
             validators={{
               onChange: ({ value }) => {
                 if (value === team.slug) return undefined;
-                const isTaken = teams.some((t) => t.slug === value);
+                const isTaken = activeOrganization?.teams.some((t) => t.slug === value);
                 return isTaken
                   ? { message: "This slug is already in use." }
                   : undefined;

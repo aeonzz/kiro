@@ -65,7 +65,7 @@ export function MemberInvitationDialog({
   ...props
 }: MemberInvitationDialogProps) {
   const anchor = useComboboxAnchor();
-  const { activeOrganization, teams } = useOrganization();
+  const { activeOrganization, } = useOrganization();
   const qc = useQueryClient();
   const [open, setOpen] = React.useState(false);
 
@@ -180,7 +180,7 @@ export function MemberInvitationDialog({
                     <Combobox
                       multiple
                       autoHighlight
-                      items={teams.map((t) => t.id)}
+                      items={activeOrganization?.teams.map((t) => t.id)}
                       value={field.state.value}
                       onValueChange={(value) => field.handleChange(value)}
                     >
@@ -189,7 +189,7 @@ export function MemberInvitationDialog({
                           {(values) => (
                             <React.Fragment>
                               {values.map((value: string) => {
-                                const team = teams.find((t) => t.id === value);
+                                const team = activeOrganization?.teams.find((t) => t.id === value);
                                 return (
                                   <ComboboxChip key={value}>
                                     {team?.name || value}
@@ -209,7 +209,7 @@ export function MemberInvitationDialog({
                         <ComboboxEmpty>No teams found.</ComboboxEmpty>
                         <ComboboxList>
                           {(item) => {
-                            const team = teams.find((t) => t.id === item);
+                            const team = activeOrganization?.teams.find((t) => t.id === item);
                             return (
                               <ComboboxItem key={item} value={item}>
                                 {team?.name || item}

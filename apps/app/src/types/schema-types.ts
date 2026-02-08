@@ -1,11 +1,14 @@
 import type {
   Invitation,
+  IssueDraft as IssueDraftType,
   Member,
   Notification as NotificationType,
   Organization as OrganizationType,
+  Project,
   TeamMember,
   Team as TeamType,
   User,
+  WorkflowState,
 } from "@kiro/db";
 
 import type { StrictOmit } from ".";
@@ -17,7 +20,9 @@ export type Team = StrictOmit<TeamType, "updatedAt"> & {
       user: User;
     }
   >;
-  updatedAt?: Date;
+  updatedAt: Date | null;
+  workflowStates: Array<WorkflowState>;
+  projects: Array<Project>;
 };
 
 export type Organization = OrganizationType & {
@@ -40,3 +45,5 @@ export type Notification = StrictOmit<NotificationType, "link"> & {
   actor: User | null;
   link: RoutePath;
 };
+
+export type IssueDraft = IssueDraftType;

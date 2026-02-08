@@ -1,25 +1,27 @@
 import * as React from "react";
+import type { StrictOmit } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import type { Organization, Team } from "better-auth/plugins";
 
+import type { IssueDraft, Organization, Team } from "@/types/schema-types";
 import { HomeViewValue } from "@/config/preferences";
-import { authClient } from "@/lib/auth-client";
 import { organizationQueries } from "@/lib/query-factory";
 import { usePreferencesStore } from "@/hooks/use-preference-store";
 import { NotFound } from "@/components/not-found";
 
-interface OrganizationContextValue {
-  organizations: Organization[] | undefined;
-  isPending: boolean;
-  activeOrganization?: (Organization & { userRole?: string | null }) | null;
-  teams: Array<
-    Omit<Team, "updatedAt"> & {
-      slug: string;
-      updatedAt?: Date;
-    }
-  >;
+type ContextOrganization = StrictOmit<
+  Organization,
+  "invitations" | "members" | "teams"
+> & {
+  teams: Array<StrictOmit<Team, "teammembers">>;
+  issueDrafts: Array<StrictOmit<IssueDraft, "creatorId">>;
   userRole?: string | null;
+};
+
+interface OrganizationContextValue {
+  organizations: Array<ContextOrganization>;
+  isPending: boolean;
+  activeOrganization: ContextOrganization | null;
 }
 
 const OrganizationContext = React.createContext<
@@ -34,7 +36,7 @@ export function OrganizationProvider({
   children: React.ReactNode;
 }) {
   const { data: userOrganizations, isPending: userOrganizationsPending } =
-    authClient.useListOrganizations();
+    useQuery(organizationQueries.list());
   const navigate = useNavigate();
   const location = useLocation();
   const homeView = usePreferencesStore((s) => s.homeView);
@@ -63,23 +65,15 @@ export function OrganizationProvider({
     return null;
   }, [slug, isReserved, userOrganizations]);
 
-  const {
-    data: organization,
-    isPending,
-    isError,
-  } = useQuery({
-    ...organizationQueries.detail({ slug: effectiveSlug! }),
-    enabled: !!effectiveSlug,
-  });
-
-  if (!isPending && slug && !isReserved && !organization) {
-    return <NotFound />;
-  }
+  const activeOrganization = React.useMemo(() => {
+    if (!userOrganizations || !effectiveSlug) return null;
+    return userOrganizations.find((o) => o.slug === effectiveSlug) || null;
+  }, [userOrganizations, effectiveSlug]);
 
   React.useEffect(() => {
     if (slug && !isReserved) {
-      if (isPending || !organization) return;
-      document.cookie = `active_org=${organization.id}; path=/; max-age=31536000; SameSite=Lax`;
+      if (userOrganizationsPending || !activeOrganization) return;
+      document.cookie = `active_org=${activeOrganization.id}; path=/; max-age=31536000; SameSite=Lax`;
     } else if (pathSegments.length === 0) {
       if (userOrganizationsPending) return;
 
@@ -99,9 +93,8 @@ export function OrganizationProvider({
   }, [
     userOrganizations,
     navigate,
-    isPending,
-    organization,
     userOrganizationsPending,
+    activeOrganization,
     slug,
     isReserved,
     pathSegments.length,
@@ -110,24 +103,35 @@ export function OrganizationProvider({
   ]);
 
   const value = React.useMemo(() => {
+    const activeOrg = activeOrganization
+      ? {
+          ...activeOrganization,
+          logo: activeOrganization.logo ?? null,
+          metadata: activeOrganization.metadata ?? null,
+          userRole: activeOrganization.members?.[0]?.role ?? null,
+        }
+      : null;
+
     return {
-      organizations: userOrganizations ?? [],
-      isPending: (isPending && !isReserved) || userOrganizationsPending,
-      activeOrganization: organization,
-      teams:
-        organization?.teams.map((t) => ({
-          ...t,
-          updatedAt: t.updatedAt ?? undefined,
+      organizations:
+        userOrganizations?.map((org) => ({
+          ...org,
+          logo: org.logo ?? null,
+          metadata: org.metadata ?? null,
+          teams:
+            org.teams.map((t) => ({
+              ...t,
+              updatedAt: t.updatedAt ?? null,
+            })) ?? [],
         })) ?? [],
-      userRole: organization?.userRole,
+      isPending: userOrganizationsPending,
+      activeOrganization: activeOrg,
     };
-  }, [
-    userOrganizations,
-    isPending,
-    userOrganizationsPending,
-    organization,
-    isReserved,
-  ]);
+  }, [userOrganizations, userOrganizationsPending, activeOrganization]);
+
+  // if (!userOrganizationsPending && slug && !isReserved && !activeOrganization) {
+  //   return <NotFound />;
+  // }
 
   return (
     <OrganizationContext.Provider value={value}>

@@ -28,7 +28,8 @@ export function InboxFilterMenu({
 }: React.ComponentProps<typeof DropdownMenu> & {
   align?: React.ComponentProps<typeof DropdownMenuContent>["align"];
 }) {
-  const { teams, activeOrganization } = useOrganization();
+  const { activeOrganization } = useOrganization();
+  const { teams } = activeOrganization ?? {};
   const { addFilter } = useInboxFilters(activeOrganization?.id);
   const [search, setSearch] = React.useState("");
   const [subMenuSearch, setSubMenuSearch] = React.useState("");
@@ -68,14 +69,14 @@ export function InboxFilterMenu({
       // Add matching options
       const options =
         filter.id === "team"
-          ? teams.map((team) => ({
+          ? teams?.map((team) => ({
               value: team.id,
               label: team.name,
               icon: filter.icon,
             }))
           : filter.options;
 
-      options.forEach((option) => {
+      options?.forEach((option) => {
         if (option.label.toLowerCase().includes(lowerSearch)) {
           results.push({
             type: "option",
@@ -154,14 +155,14 @@ export function InboxFilterMenu({
                   const filter = filterOptions.find((f) => f.id === item.id)!;
                   const options =
                     filter.id === "team"
-                      ? teams.map((team) => ({
+                      ? teams?.map((team) => ({
                           value: team.id,
                           label: team.name,
                           icon: filter.icon,
                         }))
                       : filter.options;
 
-                  const filteredSubOptions = options.filter((opt) =>
+                  const filteredSubOptions = options?.filter((opt) =>
                     opt.label
                       .toLowerCase()
                       .includes(subMenuSearch.toLowerCase())
@@ -187,13 +188,13 @@ export function InboxFilterMenu({
                             onChange={(e) => setSubMenuSearch(e.target.value)}
                             autoFocus
                           />
-                          {filteredSubOptions.length === 0 && (
+                          {filteredSubOptions?.length === 0 && (
                             <DropdownMenuEmpty>
                               No matching options
                             </DropdownMenuEmpty>
                           )}
                           <DropdownMenuGroup>
-                            {filteredSubOptions.map((subOption) => {
+                            {filteredSubOptions?.map((subOption) => {
                               return (
                                 <DropdownMenuCheckboxItem
                                   key={subOption.value}

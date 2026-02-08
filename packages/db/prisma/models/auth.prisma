@@ -17,6 +17,14 @@ model User {
   notifications          Notification[] @relation("NotificationRecipient")
   triggeredNotifications Notification[] @relation("NotificationActor")
 
+  assignedIssues Issue[]         @relation("IssueAssignee")
+  createdIssues  Issue[]         @relation("IssueCreator")
+  issueComments  IssueComment[]
+  issueHistory   IssueHistory[]
+  ledProjects    Project[]
+  projectUpdates ProjectUpdate[]
+  issueDrafts    IssueDraft[]
+
   @@unique([email])
   @@map("user")
 }
@@ -82,9 +90,11 @@ model Organization {
   members     Member[]
   invitations Invitation[]
 
-  teams Team[]
+  teams    Team[]
+  projects Project[]
 
   notifications Notification[]
+  issueDrafts   IssueDraft[]
 
   @@unique([slug])
   @@map("organization")
@@ -124,14 +134,19 @@ model Invitation {
 }
 
 model Team {
-  id             String       @id
+  id             String          @id
   name           String
   slug           String
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   createdAt      DateTime
-  updatedAt      DateTime?    @updatedAt
+  updatedAt      DateTime?       @updatedAt
   teammembers    TeamMember[]
+  projects       Project[]
+  issues         Issue[]
+  cycles         Cycle[]
+  workflowStates WorkflowState[]
+  issueLabels    IssueLabel[]
 
   @@index([organizationId])
   @@map("team")
