@@ -123,8 +123,8 @@ export async function listUserOrganizationsService({
           },
         },
         members: {
-          where: {
-            userId,
+          include: {
+            user: true,
           },
         },
         issueDrafts: {

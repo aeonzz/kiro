@@ -2,7 +2,7 @@ model Issue {
     id          String        @id @default(uuid())
     number      Int
     title       String
-    description String?
+    description Json?
     priority    IssuePriority @default(NO_PRIORITY)
 
     teamId String

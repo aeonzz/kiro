@@ -1,7 +1,7 @@
 import type {
   Invitation,
   IssueDraft as IssueDraftType,
-  Member,
+  Member as MemberType,
   Notification as NotificationType,
   Organization as OrganizationType,
   Project,
@@ -26,17 +26,17 @@ export type Team = StrictOmit<TeamType, "updatedAt"> & {
 };
 
 export type Organization = OrganizationType & {
-  members: Array<
-    Member & {
-      user: User;
-    }
-  >;
+  members: Array<Member>;
   teams: Team[];
   invitations: Array<
     Invitation & {
       user: User;
     }
   >;
+};
+
+export type Member = MemberType & {
+  user: User;
 };
 
 export type Notification = StrictOmit<NotificationType, "link"> & {

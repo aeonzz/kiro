@@ -3,8 +3,11 @@ import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 
 import { cn } from "@/lib/utils";
 
-function Popover({ ...props }: PopoverPrimitive.Root.Props) {
-  return <PopoverPrimitive.Root data-slot="popover" {...props} />;
+function Popover({
+  modal = "trap-focus",
+  ...props
+}: PopoverPrimitive.Root.Props) {
+  return <PopoverPrimitive.Root data-slot="popover" modal={modal} {...props} />;
 }
 
 function PopoverTrigger({ ...props }: PopoverPrimitive.Trigger.Props) {

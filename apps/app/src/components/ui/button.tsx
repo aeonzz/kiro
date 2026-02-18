@@ -1,3 +1,4 @@
+import * as React from "react";
 import { mergeProps } from "@base-ui/react";
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -90,6 +91,15 @@ function Button({
   );
 
   if (tooltip) {
+    if (React.isValidElement(tooltip) && tooltip.type === TooltipContent) {
+      return (
+        <Tooltip>
+          <TooltipTrigger render={button} />
+          {tooltip}
+        </Tooltip>
+      );
+    }
+
     const tooltipContentProps =
       typeof tooltip === "object" && tooltip !== null && "content" in tooltip
         ? (tooltip as ButtonTooltip)
@@ -106,12 +116,21 @@ function Button({
           className={cn("space-x-2", tooltipClassName)}
           {...restTooltipProps}
         >
-          <span>{rest.content}</span>
+          {rest.content && <span>{rest.content}</span>}
           {rest.kbd && (
             <KbdGroup>
-              {rest.kbd.map((key) => (
-                <Kbd key={key}>{key}</Kbd>
-              ))}
+              {rest.kbd.map((key, index) =>
+                key === "then" ? (
+                  <span
+                    key={index}
+                    className="text-muted-foreground mx-px text-[10px] font-medium"
+                  >
+                    then
+                  </span>
+                ) : (
+                  <Kbd key={key}>{key}</Kbd>
+                )
+              )}
             </KbdGroup>
           )}
         </TooltipContent>

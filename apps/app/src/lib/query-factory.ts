@@ -17,6 +17,10 @@ import {
   updateOrganizationFn,
 } from "@/services/organization/server-fn";
 import {
+  createProjectFn,
+  getOrganizationProjectsFn,
+} from "@/services/project/server-fn";
+import {
   createTeamFn,
   deleteTeamFn,
   getTeamByIdFn,
@@ -71,6 +75,16 @@ export const organizationQueries = {
     queryOptions({
       queryKey: [...organizationQueries.all(), "list"],
       queryFn: () => listOrganizationsFn(),
+    }),
+  getProjects: ({ organizationSlug }: { organizationSlug: string }) =>
+    queryOptions({
+      queryKey: [
+        ...organizationQueries.all(),
+        "get-projects",
+        organizationSlug,
+      ],
+      queryFn: () =>
+        getOrganizationProjectsFn({ data: { slug: organizationSlug } }),
     }),
   mutations: {
     create: () => ({
@@ -197,5 +211,39 @@ export const issueDraftQueries = {
       mutationKey: [...issueDraftQueries.all(), "clear"],
       mutationFn: clearIssueDraftsFn,
     }),
+  },
+};
+
+export const projectQueries = {
+  all: () => ["projects"],
+  lists: ({ organizationSlug }: { organizationSlug: string }) =>
+    queryOptions({
+      queryKey: [...projectQueries.all(), "list", organizationSlug],
+      queryFn: () =>
+        getOrganizationProjectsFn({ data: { slug: organizationSlug } }),
+    }),
+  details: () => [...projectQueries.all(), "detail"],
+  // detail: ({ teamSlug, slug }: { teamSlug: string; slug: string }) =>
+  //   queryOptions({
+  //     queryKey: [...projectQueries.details(), slug],
+  //     queryFn: () =>
+  //       getProjectByIdFn({
+  //         data: { teamSlug, slug },
+  //       }),
+  //     staleTime: 5000,
+  //   }),
+  mutations: {
+    create: () => ({
+      mutationKey: [...projectQueries.all(), "create"],
+      mutationFn: createProjectFn,
+    }),
+    // update: () => ({
+    //   mutationKey: [...projectQueries.all(), "update"],
+    //   mutationFn: updateProjectFn,
+    // }),
+    // delete: () => ({
+    //   mutationKey: [...projectQueries.all(), "delete"],
+    //   mutationFn: deleteProjectFn,
+    // }),
   },
 };

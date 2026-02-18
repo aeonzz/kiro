@@ -3,7 +3,7 @@ import type { StrictOmit } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 
-import type { IssueDraft, Organization, Team } from "@/types/schema-types";
+import type { IssueDraft, Member, Organization, Team } from "@/types/schema-types";
 import { HomeViewValue } from "@/config/preferences";
 import { organizationQueries } from "@/lib/query-factory";
 import { usePreferencesStore } from "@/hooks/use-preference-store";
@@ -16,6 +16,7 @@ type ContextOrganization = StrictOmit<
   teams: Array<StrictOmit<Team, "teammembers">>;
   issueDrafts: Array<StrictOmit<IssueDraft, "creatorId">>;
   userRole?: string | null;
+  members: Array<Member>;
 };
 
 interface OrganizationContextValue {
@@ -129,9 +130,9 @@ export function OrganizationProvider({
     };
   }, [userOrganizations, userOrganizationsPending, activeOrganization]);
 
-  // if (!userOrganizationsPending && slug && !isReserved && !activeOrganization) {
-  //   return <NotFound />;
-  // }
+  if (!userOrganizationsPending && slug && !isReserved && !activeOrganization) {
+    return <NotFound />;
+  }
 
   return (
     <OrganizationContext.Provider value={value}>

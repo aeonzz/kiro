@@ -219,7 +219,7 @@ export function TeamNav({
                                     item.url,
                                     activeOrganizationSlug,
                                     team.slug,
-                                    true
+                                    false
                                   );
 
                               return (

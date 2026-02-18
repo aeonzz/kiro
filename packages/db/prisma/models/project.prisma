@@ -1,7 +1,7 @@
 enum ProjectStatus {
     PLANNED
     STARTED
-    PAUSED
+    BACKLOG
     COMPLETED
     CANCELED
 }
@@ -9,12 +9,14 @@ enum ProjectStatus {
 model Project {
     id          String  @id @default(uuid())
     name        String
-    description String?
+    summary     String?
+    description Json?
     slug        String
     icon        String?
     color       String?
 
-    status ProjectStatus @default(PLANNED)
+    status   ProjectStatus @default(PLANNED)
+    priority IssuePriority @default(NO_PRIORITY)
 
     leadId String?
     lead   User?   @relation(fields: [leadId], references: [id])

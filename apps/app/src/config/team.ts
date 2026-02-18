@@ -12,6 +12,7 @@ import {
   PlayCircleIcon,
 } from "@hugeicons/core-free-icons";
 
+import { ProjectStatus } from "@/types/enums";
 import type { FilterOptions } from "@/types/inbox";
 import type { TeamIssueTab } from "@/types/team";
 import {
@@ -307,5 +308,38 @@ export const issueFilterOptions: FilterOptions[] = [
         icon: LowSignalIcon,
       },
     ],
+  },
+];
+
+export const projectStatusOptions = [
+  {
+    value: ProjectStatus.BACKLOG,
+    label: "Backlog",
+    icon: BacklogIcon,
+    color: "var(--muted-foreground)",
+  },
+  {
+    value: ProjectStatus.PLANNED,
+    label: "Planned",
+    icon: BacklogIcon,
+    color: "var(--muted-foreground)",
+  },
+  {
+    value: ProjectStatus.STARTED,
+    label: "In Progress",
+    icon: InProgressIcon,
+    color: "oklch(79.5% 0.184 86.047)",
+  },
+  {
+    value: ProjectStatus.COMPLETED,
+    label: "Done",
+    icon: DoneIcon,
+    color: "oklch(58.5% 0.233 277.117)",
+  },
+  {
+    value: ProjectStatus.CANCELED,
+    label: "Cancelled",
+    icon: CancelledIcon,
+    color: "var(--muted-foreground)",
   },
 ];

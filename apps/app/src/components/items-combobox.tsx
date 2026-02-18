@@ -27,7 +27,7 @@ interface ItemsComboboxProps<T extends FilterOption> extends StrictOmit<
 > {
   items: T[];
   placeholder?: string;
-  kbd?: string;
+  kbd?: string | Array<string>;
   isIcon?: boolean;
   triggerProps?: StrictOmit<
     React.ComponentProps<typeof Button>,
@@ -37,6 +37,7 @@ interface ItemsComboboxProps<T extends FilterOption> extends StrictOmit<
     React.ComponentProps<typeof ComboboxContent>,
     "children"
   >;
+  isMuted?: boolean;
 }
 
 export function ItemsCombobox<T extends FilterOption>({
@@ -46,6 +47,7 @@ export function ItemsCombobox<T extends FilterOption>({
   isIcon,
   triggerProps,
   contentProps,
+  isMuted = false,
   ...props
 }: ItemsComboboxProps<T>) {
   const {
@@ -61,7 +63,7 @@ export function ItemsCombobox<T extends FilterOption>({
         variant={variant}
         size={isIcon ? "icon-xs" : "xs"}
         render={<ComboboxTrigger isIcon />}
-        className={cn("text-muted-foreground", className)}
+        className={cn(isMuted && "text-muted-foreground", className)}
         {...restTriggerProps}
       >
         <ComboboxValue>
@@ -312,7 +314,7 @@ export function ItemsComboboxContent({
   ...props
 }: React.ComponentProps<typeof ComboboxContent> & {
   placeholder?: string;
-  kbd?: string;
+  kbd?: string | Array<string>;
 }) {
   return (
     <ComboboxContent className={cn("min-w-60", className)} {...props}>
@@ -322,7 +324,7 @@ export function ItemsComboboxContent({
         {(item: FilterOption) => (
           <ComboboxItem key={item.value} value={item}>
             {item.avatarUrl ? (
-              <Avatar className="size-4!">
+              <Avatar className="size-4.5!">
                 <AvatarImage src={item.avatarUrl} />
                 <AvatarFallback>
                   <HugeiconsIcon icon={User02Icon} size={14} />

@@ -1,18 +1,13 @@
 import * as React from "react";
-import { StrictOmit } from "@/types";
 import { StarIcon, User02FreeIcons } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
-import { useIssueDetailsPanelStore } from "@/hooks/use-issue-details-panel-store";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidePanel } from "@/components/ui/side-panel";
 
-interface DetailsSidePanelProps extends StrictOmit<
-  React.ComponentProps<typeof SidePanel>,
-  "isOpen"
-> {
+interface DetailsSidePanelProps extends React.ComponentProps<typeof SidePanel> {
   title: string;
   team: string;
 }
@@ -21,11 +16,10 @@ export function DetailsSidePanel({
   title,
   team,
   children,
+  isOpen,
   width = "350px",
   ...props
 }: DetailsSidePanelProps) {
-  const isOpen = useIssueDetailsPanelStore((state) => state.isOpen);
-
   return (
     <SidePanel
       isOpen={isOpen}

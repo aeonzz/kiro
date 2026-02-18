@@ -30,3 +30,13 @@ export const IssuePriority = {
 } as const;
 
 export type IssuePriority = (typeof IssuePriority)[keyof typeof IssuePriority];
+
+export const ProjectStatus = {
+  PLANNED: "PLANNED",
+  STARTED: "STARTED",
+  BACKLOG: "BACKLOG",
+  COMPLETED: "COMPLETED",
+  CANCELED: "CANCELED",
+} as const;
+
+export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus];

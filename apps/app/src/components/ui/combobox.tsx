@@ -16,7 +16,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 
-import { Kbd } from "./kbd";
+import { Kbd, KbdGroup } from "./kbd";
 
 const Combobox = ComboboxPrimitive.Root;
 
@@ -126,7 +126,7 @@ function ComboboxPopupInput({
   kbd,
   ...props
 }: ComboboxPrimitive.Input.Props & {
-  kbd?: string;
+  kbd?: string | Array<string>;
 }) {
   return (
     <React.Fragment>
@@ -146,7 +146,25 @@ function ComboboxPopupInput({
           {...props}
         />
         <InputGroupAddon align="inline-end">
-          {kbd && <Kbd>{kbd}</Kbd>}
+          {kbd &&
+            (typeof kbd === "string" ? (
+              <Kbd>{kbd}</Kbd>
+            ) : (
+              <KbdGroup>
+                {kbd.map((key, index) =>
+                  key === "then" ? (
+                    <span
+                      key={index}
+                      className="text-muted-foreground mx-px text-[10px] font-medium"
+                    >
+                      then
+                    </span>
+                  ) : (
+                    <Kbd key={key}>{key}</Kbd>
+                  )
+                )}
+              </KbdGroup>
+            ))}
         </InputGroupAddon>
         {children}
       </InputGroup>
