@@ -2,6 +2,9 @@ import { createMiddleware } from "@tanstack/react-start";
 import pino from "pino";
 
 const logger = pino({
+  serializers: {
+    error: pino.stdSerializers.err,
+  },
   transport:
     process.env.NODE_ENV === "development"
       ? {
