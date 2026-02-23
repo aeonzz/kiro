@@ -6,6 +6,7 @@ import { Container } from "@/components/container";
 import { Error } from "@/components/error";
 
 import { Header } from "./-components/header";
+import { ProjectToolbar } from "./-components/project-toolbar";
 
 export const Route = createFileRoute("/_app/$organization/team/$team/projects")(
   {
@@ -37,6 +38,7 @@ function RouteComponent() {
   return (
     <Container>
       <Header teamName={data.name} />
+      <ProjectToolbar />
       <Outlet />
     </Container>
   );

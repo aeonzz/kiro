@@ -77,6 +77,49 @@ export const issueGroupOptions = [
   },
 ];
 
+export const projectGroupOptions = [
+  {
+    value: "none",
+    label: "No grouping",
+  },
+  {
+    value: "lead",
+    label: "Lead",
+  },
+  {
+    value: "member",
+    label: "Member",
+  },
+  {
+    value: "status",
+    label: "Status",
+  },
+  {
+    value: "priority",
+    label: "Priority",
+  },
+  {
+    value: "label",
+    label: "Label",
+  },
+  {
+    value: "health",
+    label: "Health",
+  },
+  {
+    value: "priority",
+    label: "Priority",
+  },
+  {
+    value: "start",
+    label: "Start date",
+  },
+  {
+    value: "target",
+    label: "Target date",
+  },
+];
+
 export const issueOrderOptions = [
   {
     value: "manual",
@@ -108,6 +151,45 @@ export const issueOrderOptions = [
   },
 ];
 
+export const projectOrderOptions = [
+  {
+    value: "manual",
+    label: "Manual",
+  },
+  {
+    value: "name",
+    label: "Name",
+  },
+  {
+    value: "status",
+    label: "Status",
+  },
+  {
+    value: "priority",
+    label: "Priority",
+  },
+  {
+    value: "updated",
+    label: "Updated",
+  },
+  {
+    value: "created",
+    label: "Created",
+  },
+  {
+    value: "health",
+    label: "Health updated",
+  },
+  {
+    value: "start",
+    label: "Start date",
+  },
+  {
+    value: "target",
+    label: "Target date",
+  },
+];
+
 export const completedIssuesOptions = [
   {
     value: "all",
@@ -128,6 +210,33 @@ export const completedIssuesOptions = [
   {
     value: "none",
     label: "none",
+  },
+];
+
+export const closedProjectsOptions = [
+  {
+    value: "none",
+    label: "None",
+  },
+  {
+    value: "past-week",
+    label: "Past week",
+  },
+  {
+    value: "past-month",
+    label: "Past month",
+  },
+  {
+    value: "past-3-months",
+    label: "Past 3 months",
+  },
+  {
+    value: "past-6-months",
+    label: "Past 6 months",
+  },
+  {
+    value: "all",
+    label: "All",
   },
 ];
 
@@ -163,6 +272,53 @@ export const issueDisplayOptions = [
   {
     value: "updated",
     label: "Updated",
+  },
+];
+
+export const projectDisplayOptions = [
+  {
+    value: "priority",
+    label: "Priority",
+  },
+  {
+    value: "status",
+    label: "Status",
+  },
+  {
+    value: "health",
+    label: "Health",
+  },
+  {
+    value: "teams",
+    label: "Teams",
+  },
+  {
+    value: "lead",
+    label: "Lead",
+  },
+  {
+    value: "members",
+    label: "Members",
+  },
+  {
+    value: "start-date",
+    label: "Start date",
+  },
+  {
+    value: "target-date",
+    label: "Target date",
+  },
+  {
+    value: "created",
+    label: "Created",
+  },
+  {
+    value: "updated",
+    label: "Updated",
+  },
+  {
+    value: "completed",
+    label: "Completed",
   },
 ];
 
@@ -341,5 +497,49 @@ export const projectStatusOptions = [
     label: "Cancelled",
     icon: CancelledIcon,
     color: "var(--muted-foreground)",
+  },
+];
+
+export const projectFilterOptions: FilterOptions[] = [
+  {
+    id: "status",
+    label: "Status",
+    multiLabel: "statuses",
+    multiIcon: true,
+    icon: BacklogIcon,
+    options: projectStatusOptions,
+  },
+  {
+    id: "priority",
+    label: "Issue priority",
+    multiLabel: "priorities",
+    icon: FullSignalIcon,
+    options: [
+      {
+        value: "NO_PRIORITY",
+        label: "No priority",
+        icon: DashedLine01Icon,
+      },
+      {
+        value: "URGENT",
+        label: "Urgent",
+        icon: AlertSquareIcon,
+      },
+      {
+        value: "HIGH",
+        label: "High",
+        icon: FullSignalIcon,
+      },
+      {
+        value: "MEDIUM",
+        label: "Medium",
+        icon: MediumSignalIcon,
+      },
+      {
+        value: "LOW",
+        label: "Low",
+        icon: LowSignalIcon,
+      },
+    ],
   },
 ];

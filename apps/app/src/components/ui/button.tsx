@@ -28,9 +28,9 @@ const buttonVariants = cva(
         ghostPopup:
           "hover:shadow-[0_0_0_1px_var(--accent)] hover:bg-accent hover:text-foreground dark:hover:bg-[color-mix(in_oklab,var(--accent)98%,var(--accent-foreground))] aria-expanded:bg-accent dark:aria-expanded:bg-[color-mix(in_oklab,var(--accent)98%,var(--accent-foreground))] aria-expanded:text-foreground aria-expanded:shadow-[0_0_0_1px_var(--accent)]",
         destructive:
-          "bg-destructive/10 hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30",
+          "shadow-[0_0_0_1px_var(--destructive)]/25 bg-destructive/10 hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30",
         ghostDestructive:
-          "hover:bg-destructive/10 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/20",
+          "hover:shadow-[0_0_0_1px_var(--destructive)]/25 hover:bg-destructive/10 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/20",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

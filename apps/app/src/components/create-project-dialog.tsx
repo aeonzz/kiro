@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import {
   Calendar04Icon,
   CalendarCheckOut01Icon,
@@ -18,6 +18,16 @@ import * as z from "zod";
 import { ProjectStatus } from "@/types/enums";
 import { issueFilterOptions, projectStatusOptions } from "@/config/team";
 import { projectQueries } from "@/lib/query-factory";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { CopyButton } from "./copy-button";
 import { DatePicker } from "./date-picker";
@@ -141,25 +151,6 @@ export function CreateProjectDialog() {
           },
         }
       );
-
-      //   description: (
-      //     <div className="relative">
-      //       <CopyButton
-      //         value={JSON.stringify(value, null, 2)}
-      //         className="absolute top-3 right-3"
-      //         variant="ghost"
-      //       />
-      //       <pre className="bg-sidebar pointer-events-auto mt-2 max-h-40 max-w-full overflow-auto rounded-md p-4">
-      //         <code className="text-sidebar-foreground pointer-events-auto">
-      //           {JSON.stringify(value, null, 2)}
-      //         </code>
-      //       </pre>
-      //     </div>
-      //   ),
-      //   classNames: {
-      //     content: "w-full",
-      //   },
-      // });
     },
   });
 
@@ -187,6 +178,17 @@ export function CreateProjectDialog() {
 
   function handleOpenChange(open: boolean) {
     const hasName = form.state.values.name.trim().length > 0;
+    const hasSummary = form.state.values.summary.trim().length > 0;
+    const hasChangedStatus =
+      form.state.values.status !== projectStatusOptions[0].value;
+    const hasChangedPriority =
+      form.state.values.priority !== priorityOptions[0].value;
+    const hasChangedTeam =
+      form.state.values.teamId !== (activeOrganization?.teams[0]?.id ?? "");
+    const hasChangedLead = form.state.values.leadId !== "NO_LEAD";
+    const hasStartDate = form.state.values.startDate !== null;
+    const hasTargetDate = form.state.values.targetDate !== null;
+
     const description = form.state.values.description;
     const isDefaultDescription =
       description?.length === 1 &&
@@ -195,7 +197,18 @@ export function CreateProjectDialog() {
       description[0].children[0].text === "";
     const hasDescription = !isDefaultDescription;
 
-    if (!open && (hasName || hasDescription)) {
+    const hasChanges =
+      hasName ||
+      hasSummary ||
+      hasChangedStatus ||
+      hasChangedPriority ||
+      hasChangedTeam ||
+      hasChangedLead ||
+      hasStartDate ||
+      hasTargetDate ||
+      hasDescription;
+
+    if (!open && hasChanges) {
       setConfirmationOpen(true);
     } else {
       setDialogOpen(open);
@@ -583,6 +596,28 @@ export function CreateProjectDialog() {
           />
         </DialogFooter>
       </DialogContent>
+      <AlertDialog open={confirmationOpen} onOpenChange={setConfirmationOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Discard this project?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Confirm that you want to discard this project.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => {
+                setDialogOpen(false);
+                setConfirmationOpen(false);
+              }}
+            >
+              Discard
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }

@@ -79,7 +79,7 @@ export const sidebarTeamItems: NavItem[] = [
   },
   {
     title: "Projects",
-    url: "/$organization/team/$team/projects",
+    url: "/$organization/team/$team/projects/all",
     icon: Folder01Icon,
   },
   {

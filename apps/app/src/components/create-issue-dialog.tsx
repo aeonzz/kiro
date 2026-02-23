@@ -12,7 +12,6 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import type { Value } from "platejs";
 import { Plate, usePlateEditor } from "platejs/react";

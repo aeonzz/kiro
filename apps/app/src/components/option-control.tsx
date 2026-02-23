@@ -64,12 +64,18 @@ export function OptionControlSelect<
             onValueChange?.(val);
           }}
         >
-          <SelectTrigger id={id} className="w-full" size="xs" variant="secondary">
+          <SelectTrigger
+            id={id}
+            className="w-full"
+            size="xs"
+            variant="secondary"
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent
             alignItemWithTrigger={false}
             className="min-w-(--anchor-width)"
+            align="start"
           >
             <SelectGroup className="*:data-[slot=select-item]:py-1">
               {options.map((option) => (
