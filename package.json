@@ -9,7 +9,11 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "check-types": "turbo check-types"
+    "check-types": "turbo check-types",
+    "dev:web": "turbo -F web dev",
+    "db:generate": "turbo -F @kiro/db db:generate",
+    "db:push": "turbo -F @kiro/db db:push",
+    "db:studio": "turbo -F @kiro/db db:studio"
   },
 	"devDependencies": {
 		"turbo": "^2.6.3"

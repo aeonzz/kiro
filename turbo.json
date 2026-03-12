@@ -5,6 +5,19 @@
     "build": {
       "outputs": ["dist/**"]
     },
+    "db:generate": {
+      "cache": false
+    },
+    "db:push": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false
+    },
+    "db:studio": {
+      "persistent": true,
+      "cache": false
+    },
     "check-types": {
       "dependsOn": ["^check-types"]
     },
