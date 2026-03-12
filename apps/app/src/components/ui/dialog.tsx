@@ -30,7 +30,7 @@ function DialogOverlay({
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        "ease-out-expo fixed inset-0 isolate bg-black/60 duration-450 data-ending-style:opacity-0 data-starting-style:opacity-0",
+        "ease-out-expo fixed inset-0 isolate bg-black/60 duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0",
         className
       )}
       {...props}
@@ -72,7 +72,7 @@ function DialogContent({
           data-flush={flush}
           data-slot="dialog-content"
           className={cn(
-            "group/dialog-content bg-background shadow-border-md ease-out-expo fixed top-1/2 left-1/2 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-lg text-sm transition-all duration-450 outline-none sm:max-w-sm",
+            "group/dialog-content bg-background shadow-border-md ease-out-expo fixed top-1/2 left-1/2 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-lg text-sm transition-all duration-300 outline-none sm:max-w-sm",
             "scale-[calc(1-0.025*var(--nested-dialogs))] data-ending-style:top-[50%] data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:top-[50%] data-starting-style:scale-95 data-starting-style:opacity-0",
             "data-nested-dialog-open:before:bg-sidebar/40 before:absolute before:inset-0 before:-z-1 before:content-[''] data-nested-dialog-open:before:z-1",
             flush ? "gap-0 p-0" : "gap-4 p-4",
