@@ -48,7 +48,7 @@ export function InboxDisplayOptions({
           content: "Show display options",
           kbd: ["⇧", "V"],
         }}
-        render={PopoverTrigger}
+        render={(triggerProps) => <PopoverTrigger {...triggerProps} />}
       >
         <HugeiconsIcon icon={SlidersHorizontalIcon} strokeWidth={2} />
       </Button>

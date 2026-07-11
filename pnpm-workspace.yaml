@@ -1,7 +1,8 @@
 packages:
   - apps/*
   - packages/*
+
 catalog:
-  zod: ^4.1.13
-  tsdown: ^0.17.3
   dotenv: ^17.2.3
+  tsdown: ^0.17.3
+  zod: ^4.4.3

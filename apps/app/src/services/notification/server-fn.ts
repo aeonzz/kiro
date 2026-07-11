@@ -16,28 +16,28 @@ import {
 
 export const getUserNotificationsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(getUserNotificationsSchema)
+  .validator(getUserNotificationsSchema)
   .handler(async ({ data }) => {
     return getUserNotificationsService(data);
   });
 
 export const readNotificationFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(readNotificationSchema)
+  .validator(readNotificationSchema)
   .handler(async ({ data }) => {
     return readNotificationService(data);
   });
 
 export const deleteNotificationFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(deleteNotificationSchema)
+  .validator(deleteNotificationSchema)
   .handler(async ({ data }) => {
     return deleteNotificationService(data);
   });
 
 export const restoreNotificationFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(restoreNotificationSchema)
+  .validator(restoreNotificationSchema)
   .handler(async ({ data }) => {
     return restoreNotificationService(data);
   });

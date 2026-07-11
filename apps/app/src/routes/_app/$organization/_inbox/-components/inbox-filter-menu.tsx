@@ -110,7 +110,7 @@ export function InboxFilterMenu({
           content: "Filter notifications by",
           kbd: ["F"],
         }}
-        render={DropdownMenuTrigger}
+        render={(triggerProps) => <DropdownMenuTrigger {...triggerProps} />}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

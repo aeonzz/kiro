@@ -15,8 +15,8 @@
     "db:push": "turbo -F @kiro/db db:push",
     "db:studio": "turbo -F @kiro/db db:studio"
   },
-	"devDependencies": {
-		"turbo": "^2.6.3"
-	},
-	"packageManager": "pnpm@10.17.1"
+  "devDependencies": {
+    "turbo": "^2.10.4"
+  },
+  "packageManager": "pnpm@10.17.1"
 }

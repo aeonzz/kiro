@@ -6,7 +6,7 @@ import { setUserPreferencesService } from "./service";
 
 export const setUserPreferencesFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(setUserPreferencesInput)
+  .validator(setUserPreferencesInput)
   .handler(async ({ data, context }) => {
     return setUserPreferencesService({
       userId: context.session.user.id,

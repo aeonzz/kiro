@@ -9,7 +9,7 @@ import {
 
 export const getOrganizationProjectsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(getOrganizationProjectSchema)
+  .validator(getOrganizationProjectSchema)
   .handler(async ({ context, data }) => {
     return getOrganizationProjectsService({
       userId: context.session.user.id,
@@ -19,7 +19,7 @@ export const getOrganizationProjectsFn = createServerFn({ method: "GET" })
 
 export const createProjectFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(createProjectSchema)
+  .validator(createProjectSchema)
   .handler(async ({ data }) => {
     return createProjectService({
       data,

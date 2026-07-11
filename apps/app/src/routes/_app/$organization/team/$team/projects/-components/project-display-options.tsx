@@ -87,7 +87,7 @@ export function ProjectDisplayOptions({
             collisionBoundary: tooltipBoundary,
           },
         }}
-        render={PopoverTrigger}
+        render={(triggerProps) => <PopoverTrigger {...triggerProps} />}
       >
         <HugeiconsIcon icon={SlidersHorizontalIcon} strokeWidth={2} />
         <span>Display</span>

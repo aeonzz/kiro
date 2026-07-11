@@ -331,7 +331,7 @@ const AppOrganizationSettingsTeamsNameMembersIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
-  '/$organization': typeof AppOrganizationInboxRouteRouteWithChildren
+  '/$organization': typeof AppOrganizationRouteRouteWithChildren
   '/login': typeof AuthLoginRouteRoute
   '/join': typeof AppJoinRoute
   '/api/users': typeof ApiUsersRouteWithChildren

@@ -35,6 +35,7 @@ export function LabelCombobox({ issueId, issueLabels }: LabelComboboxProps) {
         >
           <ComboboxTrigger
             isIcon
+            nativeButton={false}
             render={
               <Badge
                 variant="outline"

@@ -3,7 +3,7 @@ import axios from "redaxios";
 import { z } from "zod";
 
 export const getGeolocationFn = createServerFn({ method: "GET" })
-  .inputValidator((d: unknown) => d as string)
+  .validator((d: unknown) => d as string)
   .handler(async ({ data: ip }) => {
     if (!ip || ip === "::1" || ip === "127.0.0.1") {
       return { city: "Local", country: "Development" };

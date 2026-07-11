@@ -14,7 +14,7 @@ import {
 
 export const saveIssueDraftFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(issueDraftSchema)
+  .validator(issueDraftSchema)
   .handler(async ({ context, data }) => {
     return saveIssueDraft({
       userId: context.session.user.id,
@@ -24,7 +24,7 @@ export const saveIssueDraftFn = createServerFn({ method: "POST" })
 
 export const getIssueDraftsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(getUserOrganizationSchema)
+  .validator(getUserOrganizationSchema)
   .handler(async ({ context, data }) => {
     const org = await prisma.organization.findUnique({
       where: { slug: data.slug },
@@ -43,7 +43,7 @@ export const getIssueDraftsFn = createServerFn({ method: "GET" })
 
 export const deleteIssueDraftFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(z.object({ draftId: z.string() }))
+  .validator(z.object({ draftId: z.string() }))
   .handler(async ({ context, data }) => {
     return deleteIssueDraft({
       userId: context.session.user.id,
@@ -53,7 +53,7 @@ export const deleteIssueDraftFn = createServerFn({ method: "POST" })
 
 export const clearIssueDraftsFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(getUserOrganizationSchema)
+  .validator(getUserOrganizationSchema)
   .handler(async ({ context, data }) => {
     const org = await prisma.organization.findUnique({
       where: { slug: data.slug },

@@ -16,7 +16,7 @@ import {
 
 export const getOrganizationFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(getUserOrganizationSchema)
+  .validator(getUserOrganizationSchema)
   .handler(async ({ context, data }) => {
     return getOrganizationService({
       userId: context.session.user.id,
@@ -26,7 +26,7 @@ export const getOrganizationFn = createServerFn({ method: "GET" })
 
 export const createOrganizationFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(organizationInputSchema)
+  .validator(organizationInputSchema)
   .handler(async ({ data, context }) => {
     const headers = getRequestHeaders();
     const session = context.session;
@@ -39,7 +39,7 @@ export const createOrganizationFn = createServerFn({ method: "POST" })
 
 export const updateOrganizationFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(updateOrganizationSchema)
+  .validator(updateOrganizationSchema)
   .handler(async ({ data }) => {
     const headers = getRequestHeaders();
 

@@ -27,7 +27,7 @@ import { getRequestHeaders } from "@tanstack/react-start/server";
 
 export const getTeamByIdFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(getTeamByIdSchema)
+  .validator(getTeamByIdSchema)
   .handler(async ({ data }) => {
     return getTeamByIdService({
       slug: data.slug,
@@ -37,7 +37,7 @@ export const getTeamByIdFn = createServerFn({ method: "GET" })
 
 export const getTeamsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(getTeamsSchema)
+  .validator(getTeamsSchema)
   .handler(async ({ data }) => {
     return getTeamsService({
       organizationSlug: data.organizationSlug,
@@ -46,7 +46,7 @@ export const getTeamsFn = createServerFn({ method: "GET" })
 
 export const createTeamFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(createTeamSchema)
+  .validator(createTeamSchema)
   .handler(async ({ data }) => {
     const headers = getRequestHeaders();
     return createTeamService(data, headers);
@@ -54,42 +54,42 @@ export const createTeamFn = createServerFn({ method: "POST" })
 
 export const updateTeamFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(updateTeamSchema)
+  .validator(updateTeamSchema)
   .handler(async ({ data }) => {
     return updateTeamService(data);
   });
 
 export const deleteTeamFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(deleteTeamSchema)
+  .validator(deleteTeamSchema)
   .handler(async ({ data }) => {
     return deleteTeamService(data);
   });
 
 export const createWorkflowStateFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(createWorkflowStateSchema)
+  .validator(createWorkflowStateSchema)
   .handler(async ({ data }) => {
     return createWorkflowStateService(data);
   });
 
 export const updateWorkflowStateFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(updateWorkflowStateSchema)
+  .validator(updateWorkflowStateSchema)
   .handler(async ({ data }) => {
     return updateWorkflowStateService(data);
   });
 
 export const deleteWorkflowStateFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(deleteWorkflowStateSchema)
+  .validator(deleteWorkflowStateSchema)
   .handler(async ({ data }) => {
     return deleteWorkflowStateService(data);
   });
 
 export const reorderWorkflowStatesFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(reorderWorkflowStatesSchema)
+  .validator(reorderWorkflowStatesSchema)
   .handler(async ({ data }) => {
     return reorderWorkflowStatesService(data);
   });

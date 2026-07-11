@@ -110,7 +110,7 @@ export function ProjectFilterMenu({
           content: "Add filter",
           kbd: ["F"],
         }}
-        render={DropdownMenuTrigger}
+        render={(triggerProps) => <DropdownMenuTrigger {...triggerProps} />}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
