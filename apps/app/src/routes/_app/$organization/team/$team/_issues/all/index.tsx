@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
-import { teamQueries } from "@/lib/query-factory";
+import { issueQueries, teamQueries } from "@/lib/query-factory";
 import { useIssueDetailsPanelStore } from "@/hooks/use-details-panel-store";
 import { ContainerContent } from "@/components/container";
 import { Error } from "@/components/error";
@@ -40,6 +40,9 @@ function RouteComponent() {
   const { data } = useSuspenseQuery(
     teamQueries.detail({ organizationSlug: organization, slug: team })
   );
+  const { data: issues } = useSuspenseQuery(
+    issueQueries.lists({ organizationSlug: organization, teamSlug: team })
+  );
 
   if (!data) {
     throw notFound();
@@ -47,7 +50,7 @@ function RouteComponent() {
 
   return (
     <ContainerContent className="flex flex-1">
-      <IssueList />
+      <IssueList issues={issues} />
       <DetailsSidePanel title="All issues" team={data.name} isOpen={isOpen}>
         <FilterTabs />
       </DetailsSidePanel>

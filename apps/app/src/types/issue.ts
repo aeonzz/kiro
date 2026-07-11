@@ -1,21 +1,15 @@
+import type { WorkflowGroupType } from "@/config/workflow";
+
 import type { IssuePriority } from "./enums";
 
 export type Issue = {
   id: string;
+  number?: number;
   title: string;
-  status: IssueStatus;
+  status: WorkflowGroupType;
   priority: IssuePriority;
   createdAt: string;
   updatedAt: string;
   assigneeId?: string;
   labelIds: string[];
 };
-
-export type IssueStatus =
-  | "BACKLOG"
-  | "UNSTARTED"
-  | "STARTED"
-  | "IN_REVIEW"
-  | "COMPLETED"
-  | "CANCELLED"
-  | "DUPLICATE";

@@ -1,5 +1,4 @@
 import * as React from "react";
-import { issueLabelOptions } from "@/config";
 import { MOCK_USERS } from "@/mocks/users";
 import { formatDate } from "@/utils/format-date";
 import { Icon } from "@/utils/icon";
@@ -11,25 +10,19 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, useParams } from "@tanstack/react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 
 import type { Issue } from "@/types/issue";
+import { getWorkflowIcon } from "@/config";
 import { issueFilterOptions } from "@/config/team";
+import { issueQueries } from "@/lib/query-factory";
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
-import { useIssueStore } from "@/hooks/use-issue-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   ContextMenu,
-  ContextMenuCheckboxItem,
-  ContextMenuContent,
-  ContextMenuGroup,
-  ContextMenuRadioGroup,
-  ContextMenuRadioItem,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
@@ -42,6 +35,9 @@ import {
 import { InProgressIcon } from "@/components/icons";
 import { ItemsCombobox } from "@/components/items-combobox";
 
+import { useTeamLabels } from "@/hooks/use-team-labels";
+import { useTeamWorkflowStates } from "@/hooks/use-team-workflow-states";
+import { IssueContextMenu } from "./issue-context-menu";
 import { LabelCombobox } from "./label-combobox";
 
 interface IssueListItemProps {
@@ -57,8 +53,7 @@ export function IssueListItem({
   toggleId,
   issue,
 }: IssueListItemProps) {
-  const updateIssue = useIssueStore((state) => state.updateIssue);
-
+  const qc = useQueryClient();
   const { organization, team } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });
@@ -73,23 +68,37 @@ export function IssueListItem({
     displayProperties,
   } = useActiveIssueDisplayOptions(team);
 
+  const updateMutation = useMutation({
+    ...issueQueries.mutations.update(),
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: issueQueries.lists({ organizationSlug: organization, teamSlug: team }).queryKey }),
+  });
+
   const handleUpdateIssue = (updates: Partial<Issue>) => {
-    updateIssue(issue.id, updates);
+    updateMutation.mutate({ data: { id: issue.id, ...updates } });
   };
 
   const priorityOptions =
     issueFilterOptions.find((option) => option.id === "priority")?.options ??
     [];
 
-  const statusOptions =
-    issueFilterOptions.find((option) => option.id === "status")?.options ?? [];
+  const workflowStates = useTeamWorkflowStates(team);
+  const statusOptions = React.useMemo(
+    () =>
+      workflowStates.map((state) => ({
+        value: state.id,
+        label: state.name,
+        icon: getWorkflowIcon(state.type),
+        color: state.color,
+      })),
+    [workflowStates]
+  );
+
+  const allLabelOptions = useTeamLabels(team);
 
   const issueLabels = React.useMemo(
-    () =>
-      issueLabelOptions.filter((option) =>
-        issue?.labelIds?.includes(option.value)
-      ),
-    [issue?.labelIds]
+    () => allLabelOptions.filter((option) => issue?.labelIds?.includes(option.value)),
+    [allLabelOptions, issue?.labelIds]
   );
 
   const assigneesOptions = [
@@ -195,7 +204,7 @@ export function IssueListItem({
         <div className="flex items-center gap-1.5">
           {displayProperties.includes("id") && (
             <span className="text-xs-plus text-muted-foreground w-13 justify-self-start leading-none tracking-wide">
-              {issue.id}
+              {issue.number ? `${team.toUpperCase()}-${issue.number}` : issue.id}
             </span>
           )}
           {displayProperties.includes("status") && (
@@ -251,7 +260,7 @@ export function IssueListItem({
               onPointerDown={(e) => e.stopPropagation()}
               className="flex items-center"
             >
-              <LabelCombobox issueId={issue.id} issueLabels={issueLabels} />
+              <LabelCombobox issueId={issue.id} issueLabels={issueLabels} allLabelOptions={allLabelOptions} />
             </div>
           )}
           {displayProperties.includes("assignee") && (
@@ -322,144 +331,7 @@ export function IssueListItem({
           )}
         </div>
       </ContextMenuTrigger>
-      <ContextMenuContent className="min-w-52">
-        <ContextMenuGroup>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger shortcut="S">
-              <InProgressIcon />
-              Status
-            </ContextMenuSubTrigger>
-            <ContextMenuSubContent>
-              <ContextMenuRadioGroup
-                value={issue.status}
-                onValueChange={(value) => {
-                  if (value) {
-                    handleUpdateIssue({
-                      status: value as Issue["status"],
-                    });
-                  }
-                }}
-              >
-                {statusOptions.map((option) => (
-                  <ContextMenuRadioItem
-                    key={option.value}
-                    value={option.value}
-                    closeOnClick
-                  >
-                    {option.icon && (
-                      <Icon icon={option.icon} color={option.color} />
-                    )}
-                    {option.label}
-                  </ContextMenuRadioItem>
-                ))}
-              </ContextMenuRadioGroup>
-            </ContextMenuSubContent>
-          </ContextMenuSub>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger shortcut="A">
-              <HugeiconsIcon icon={EditUser02Icon} strokeWidth={2} />
-              Assignee
-            </ContextMenuSubTrigger>
-            <ContextMenuSubContent>
-              <ContextMenuRadioGroup
-                value={issue.assigneeId}
-                onValueChange={(value) => {
-                  if (value) {
-                    handleUpdateIssue({
-                      assigneeId: value as Issue["assigneeId"],
-                    });
-                  }
-                }}
-              >
-                {assigneesOptions.map((option: any) => (
-                  <ContextMenuRadioItem
-                    key={option.value}
-                    value={option.value}
-                    closeOnClick
-                  >
-                    {option.avatarUrl ? (
-                      <Avatar className="size-4.5!">
-                        <AvatarImage src={option.avatarUrl} />
-                        <AvatarFallback>
-                          <HugeiconsIcon icon={User02Icon} size={12} />
-                        </AvatarFallback>
-                      </Avatar>
-                    ) : (
-                      <Icon icon={option.icon} strokeWidth={2} />
-                    )}
-                    {option.label}
-                  </ContextMenuRadioItem>
-                ))}
-              </ContextMenuRadioGroup>
-            </ContextMenuSubContent>
-          </ContextMenuSub>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger shortcut="P">
-              <HugeiconsIcon icon={FullSignalIcon} strokeWidth={2} />
-              Priority
-            </ContextMenuSubTrigger>
-            <ContextMenuSubContent>
-              <ContextMenuRadioGroup
-                value={issue.priority}
-                onValueChange={(value) => {
-                  if (value) {
-                    handleUpdateIssue({
-                      priority: value as Issue["priority"],
-                    });
-                  }
-                }}
-              >
-                {priorityOptions.map((option) => (
-                  <ContextMenuRadioItem
-                    key={option.value}
-                    value={option.value}
-                    closeOnClick
-                  >
-                    {option.icon && (
-                      <Icon icon={option.icon} color={option.color} />
-                    )}
-                    {option.label}
-                  </ContextMenuRadioItem>
-                ))}
-              </ContextMenuRadioGroup>
-            </ContextMenuSubContent>
-          </ContextMenuSub>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger shortcut="L">
-              <HugeiconsIcon icon={LabelIcon} strokeWidth={2} />
-              Labels
-            </ContextMenuSubTrigger>
-            <ContextMenuSubContent>
-              <ContextMenuGroup>
-                {issueLabelOptions.map((option) => (
-                  <ContextMenuCheckboxItem
-                    key={option.value}
-                    checked={issue.labelIds.includes(option.value)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        handleUpdateIssue({
-                          labelIds: [...issue.labelIds, option.value],
-                        });
-                      } else {
-                        handleUpdateIssue({
-                          labelIds: issue.labelIds.filter(
-                            (labelId) => labelId !== option.value
-                          ),
-                        });
-                      }
-                    }}
-                  >
-                    {option.icon && (
-                      <Icon icon={option.icon} color={option.color} />
-                    )}
-                    {option.label}
-                  </ContextMenuCheckboxItem>
-                ))}
-              </ContextMenuGroup>
-            </ContextMenuSubContent>
-          </ContextMenuSub>
-        </ContextMenuGroup>
-      </ContextMenuContent>
+      <IssueContextMenu issue={issue} />
     </ContextMenu>
   );
 }

@@ -9,18 +9,6 @@ export const NotificationType = {
 export type NotificationType =
   (typeof NotificationType)[keyof typeof NotificationType];
 
-export const IssueStatus = {
-  TRIAGE: "TRIAGE",
-  BACKLOG: "BACKLOG",
-  UNSTARTED: "UNSTARTED",
-  STARTED: "STARTED",
-  IN_REVIEW: "IN_REVIEW",
-  COMPLETED: "COMPLETED",
-  CANCELLED: "CANCELLED",
-} as const;
-
-export type IssueStatus = (typeof IssueStatus)[keyof typeof IssueStatus];
-
 export const IssuePriority = {
   NO_PRIORITY: "NO_PRIORITY",
   URGENT: "URGENT",

@@ -16,7 +16,6 @@ import type { Issue } from "@/types/issue";
 import { issueFilterOptions } from "@/config/team";
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
-import { useIssueStore } from "@/hooks/use-issue-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -38,10 +37,11 @@ import { IssueListItem } from "./issue-list-item";
 interface IssueListProps extends StrictOmit<
   React.ComponentProps<"div">,
   "children"
-> {}
+> {
+  issues?: Issue[];
+}
 
-export function IssueList({ className, ...props }: IssueListProps) {
-  const { issues } = useIssueStore();
+export function IssueList({ className, issues = [], ...props }: IssueListProps) {
   const { team } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });

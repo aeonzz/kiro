@@ -1,5 +1,12 @@
 import * as React from "react";
-import { getWorkflowIcon, issueLabelOptions, workflowGroupOrder } from "@/config";
+import {
+  getWorkflowIcon,
+  workflowGroupOrder,
+  type WorkflowGroupType,
+} from "@/config";
+import { DotIcon } from "@/components/icons";
+import { useTeamLabels } from "@/hooks/use-team-labels";
+import { useTeamWorkflowStates } from "@/hooks/use-team-workflow-states";
 import {
   ArrowExpand01Icon,
   ArrowShrink02Icon,
@@ -17,8 +24,14 @@ import { Plate, usePlateEditor } from "platejs/react";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { IssuePriority } from "@/types/enums";
 import { issueFilterOptions } from "@/config/team";
-import { issueDraftQueries, organizationQueries } from "@/lib/query-factory";
+import {
+  issueDraftQueries,
+  issueQueries,
+  organizationQueries,
+} from "@/lib/query-factory";
+import { createIssueSchema } from "@/services/issue/schema";
 import { useIssueDraftStore } from "@/hooks/use-issue-draft-store";
 import { useAuthenticatedSession } from "@/hooks/use-session";
 import {
@@ -52,7 +65,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TooltipContent } from "@/components/ui/tooltip";
-import { CopyButton } from "@/components/copy-button";
 import { EditorKit } from "@/components/editor/editor-kit";
 import { Editor, EditorContainer } from "@/components/editor/ui/editor";
 import { ItemsCombobox, MultiItemsCombobox } from "@/components/items-combobox";
@@ -61,7 +73,7 @@ import { useOrganization } from "@/components/organization-context";
 const formSchema = z.object({
   title: z.string().max(512),
   status: z.string(),
-  priority: z.string(),
+  priority: z.enum(IssuePriority),
   labels: z.array(z.string()),
   description: z.custom<Value>(),
   projectId: z.string().nullable(),
@@ -75,8 +87,6 @@ const MotionPopup = motion.create(DialogPrimitive.Popup);
 const workflowTypeOrder = new Map(
   workflowGroupOrder.map((type, index) => [type, index])
 );
-
-type WorkflowGroupType = (typeof workflowGroupOrder)[number];
 
 function getSelectableWorkflowStates<
   T extends { position: number; type: WorkflowGroupType },
@@ -119,7 +129,6 @@ export function CreateIssueDialog() {
   const setTriggerDraftId = useIssueDraftStore(
     (state) => state.setTriggerDraftId
   );
-
   const drafts = activeOrganization?.issueDrafts ?? [];
 
   const triggerDraft = React.useMemo(
@@ -147,7 +156,11 @@ export function CreateIssueDialog() {
   const height = expand ? "100%" : "auto";
   const width = expand ? "820px" : "768px";
 
-  const mutation = useMutation({
+  const createIssueMutation = useMutation({
+    ...issueQueries.mutations.create(),
+  });
+
+  const saveDraftMutation = useMutation({
     ...issueDraftQueries.mutations.save(),
   });
 
@@ -174,25 +187,37 @@ export function CreateIssueDialog() {
         return;
       }
 
-      toast("Issue created", {
-        description: (
-          <div className="relative">
-            <CopyButton
-              value={JSON.stringify(value, null, 2)}
-              className="absolute top-3 right-3"
-              variant="ghost"
-            />
-            <pre className="bg-sidebar pointer-events-auto mt-2 max-h-40 max-w-full overflow-auto rounded-md p-4">
-              <code className="text-sidebar-foreground pointer-events-auto">
-                {JSON.stringify(value, null, 2)}
-              </code>
-            </pre>
-          </div>
-        ),
-        classNames: {
-          content: "w-full",
-        },
+      if (!activeOrganization) {
+        toast.error("Organization unavailable");
+        return;
+      }
+
+      const data = createIssueSchema.parse({
+        draftId: triggerDraftId ?? undefined,
+        organizationId: activeOrganization.id,
+        title: value.title,
+        description: value.description,
+        status: value.status,
+        priority: value.priority,
+        labels: value.labels,
+        teamId: value.teamId,
+        projectId: value.projectId,
       });
+
+      createIssueMutation.mutate(
+        {
+          data,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Issue created");
+            setDialogOpen(false);
+            qc.invalidateQueries({ queryKey: issueQueries.all() });
+            qc.invalidateQueries({ queryKey: issueDraftQueries.all() });
+            qc.invalidateQueries({ queryKey: organizationQueries.all() });
+          },
+        }
+      );
     },
   });
 
@@ -204,17 +229,20 @@ export function CreateIssueDialog() {
     [activeOrganization, selectedTeamId]
   );
 
-  const statusOptions = React.useMemo(() => {
-    return (
-      getSelectableWorkflowStates(selectedTeam?.workflowStates)
-        .map((state) => ({
-          value: state.id,
-          label: state.name,
-          icon: getWorkflowIcon(state.type),
-          color: state.color,
-        }))
-    );
-  }, [selectedTeam]);
+  const workflowStates = useTeamWorkflowStates(selectedTeam?.slug ?? "");
+
+  const statusOptions = React.useMemo(
+    () =>
+      getSelectableWorkflowStates(workflowStates).map((state) => ({
+        value: state.id,
+        label: state.name,
+        icon: getWorkflowIcon(state.type),
+        color: state.color,
+      })),
+    [workflowStates]
+  );
+
+  const labelOptions = useTeamLabels(selectedTeam?.slug ?? "");
 
   const projectOptions = React.useMemo(() => {
     const options =
@@ -283,7 +311,7 @@ export function CreateIssueDialog() {
       }
     } else {
       if (!open && hasTitle && !isDefaultDescription && activeOrganization) {
-        mutation.mutate({
+        saveDraftMutation.mutate({
           data: {
             id: triggerDraftId,
             title: form.state.values.title,
@@ -306,7 +334,7 @@ export function CreateIssueDialog() {
 
   function handleSaveDraft() {
     if (!activeOrganization) return;
-    mutation.mutate(
+    saveDraftMutation.mutate(
       {
         data: {
           title: form.state.values.title,
@@ -374,7 +402,7 @@ export function CreateIssueDialog() {
               "opacity 450ms var(--ease-out-expo), transform 450ms var(--ease-out-expo), scale 450ms var(--ease-out-expo), top 450ms var(--ease-out-expo), height, width",
           } as React.CSSProperties
         }
-        className="top-[16%] mt-6 flex max-h-[calc(100%-4rem)] min-w-3xl -translate-y-[16%] flex-col overflow-hidden data-ending-style:top-[16%] data-starting-style:top-[16%] sm:max-w-none"
+        className="top-[16%] mt-6 flex max-h-[calc(100%-4rem)] min-w-3xl translate-y-[-16%] flex-col overflow-hidden data-ending-style:top-[16%] data-starting-style:top-[16%] sm:max-w-none"
         render={
           <MotionPopup
             initial={{ height, width }}
@@ -651,8 +679,8 @@ export function CreateIssueDialog() {
                 <MultiItemsCombobox
                   id={field.name}
                   name={field.name}
-                  items={issueLabelOptions}
-                  value={issueLabelOptions.filter((option) =>
+                  items={labelOptions}
+                  value={labelOptions.filter((option) =>
                     field.state.value.includes(option.value)
                   )}
                   onValueChange={(value) =>

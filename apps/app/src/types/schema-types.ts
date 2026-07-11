@@ -1,5 +1,6 @@
 import type {
   Invitation,
+  IssueLabel,
   IssueDraft as IssueDraftType,
   Member as MemberType,
   Notification as NotificationType,
@@ -23,6 +24,7 @@ export type Team = StrictOmit<TeamType, "updatedAt"> & {
   updatedAt: Date | null;
   workflowStates: Array<WorkflowState>;
   projects: Array<Project>;
+  issueLabels: Array<IssueLabel>;
 };
 
 export type Organization = OrganizationType & {

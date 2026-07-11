@@ -55,6 +55,7 @@ export async function getOrganizationService({
             workflowStates: {
               orderBy: [{ type: "asc" }, { position: "asc" }],
             },
+            issueLabels: true,
           },
         },
         invitations: {
@@ -124,6 +125,7 @@ export async function listUserOrganizationsService({
               orderBy: [{ type: "asc" }, { position: "asc" }],
             },
             projects: true,
+            issueLabels: true,
           },
         },
         members: {

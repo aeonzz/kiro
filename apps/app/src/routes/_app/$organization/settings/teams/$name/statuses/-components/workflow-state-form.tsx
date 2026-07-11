@@ -7,7 +7,7 @@ import { useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { teamQueries } from "@/lib/query-factory";
+import { organizationQueries, teamQueries } from "@/lib/query-factory";
 import { Button } from "@/components/ui/button";
 import { ColorPicker, colorPickerOptions } from "@/components/ui/color-picker";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -104,6 +104,9 @@ export function WorkflowStateForm({
               organizationSlug: organization,
               slug: name,
             }).queryKey,
+          });
+          qc.invalidateQueries({
+            queryKey: organizationQueries.all(),
           });
           toast(isEditing ? "Status updated." : "Status created.", {
             description: isEditing

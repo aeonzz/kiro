@@ -128,6 +128,25 @@ export const auth = betterAuth({
                   },
                 ],
               }),
+              prisma.issueLabel.createMany({
+                data: [
+                  {
+                    teamId: team.id,
+                    name: "Bug",
+                    color: "oklch(70.4% 0.191 22.216)",
+                  },
+                  {
+                    teamId: team.id,
+                    name: "Improvement",
+                    color: "oklch(71.4% 0.203 305.504)",
+                  },
+                  {
+                    teamId: team.id,
+                    name: "Feature",
+                    color: "oklch(74.6% 0.16 232.661)",
+                  },
+                ],
+              }),
             ]);
           } catch (error) {
             console.error("Failed to setup team:", error);

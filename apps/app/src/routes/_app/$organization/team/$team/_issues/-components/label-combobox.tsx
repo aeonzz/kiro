@@ -1,26 +1,32 @@
 import * as React from "react";
-import { issueLabelOptions } from "@/config";
 import { Icon } from "@/utils/icon";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
 
 import type { FilterOption } from "@/types/inbox";
 import { cn } from "@/lib/utils";
-import { useIssueStore } from "@/hooks/use-issue-store";
+import { issueQueries } from "@/lib/query-factory";
 import { Badge } from "@/components/ui/badge";
 import { Combobox, ComboboxTrigger } from "@/components/ui/combobox";
 import { ItemsComboboxContent } from "@/components/items-combobox";
 
 interface LabelComboboxProps {
   issueId: string;
-  issueLabels: typeof issueLabelOptions;
+  issueLabels: FilterOption[];
+  allLabelOptions: FilterOption[];
 }
 
-export function LabelCombobox({ issueId, issueLabels }: LabelComboboxProps) {
-  const updateIssue = useIssueStore((state) => state.updateIssue);
+export function LabelCombobox({ issueId, issueLabels, allLabelOptions }: LabelComboboxProps) {
+  const qc = useQueryClient();
+  const { organization, team } = useParams({ from: "/_app/$organization/team/$team/_issues" });
+  const updateMutation = useMutation({
+    ...issueQueries.mutations.update(),
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: issueQueries.lists({ organizationSlug: organization, teamSlug: team }).queryKey }),
+  });
 
   const setValue = (newOptions: FilterOption[]) => {
-    updateIssue(issueId, {
-      labelIds: newOptions.map((o) => o.value),
-    });
+    updateMutation.mutate({ data: { id: issueId, labelIds: newOptions.map((o) => o.value) } });
   };
 
   return (
@@ -28,7 +34,7 @@ export function LabelCombobox({ issueId, issueLabels }: LabelComboboxProps) {
       {issueLabels.map((item) => (
         <Combobox
           key={item.value}
-          items={issueLabelOptions}
+          items={allLabelOptions}
           value={issueLabels}
           onValueChange={setValue}
           multiple

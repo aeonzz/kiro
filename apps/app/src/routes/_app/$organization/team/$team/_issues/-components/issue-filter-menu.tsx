@@ -5,9 +5,11 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { useParams } from "@tanstack/react-router";
 
 import type { IconType } from "@/types/inbox";
+import { getWorkflowIcon } from "@/config";
 import { issueFilterOptions } from "@/config/team";
 import { cn } from "@/lib/utils";
 import { useIssueFilters } from "@/hooks/use-issue-filter-store";
+import { useTeamWorkflowStates } from "@/hooks/use-team-workflow-states";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -35,6 +37,22 @@ export function IssueFilterMenu({
     from: "/_app/$organization/team/$team/_issues",
   });
   const { addFilter, filters } = useIssueFilters(team);
+  const workflowStates = useTeamWorkflowStates(team);
+
+  const filterOptions = React.useMemo(() => {
+    return issueFilterOptions.map((f) => {
+      if (f.id !== "status") return f;
+      return {
+        ...f,
+        options: workflowStates.map((state) => ({
+          value: state.id,
+          label: state.name,
+          icon: getWorkflowIcon(state.type),
+          color: state.color,
+        })),
+      };
+    });
+  }, [workflowStates]);
   const [search, setSearch] = React.useState("");
   const [subMenuSearch, setSubMenuSearch] = React.useState("");
 
@@ -42,7 +60,7 @@ export function IssueFilterMenu({
     const lowerSearch = search.toLowerCase();
 
     if (lowerSearch.length < 2) {
-      return issueFilterOptions.map((f) => ({
+      return filterOptions.map((f) => ({
         type: "category" as const,
         ...f,
       }));
@@ -65,7 +83,7 @@ export function IssueFilterMenu({
         }
     )[] = [];
 
-    issueFilterOptions.forEach((filter) => {
+    filterOptions.forEach((filter) => {
       const isCategoryMatch = filter.label.toLowerCase().includes(lowerSearch);
 
       // Add category if it matches
@@ -91,7 +109,7 @@ export function IssueFilterMenu({
     });
 
     return results;
-  }, [search]);
+  }, [search, filterOptions]);
 
   return (
     <DropdownMenu
@@ -153,7 +171,7 @@ export function IssueFilterMenu({
             <React.Fragment>
               {flattenedFilterOptions.map((item) => {
                 if (item.type === "category") {
-                  const filter = issueFilterOptions.find(
+                  const filter = filterOptions.find(
                     (f) => f.id === item.id
                   )!;
                   const options = filter.options;

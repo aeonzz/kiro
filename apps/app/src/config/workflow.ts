@@ -29,6 +29,8 @@ export const workflowGroupOrder = [
   "DUPLICATE",
 ] satisfies WorkflowType[];
 
+export type WorkflowGroupType = (typeof workflowGroupOrder)[number];
+
 export const workflowIconMap = {
   BACKLOG: BacklogIcon,
   UNSTARTED: TodoIcon,
