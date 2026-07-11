@@ -12,6 +12,8 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { createMiddleware } from "@tanstack/react-start";
+import { evlogErrorHandler } from "evlog/nitro/v3";
 
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/not-found";
@@ -21,6 +23,9 @@ import appCss from "@/styles/app.css?url";
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
+  server: {
+    middleware: [createMiddleware().server(evlogErrorHandler)],
+  },
   beforeLoad: async () => {
     const session = await getSessionFn();
     return { session };

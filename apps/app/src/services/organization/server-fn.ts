@@ -1,5 +1,4 @@
 import authMiddleware from "@/middlewares/auth";
-import loggerMiddleware from "@/middlewares/logger";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 
@@ -16,7 +15,7 @@ import {
 } from "./service";
 
 export const getOrganizationFn = createServerFn({ method: "GET" })
-  .middleware([loggerMiddleware, authMiddleware])
+  .middleware([authMiddleware])
   .inputValidator(getUserOrganizationSchema)
   .handler(async ({ context, data }) => {
     return getOrganizationService({
@@ -26,7 +25,7 @@ export const getOrganizationFn = createServerFn({ method: "GET" })
   });
 
 export const createOrganizationFn = createServerFn({ method: "POST" })
-  .middleware([loggerMiddleware, authMiddleware])
+  .middleware([authMiddleware])
   .inputValidator(organizationInputSchema)
   .handler(async ({ data, context }) => {
     const headers = getRequestHeaders();
@@ -39,7 +38,7 @@ export const createOrganizationFn = createServerFn({ method: "POST" })
   });
 
 export const updateOrganizationFn = createServerFn({ method: "POST" })
-  .middleware([loggerMiddleware, authMiddleware])
+  .middleware([authMiddleware])
   .inputValidator(updateOrganizationSchema)
   .handler(async ({ data }) => {
     const headers = getRequestHeaders();
@@ -51,7 +50,7 @@ export const updateOrganizationFn = createServerFn({ method: "POST" })
   });
 
 export const listOrganizationsFn = createServerFn({ method: "GET" })
-  .middleware([loggerMiddleware, authMiddleware])
+  .middleware([authMiddleware])
   .handler(async ({ context }) => {
     return listUserOrganizationsService({
       userId: context.session.user.id,

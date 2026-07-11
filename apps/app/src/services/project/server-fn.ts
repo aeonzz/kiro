@@ -1,5 +1,4 @@
 import authMiddleware from "@/middlewares/auth";
-import loggerMiddleware from "@/middlewares/logger";
 import { createServerFn } from "@tanstack/react-start";
 
 import { createProjectSchema, getOrganizationProjectSchema } from "./schema";
@@ -9,7 +8,7 @@ import {
 } from "./service";
 
 export const getOrganizationProjectsFn = createServerFn({ method: "GET" })
-  .middleware([loggerMiddleware, authMiddleware])
+  .middleware([authMiddleware])
   .inputValidator(getOrganizationProjectSchema)
   .handler(async ({ context, data }) => {
     return getOrganizationProjectsService({
@@ -19,7 +18,7 @@ export const getOrganizationProjectsFn = createServerFn({ method: "GET" })
   });
 
 export const createProjectFn = createServerFn({ method: "POST" })
-  .middleware([loggerMiddleware, authMiddleware])
+  .middleware([authMiddleware])
   .inputValidator(createProjectSchema)
   .handler(async ({ data }) => {
     return createProjectService({

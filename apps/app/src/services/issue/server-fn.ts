@@ -1,5 +1,4 @@
 import authMiddleware from "@/middlewares/auth";
-import loggerMiddleware from "@/middlewares/logger";
 import { prisma } from "@kiro/db";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -14,7 +13,7 @@ import {
 } from "./service";
 
 export const saveIssueDraftFn = createServerFn({ method: "POST" })
-  .middleware([loggerMiddleware, authMiddleware])
+  .middleware([authMiddleware])
   .inputValidator(issueDraftSchema)
   .handler(async ({ context, data }) => {
     return saveIssueDraft({
@@ -24,7 +23,7 @@ export const saveIssueDraftFn = createServerFn({ method: "POST" })
   });
 
 export const getIssueDraftsFn = createServerFn({ method: "GET" })
-  .middleware([loggerMiddleware, authMiddleware])
+  .middleware([authMiddleware])
   .inputValidator(getUserOrganizationSchema)
   .handler(async ({ context, data }) => {
     const org = await prisma.organization.findUnique({
@@ -43,7 +42,7 @@ export const getIssueDraftsFn = createServerFn({ method: "GET" })
   });
 
 export const deleteIssueDraftFn = createServerFn({ method: "POST" })
-  .middleware([loggerMiddleware, authMiddleware])
+  .middleware([authMiddleware])
   .inputValidator(z.object({ draftId: z.string() }))
   .handler(async ({ context, data }) => {
     return deleteIssueDraft({
@@ -53,7 +52,7 @@ export const deleteIssueDraftFn = createServerFn({ method: "POST" })
   });
 
 export const clearIssueDraftsFn = createServerFn({ method: "POST" })
-  .middleware([loggerMiddleware, authMiddleware])
+  .middleware([authMiddleware])
   .inputValidator(getUserOrganizationSchema)
   .handler(async ({ context, data }) => {
     const org = await prisma.organization.findUnique({
