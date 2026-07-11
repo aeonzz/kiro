@@ -52,7 +52,9 @@ export async function getOrganizationService({
         },
         teams: {
           include: {
-            workflowStates: true,
+            workflowStates: {
+              orderBy: [{ type: "asc" }, { position: "asc" }],
+            },
           },
         },
         invitations: {
@@ -118,7 +120,9 @@ export async function listUserOrganizationsService({
       include: {
         teams: {
           include: {
-            workflowStates: true,
+            workflowStates: {
+              orderBy: [{ type: "asc" }, { position: "asc" }],
+            },
             projects: true,
           },
         },

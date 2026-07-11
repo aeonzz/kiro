@@ -1,6 +1,5 @@
 import * as React from "react";
-import { issueLabelOptions } from "@/config";
-import { getWorkflowIcon } from "@/utils/workflow-icon";
+import { getWorkflowIcon, issueLabelOptions, workflowGroupOrder } from "@/config";
 import {
   ArrowExpand01Icon,
   ArrowShrink02Icon,
@@ -73,6 +72,42 @@ export const createIssueDialogHandle = DialogPrimitive.createHandle();
 
 const MotionPopup = motion.create(DialogPrimitive.Popup);
 
+const workflowTypeOrder = new Map(
+  workflowGroupOrder.map((type, index) => [type, index])
+);
+
+type WorkflowGroupType = (typeof workflowGroupOrder)[number];
+
+function getSelectableWorkflowStates<
+  T extends { position: number; type: WorkflowGroupType },
+>(workflowStates?: T[]) {
+  return [...(workflowStates ?? [])]
+    .filter((state) => state.type !== "DUPLICATE")
+    .sort(
+      (a, b) =>
+        (workflowTypeOrder.get(a.type) ?? Number.MAX_SAFE_INTEGER) -
+          (workflowTypeOrder.get(b.type) ?? Number.MAX_SAFE_INTEGER) ||
+        a.position - b.position
+    );
+}
+
+function getDefaultWorkflowStateId<
+  T extends {
+    id: string;
+    isDefault: boolean;
+    position: number;
+    type: WorkflowGroupType;
+  },
+>(workflowStates?: T[]) {
+  const workflowStatesByPosition = getSelectableWorkflowStates(workflowStates);
+
+  return (
+    workflowStatesByPosition.find((state) => state.isDefault)?.id ??
+    workflowStatesByPosition[0]?.id ??
+    ""
+  );
+}
+
 export function CreateIssueDialog() {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const qc = useQueryClient();
@@ -122,8 +157,7 @@ export function CreateIssueDialog() {
       description: parsedDescription ?? editor.children,
       status:
         triggerDraft?.status ??
-        activeOrganization?.teams[0]?.workflowStates?.[0]?.id ??
-        "",
+        getDefaultWorkflowStateId(activeOrganization?.teams[0]?.workflowStates),
       priority: triggerDraft?.priority ?? priorityOptions[0].value,
       labels: (triggerDraft?.labels as string[]) ?? ([] as Array<string>),
       teamId: triggerDraft?.teamId ?? activeOrganization?.teams[0]?.id ?? "",
@@ -172,12 +206,13 @@ export function CreateIssueDialog() {
 
   const statusOptions = React.useMemo(() => {
     return (
-      selectedTeam?.workflowStates?.map((state) => ({
-        value: state.id,
-        label: state.name,
-        icon: getWorkflowIcon(state.type),
-        color: state.color,
-      })) ?? []
+      getSelectableWorkflowStates(selectedTeam?.workflowStates)
+        .map((state) => ({
+          value: state.id,
+          label: state.name,
+          icon: getWorkflowIcon(state.type),
+          color: state.color,
+        }))
     );
   }, [selectedTeam]);
 
@@ -198,8 +233,7 @@ export function CreateIssueDialog() {
         description: parsedDescription ?? editor.children,
         status:
           triggerDraft.status ??
-          activeOrganization?.teams[0]?.workflowStates?.[0]?.id ??
-          "",
+          getDefaultWorkflowStateId(activeOrganization?.teams[0]?.workflowStates),
         priority: triggerDraft.priority ?? priorityOptions[0].value,
         labels: (triggerDraft.labels as string[]) ?? [],
         teamId: triggerDraft.teamId ?? activeOrganization?.teams[0]?.id ?? "",
@@ -369,7 +403,10 @@ export function CreateIssueDialog() {
                     (s) => s.id === currentStatus
                   );
                   if (!isValidStatus) {
-                    form.setFieldValue("status", value.workflowStates[0]?.id);
+                    form.setFieldValue(
+                      "status",
+                      getDefaultWorkflowStateId(value.workflowStates)
+                    );
                   }
                 }
               }}

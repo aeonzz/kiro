@@ -21,11 +21,15 @@ import {
   getOrganizationProjectsFn,
 } from "@/services/project/server-fn";
 import {
+  createWorkflowStateFn,
   createTeamFn,
   deleteTeamFn,
+  deleteWorkflowStateFn,
   getTeamByIdFn,
   getTeamsFn,
+  reorderWorkflowStatesFn,
   updateTeamFn,
+  updateWorkflowStateFn,
 } from "@/services/team/server-fn";
 import { queryOptions } from "@tanstack/react-query";
 
@@ -157,6 +161,22 @@ export const teamQueries = {
     delete: () => ({
       mutationKey: [...teamQueries.all(), "delete"],
       mutationFn: deleteTeamFn,
+    }),
+    createWorkflowState: () => ({
+      mutationKey: [...teamQueries.all(), "create-workflow-state"],
+      mutationFn: createWorkflowStateFn,
+    }),
+    updateWorkflowState: () => ({
+      mutationKey: [...teamQueries.all(), "update-workflow-state"],
+      mutationFn: updateWorkflowStateFn,
+    }),
+    deleteWorkflowState: () => ({
+      mutationKey: [...teamQueries.all(), "delete-workflow-state"],
+      mutationFn: deleteWorkflowStateFn,
+    }),
+    reorderWorkflowStates: () => ({
+      mutationKey: [...teamQueries.all(), "reorder-workflow-states"],
+      mutationFn: reorderWorkflowStatesFn,
     }),
   },
 };

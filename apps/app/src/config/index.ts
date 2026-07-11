@@ -1,5 +1,7 @@
 import { DotIcon } from "@/components/icons";
 
+export * from "./workflow";
+
 export const issueLabelOptions = [
   {
     value: "bug",

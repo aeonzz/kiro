@@ -4,6 +4,7 @@ enum WorkflowType {
     STARTED
     COMPLETED
     CANCELED
+    DUPLICATE
 }
 
 model WorkflowState {
@@ -14,6 +15,7 @@ model WorkflowState {
     type        WorkflowType
     description String?
     position    Float
+    isDefault   Boolean      @default(false)
 
     teamId String
     team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
@@ -24,5 +26,6 @@ model WorkflowState {
     updatedAt DateTime @updatedAt
 
     @@index([teamId])
+    @@index([teamId, isDefault])
     @@map("workflow_state")
 }

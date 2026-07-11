@@ -80,6 +80,7 @@ export const auth = betterAuth({
                     teamId: team.id,
                     name: "Backlog",
                     type: "BACKLOG",
+                    isDefault: true,
                     position: 1,
                     color: "var(--muted-foreground)",
                   },
@@ -121,7 +122,7 @@ export const auth = betterAuth({
                   {
                     teamId: team.id,
                     name: "Duplicate",
-                    type: "CANCELED",
+                    type: "DUPLICATE",
                     position: 7,
                     color: "var(--muted-foreground)",
                   },

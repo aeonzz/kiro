@@ -1,6 +1,6 @@
-import { ArrowLeft01Icon, Work } from "@hugeicons/core-free-icons";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useMutationState, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { teamQueries } from "@/lib/query-factory";
@@ -9,12 +9,10 @@ import { Error } from "@/components/error";
 import { NotFound } from "@/components/not-found";
 import SettingsContainer from "@/components/settings/settings-container";
 
-import { DangerZone } from "./-components/danger-zone";
-import { General } from "./-components/general";
-import { Workflow } from "./-components/workflow";
+import { WorkflowStatuses } from "./-components/workflow-statuses";
 
 export const Route = createFileRoute(
-  "/_app/$organization/settings/teams/$name/"
+  "/_app/$organization/settings/teams/$name/statuses/"
 )({
   loader: async ({ params: { organization, name }, context }) => {
     const data = await context.queryClient.ensureQueryData(
@@ -26,7 +24,7 @@ export const Route = createFileRoute(
     }
 
     return {
-      title: `${data.name} > Overview`,
+      title: `${data.name} > Issue statuses`,
     };
   },
   head: ({ loaderData }) => ({
@@ -46,11 +44,6 @@ function RouteComponent() {
     teamQueries.detail({ organizationSlug: organization, slug: name })
   );
 
-  const status = useMutationState({
-    filters: { mutationKey: teamQueries.mutations.delete().mutationKey },
-    select: (mutation) => mutation.state.status,
-  });
-
   if (!data) {
     throw notFound();
   }
@@ -58,21 +51,22 @@ function RouteComponent() {
   return (
     <SettingsContainer key={data.id}>
       <BackButton
-        to="/$organization/settings/teams"
+        to="/$organization/settings/teams/$name"
         variant="ghost"
         className="text-muted-foreground w-fit"
         showTooltip={false}
       >
         <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
-        <span>Teams</span>
+        <span>{data?.name}</span>
       </BackButton>
-      <h1 className="text-foreground text-2xl font-medium">{data.name}</h1>
-      <General disabled={status.includes("pending")} team={data} />
-      <Workflow />
-      <DangerZone
-        disabled={status.includes("pending")}
-        team={{ id: data.id, name: data.name }}
-      />
+      <div className="space-y-1.5">
+        <h1 className="text-foreground text-2xl font-medium">Issue statuses</h1>
+        <p className="text-muted-foreground text-xs-plus">
+          Issue statuses define the workflow that issues go through from start
+          to completion.
+        </p>
+      </div>
+      <WorkflowStatuses states={data.workflowStates} />
     </SettingsContainer>
   );
 }

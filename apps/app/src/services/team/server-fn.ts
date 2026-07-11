@@ -3,18 +3,26 @@ import loggerMiddleware from "@/middlewares/logger";
 import { createServerFn } from "@tanstack/react-start";
 
 import {
+  createWorkflowStateSchema,
   createTeamSchema,
   deleteTeamSchema,
+  deleteWorkflowStateSchema,
   getTeamByIdSchema,
   getTeamsSchema,
+  reorderWorkflowStatesSchema,
   updateTeamSchema,
+  updateWorkflowStateSchema,
 } from "./schema";
 import {
+  createWorkflowStateService,
   createTeamService,
   deleteTeamService,
+  deleteWorkflowStateService,
   getTeamByIdService,
   getTeamsService,
+  reorderWorkflowStatesService,
   updateTeamService,
+  updateWorkflowStateService,
 } from "./service";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 
@@ -57,4 +65,32 @@ export const deleteTeamFn = createServerFn({ method: "POST" })
   .inputValidator(deleteTeamSchema)
   .handler(async ({ data }) => {
     return deleteTeamService(data);
+  });
+
+export const createWorkflowStateFn = createServerFn({ method: "POST" })
+  .middleware([loggerMiddleware, authMiddleware])
+  .inputValidator(createWorkflowStateSchema)
+  .handler(async ({ data }) => {
+    return createWorkflowStateService(data);
+  });
+
+export const updateWorkflowStateFn = createServerFn({ method: "POST" })
+  .middleware([loggerMiddleware, authMiddleware])
+  .inputValidator(updateWorkflowStateSchema)
+  .handler(async ({ data }) => {
+    return updateWorkflowStateService(data);
+  });
+
+export const deleteWorkflowStateFn = createServerFn({ method: "POST" })
+  .middleware([loggerMiddleware, authMiddleware])
+  .inputValidator(deleteWorkflowStateSchema)
+  .handler(async ({ data }) => {
+    return deleteWorkflowStateService(data);
+  });
+
+export const reorderWorkflowStatesFn = createServerFn({ method: "POST" })
+  .middleware([loggerMiddleware, authMiddleware])
+  .inputValidator(reorderWorkflowStatesSchema)
+  .handler(async ({ data }) => {
+    return reorderWorkflowStatesService(data);
   });

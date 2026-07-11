@@ -5,7 +5,7 @@ import { teamQueries } from "@/lib/query-factory";
 import { ContainerContent } from "@/components/container";
 import { Error } from "@/components/error";
 
-import { DetailsSidePanel } from "../-components/details-side-panel";
+// import { DetailsSidePanel } from "../-components/details-side-panel";
 
 export const Route = createFileRoute(
   "/_app/$organization/team/$team/_issues/backlog/"
@@ -44,7 +44,7 @@ function RouteComponent() {
   return (
     <ContainerContent className="flex">
       <div className="flex-1"></div>
-      <DetailsSidePanel title="Backlog" team={data.name} />
+      {/* <DetailsSidePanel title="Backlog" team={data.name} /> */}
     </ContainerContent>
   );
 }
