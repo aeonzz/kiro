@@ -1,32 +1,54 @@
 import * as React from "react";
 import { Icon } from "@/utils/icon";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 
 import type { FilterOption } from "@/types/inbox";
+import {
+  getIssueLabelLinksCollection,
+  issueLabelLinkKey,
+} from "@/lib/collections/issue-label-links";
 import { cn } from "@/lib/utils";
-import { issueQueries } from "@/lib/query-factory";
 import { Badge } from "@/components/ui/badge";
 import { Combobox, ComboboxTrigger } from "@/components/ui/combobox";
 import { ItemsComboboxContent } from "@/components/items-combobox";
 
 interface LabelComboboxProps {
   issueId: string;
+  teamId: string;
   issueLabels: FilterOption[];
   allLabelOptions: FilterOption[];
 }
 
-export function LabelCombobox({ issueId, issueLabels, allLabelOptions }: LabelComboboxProps) {
-  const qc = useQueryClient();
+export function LabelCombobox({
+  issueId,
+  teamId,
+  issueLabels,
+  allLabelOptions,
+}: LabelComboboxProps) {
+  const queryClient = useQueryClient();
   const { organization, team } = useParams({ from: "/_app/$organization/team/$team/_issues" });
-  const updateMutation = useMutation({
-    ...issueQueries.mutations.update(),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: issueQueries.lists({ organizationSlug: organization, teamSlug: team }).queryKey }),
+  const labelLinksCollection = getIssueLabelLinksCollection({
+    queryClient,
+    organizationSlug: organization,
+    teamSlug: team,
   });
 
   const setValue = (newOptions: FilterOption[]) => {
-    updateMutation.mutate({ data: { id: issueId, labelIds: newOptions.map((o) => o.value) } });
+    const nextIds = new Set(newOptions.map((option) => option.value));
+    const currentIds = new Set(issueLabels.map((option) => option.value));
+
+    for (const labelId of nextIds) {
+      if (!currentIds.has(labelId)) {
+        labelLinksCollection.insert({ issueId, labelId, teamId });
+      }
+    }
+
+    for (const labelId of currentIds) {
+      if (!nextIds.has(labelId)) {
+        labelLinksCollection.delete(issueLabelLinkKey(issueId, labelId));
+      }
+    }
   };
 
   return (

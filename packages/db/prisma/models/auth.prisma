@@ -147,6 +147,7 @@ model Team {
   cycles         Cycle[]
   workflowStates WorkflowState[]
   issueLabels    IssueLabel[]
+  issueLabelLinks IssueLabelOnIssue[]
 
   @@index([organizationId])
   @@map("team")

@@ -48,6 +48,7 @@ export function ItemsCombobox<T extends FilterOption>({
   triggerProps,
   contentProps,
   isMuted = false,
+  onValueChange,
   ...props
 }: ItemsComboboxProps<T>) {
   const {
@@ -57,8 +58,21 @@ export function ItemsCombobox<T extends FilterOption>({
     ...restTriggerProps
   } = triggerProps ?? {};
 
+  // Single-select: close the popup as soon as an item is chosen.
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <Combobox items={items} multiple={false} {...props}>
+    <Combobox
+      items={items}
+      multiple={false}
+      open={open}
+      onOpenChange={setOpen}
+      onValueChange={(value, eventDetails) => {
+        onValueChange?.(value, eventDetails);
+        setOpen(false);
+      }}
+      {...props}
+    >
       <Button
         variant={variant}
         size={isIcon ? "icon-xs" : "xs"}

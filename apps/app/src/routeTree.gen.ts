@@ -17,6 +17,7 @@ import { Route as AuthLoginRouteRouteImport } from './routes/_auth/login/route'
 import { Route as AppOrganizationRouteRouteImport } from './routes/_app/$organization/route'
 import { Route as AppOrganizationIndexRouteImport } from './routes/_app/$organization/index'
 import { Route as ApiUsersIdRouteImport } from './routes/api/users.$id'
+import { Route as ApiElectricShapeRouteImport } from './routes/api/electric/shape'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AppOrganizationSettingsRouteRouteImport } from './routes/_app/$organization/settings/route'
 import { Route as AppOrganizationInboxRouteRouteImport } from './routes/_app/$organization/_inbox/route'
@@ -95,6 +96,11 @@ const ApiUsersIdRoute = ApiUsersIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ApiUsersRoute,
+} as any)
+const ApiElectricShapeRoute = ApiElectricShapeRouteImport.update({
+  id: '/api/electric/shape',
+  path: '/api/electric/shape',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -337,6 +343,7 @@ export interface FileRoutesByFullPath {
   '/api/users': typeof ApiUsersRouteWithChildren
   '/$organization/settings': typeof AppOrganizationSettingsRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/electric/shape': typeof ApiElectricShapeRoute
   '/api/users/$id': typeof ApiUsersIdRoute
   '/$organization/': typeof AppOrganizationIndexRoute
   '/$organization/settings/teams': typeof AppOrganizationSettingsTeamsRouteRouteWithChildren
@@ -383,6 +390,7 @@ export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/$organization': typeof AppOrganizationIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/electric/shape': typeof ApiElectricShapeRoute
   '/api/users/$id': typeof ApiUsersIdRoute
   '/$organization/test': typeof AppOrganizationInboxTestRoute
   '/$organization/my-issues/assigned': typeof AppOrganizationMyIssuesAssignedRoute
@@ -429,6 +437,7 @@ export interface FileRoutesById {
   '/_app/$organization/_inbox': typeof AppOrganizationInboxRouteRouteWithChildren
   '/_app/$organization/settings': typeof AppOrganizationSettingsRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/electric/shape': typeof ApiElectricShapeRoute
   '/api/users/$id': typeof ApiUsersIdRoute
   '/_app/$organization/': typeof AppOrganizationIndexRoute
   '/_app/$organization/settings/teams': typeof AppOrganizationSettingsTeamsRouteRouteWithChildren
@@ -478,6 +487,7 @@ export interface FileRouteTypes {
     | '/api/users'
     | '/$organization/settings'
     | '/api/auth/$'
+    | '/api/electric/shape'
     | '/api/users/$id'
     | '/$organization/'
     | '/$organization/settings/teams'
@@ -524,6 +534,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$organization'
     | '/api/auth/$'
+    | '/api/electric/shape'
     | '/api/users/$id'
     | '/$organization/test'
     | '/$organization/my-issues/assigned'
@@ -569,6 +580,7 @@ export interface FileRouteTypes {
     | '/_app/$organization/_inbox'
     | '/_app/$organization/settings'
     | '/api/auth/$'
+    | '/api/electric/shape'
     | '/api/users/$id'
     | '/_app/$organization/'
     | '/_app/$organization/settings/teams'
@@ -614,6 +626,7 @@ export interface RootRouteChildren {
   AuthLoginRouteRoute: typeof AuthLoginRouteRoute
   ApiUsersRoute: typeof ApiUsersRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiElectricShapeRoute: typeof ApiElectricShapeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -673,6 +686,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/users/$id'
       preLoaderRoute: typeof ApiUsersIdRouteImport
       parentRoute: typeof ApiUsersRoute
+    }
+    '/api/electric/shape': {
+      id: '/api/electric/shape'
+      path: '/api/electric/shape'
+      fullPath: '/api/electric/shape'
+      preLoaderRoute: typeof ApiElectricShapeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -1150,6 +1170,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRouteRoute: AuthLoginRouteRoute,
   ApiUsersRoute: ApiUsersRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiElectricShapeRoute: ApiElectricShapeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

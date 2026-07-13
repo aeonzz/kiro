@@ -6,16 +6,17 @@ import { z } from "zod";
 import { getUserOrganizationSchema } from "../organization/schema";
 import {
   createIssueSchema,
-  getTeamIssuesSchema,
   issueDraftSchema,
+  issueLabelLinkSchema,
   updateIssueSchema,
 } from "./schema";
 import {
+  addIssueLabel,
   clearIssueDrafts,
   createIssue,
   deleteIssueDraft,
   getIssueDrafts,
-  getTeamIssues,
+  removeIssueLabel,
   saveIssueDraft,
   updateIssue,
 } from "./service";
@@ -30,17 +31,6 @@ export const createIssueFn = createServerFn({ method: "POST" })
     });
   });
 
-export const getTeamIssuesFn = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
-  .validator(getTeamIssuesSchema)
-  .handler(async ({ context, data }) => {
-    return getTeamIssues({
-      userId: context.session.user.id,
-      organizationSlug: data.organizationSlug,
-      teamSlug: data.teamSlug,
-    });
-  });
-
 export const updateIssueFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator(updateIssueSchema)
@@ -48,6 +38,28 @@ export const updateIssueFn = createServerFn({ method: "POST" })
     return updateIssue({
       userId: context.session.user.id,
       issue: data,
+    });
+  });
+
+export const addIssueLabelFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator(issueLabelLinkSchema)
+  .handler(async ({ context, data }) => {
+    return addIssueLabel({
+      userId: context.session.user.id,
+      issueId: data.issueId,
+      labelId: data.labelId,
+    });
+  });
+
+export const removeIssueLabelFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator(issueLabelLinkSchema)
+  .handler(async ({ context, data }) => {
+    return removeIssueLabel({
+      userId: context.session.user.id,
+      issueId: data.issueId,
+      labelId: data.labelId,
     });
   });
 

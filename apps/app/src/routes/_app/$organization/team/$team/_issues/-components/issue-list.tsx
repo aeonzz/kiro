@@ -13,9 +13,11 @@ import { useParams } from "@tanstack/react-router";
 
 import type { IconType } from "@/types/inbox";
 import type { Issue } from "@/types/issue";
+import { getWorkflowIcon } from "@/config";
 import { issueFilterOptions } from "@/config/team";
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
+import { useTeamWorkflowStates } from "@/hooks/use-team-workflow-states";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -46,6 +48,7 @@ export function IssueList({ className, issues = [], ...props }: IssueListProps) 
     from: "/_app/$organization/team/$team/_issues",
   });
   const { grouping } = useActiveIssueDisplayOptions(team);
+  const workflowStates = useTeamWorkflowStates(team);
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
@@ -82,22 +85,26 @@ export function IssueList({ className, issues = [], ...props }: IssueListProps) 
     > = {};
 
     if (grouping === "status") {
-      const statusOptions =
-        issueFilterOptions.find((o) => o.id === "status")?.options ?? [];
-
-      statusOptions.forEach((opt) => {
-        groups[opt.value] = {
-          label: opt.label,
-          icon: opt.icon,
-          color: opt.color || "var(--muted-foreground)",
+      workflowStates.forEach((state) => {
+        groups[state.id] = {
+          label: state.name,
+          icon: getWorkflowIcon(state.type),
+          color: state.color || "var(--muted-foreground)",
           issues: [],
         };
       });
 
       issues.forEach((issue) => {
-        if (groups[issue.status]) {
-          groups[issue.status].issues.push(issue);
+        if (!groups[issue.stateId]) {
+          groups[issue.stateId] = {
+            label: issue.stateName ?? issue.stateId,
+            icon: getWorkflowIcon(issue.stateType),
+            color: issue.stateColor ?? "var(--muted-foreground)",
+            issues: [],
+          };
         }
+
+        groups[issue.stateId].issues.push(issue);
       });
     } else if (grouping === "priority") {
       const priorityOptions =
@@ -152,7 +159,7 @@ export function IssueList({ className, issues = [], ...props }: IssueListProps) 
       groupedIssues: filteredGroups,
       flattenedIssues: filteredGroups.flatMap((g) => g.issues),
     };
-  }, [issues, grouping]);
+  }, [issues, grouping, workflowStates]);
 
   let cumulativeIndex = 0;
 

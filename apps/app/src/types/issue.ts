@@ -6,7 +6,11 @@ export type Issue = {
   id: string;
   number?: number;
   title: string;
-  status: WorkflowGroupType;
+  teamId: string;
+  stateId: string;
+  stateName?: string;
+  stateColor?: string;
+  stateType: WorkflowGroupType;
   priority: IssuePriority;
   createdAt: string;
   updatedAt: string;

@@ -9,12 +9,16 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useParams } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 import type { Issue } from "@/types/issue";
 import { getWorkflowIcon } from "@/config";
 import { issueFilterOptions } from "@/config/team";
-import { issueQueries } from "@/lib/query-factory";
+import {
+  getIssueLabelLinksCollection,
+  issueLabelLinkKey,
+} from "@/lib/collections/issue-label-links";
+import { getIssuesCollection } from "@/lib/collections/issues";
 import { useTeamLabels } from "@/hooks/use-team-labels";
 import { useTeamWorkflowStates } from "@/hooks/use-team-workflow-states";
 import {
@@ -35,16 +39,35 @@ interface IssueContextMenuProps {
 }
 
 export function IssueContextMenu({ issue }: IssueContextMenuProps) {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   const { team, organization } = useParams({ from: "/_app/$organization/team/$team/_issues" });
-  const updateMutation = useMutation({
-    ...issueQueries.mutations.update(),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: issueQueries.lists({ organizationSlug: organization, teamSlug: team }).queryKey }),
+  const issuesCollection = getIssuesCollection({
+    queryClient,
+    organizationSlug: organization,
+    teamSlug: team,
+  });
+  const labelLinksCollection = getIssueLabelLinksCollection({
+    queryClient,
+    organizationSlug: organization,
+    teamSlug: team,
   });
 
   const handleUpdate = (updates: Partial<Issue>) => {
-    updateMutation.mutate({ data: { id: issue.id, ...updates } });
+    issuesCollection.update(issue.id, (draft) => {
+      Object.assign(draft, updates);
+    });
+  };
+
+  const toggleLabel = (labelId: string, checked: boolean) => {
+    if (checked) {
+      labelLinksCollection.insert({
+        issueId: issue.id,
+        labelId,
+        teamId: issue.teamId,
+      });
+    } else {
+      labelLinksCollection.delete(issueLabelLinkKey(issue.id, labelId));
+    }
   };
 
   const priorityOptions =
@@ -56,6 +79,7 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
       workflowStates.map((state) => ({
         value: state.id,
         label: state.name,
+        type: state.type,
         icon: getWorkflowIcon(state.type),
         color: state.color,
       })),
@@ -91,9 +115,13 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
           </ContextMenuSubTrigger>
           <ContextMenuSubContent>
             <ContextMenuRadioGroup
-              value={issue.status}
+              value={issue.stateId}
               onValueChange={(value) => {
-                if (value) handleUpdate({ status: value as Issue["status"] });
+                const option = statusOptions.find((option) => option.value === value);
+
+                if (option) {
+                  handleUpdate({ stateId: option.value });
+                }
               }}
             >
               {statusOptions.map((option) => (
@@ -186,12 +214,9 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
                   key={option.value}
                   checked={issue.labelIds.includes(option.value)}
                   onCheckedChange={(checked) => {
-                    handleUpdate({
-                      labelIds: checked
-                        ? [...issue.labelIds, option.value]
-                        : issue.labelIds.filter((id) => id !== option.value),
-                    });
+                    toggleLabel(option.value, checked === true);
                   }}
+                  closeOnClick
                 >
                   {option.icon && (
                     <Icon icon={option.icon} color={option.color} />

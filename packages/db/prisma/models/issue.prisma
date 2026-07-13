@@ -27,7 +27,7 @@ model Issue {
     cycleId String?
     cycle   Cycle?  @relation(fields: [cycleId], references: [id])
 
-    labels   IssueLabel[]
+    labels   IssueLabelOnIssue[]
     comments IssueComment[]
     history  IssueHistory[]
 
@@ -71,13 +71,33 @@ model IssueLabel {
     teamId String
     team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-    issues Issue[]
+    issues IssueLabelOnIssue[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     @@unique([teamId, name])
     @@map("issue_label")
+}
+
+model IssueLabelOnIssue {
+    issueId String
+    issue   Issue      @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+    labelId String
+    label   IssueLabel @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+    // Denormalized team scope so Electric shapes can filter by team without a join.
+    teamId String
+    team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+
+    @@id([issueId, labelId])
+    @@index([teamId])
+    @@index([issueId])
+    @@index([labelId])
+    @@map("issue_label_on_issue")
 }
 
 model IssueHistory {

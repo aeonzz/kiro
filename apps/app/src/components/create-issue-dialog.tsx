@@ -26,11 +26,8 @@ import * as z from "zod";
 
 import { IssuePriority } from "@/types/enums";
 import { issueFilterOptions } from "@/config/team";
-import {
-  issueDraftQueries,
-  issueQueries,
-  organizationQueries,
-} from "@/lib/query-factory";
+import { getIssuesCollection } from "@/lib/collections/issues";
+import { issueDraftQueries, organizationQueries } from "@/lib/query-factory";
 import { createIssueSchema } from "@/services/issue/schema";
 import { useIssueDraftStore } from "@/hooks/use-issue-draft-store";
 import { useAuthenticatedSession } from "@/hooks/use-session";
@@ -72,13 +69,15 @@ import { useOrganization } from "@/components/organization-context";
 
 const formSchema = z.object({
   title: z.string().max(512),
-  status: z.string(),
+  stateId: z.string(),
   priority: z.enum(IssuePriority),
   labels: z.array(z.string()),
   description: z.custom<Value>(),
   projectId: z.string().nullable(),
   teamId: z.string(),
 });
+
+type CreateIssueFormValues = z.input<typeof formSchema>;
 
 export const createIssueDialogHandle = DialogPrimitive.createHandle();
 
@@ -116,6 +115,18 @@ function getDefaultWorkflowStateId<
     workflowStatesByPosition[0]?.id ??
     ""
   );
+}
+
+function getIssuePriority(
+  value: string | null | undefined
+): (typeof IssuePriority)[keyof typeof IssuePriority] {
+  return Object.values(IssuePriority).includes(value as IssuePriority)
+    ? (value as IssuePriority)
+    : IssuePriority.NO_PRIORITY;
+}
+
+function getNextIssueNumber(issues: Array<{ number?: number | null }>) {
+  return issues.reduce((max, issue) => Math.max(max, issue.number ?? 0), 0) + 1;
 }
 
 export function CreateIssueDialog() {
@@ -156,10 +167,6 @@ export function CreateIssueDialog() {
   const height = expand ? "100%" : "auto";
   const width = expand ? "820px" : "768px";
 
-  const createIssueMutation = useMutation({
-    ...issueQueries.mutations.create(),
-  });
-
   const saveDraftMutation = useMutation({
     ...issueDraftQueries.mutations.save(),
   });
@@ -168,14 +175,14 @@ export function CreateIssueDialog() {
     defaultValues: {
       title: triggerDraft?.title ?? "",
       description: parsedDescription ?? editor.children,
-      status:
+      stateId:
         triggerDraft?.status ??
         getDefaultWorkflowStateId(activeOrganization?.teams[0]?.workflowStates),
-      priority: triggerDraft?.priority ?? priorityOptions[0].value,
+      priority: getIssuePriority(triggerDraft?.priority ?? priorityOptions[0]?.value),
       labels: (triggerDraft?.labels as string[]) ?? ([] as Array<string>),
       teamId: triggerDraft?.teamId ?? activeOrganization?.teams[0]?.id ?? "",
       projectId: triggerDraft?.projectId ?? null,
-    },
+    } satisfies CreateIssueFormValues,
     validators: {
       onSubmit: formSchema,
     },
@@ -192,32 +199,74 @@ export function CreateIssueDialog() {
         return;
       }
 
+      const submittedTeam = activeOrganization.teams.find(
+        (team) => team.id === value.teamId
+      );
+
+      if (!submittedTeam) {
+        toast.error("Team unavailable");
+        return;
+      }
+
+      const workflowState = submittedTeam.workflowStates.find(
+        (state) => state.id === value.stateId
+      );
+
+      if (!workflowState) {
+        toast.error("Status unavailable");
+        return;
+      }
+
+      // Generate the id client-side and hand it to the server so the optimistic
+      // row and the row Electric later syncs back share a key (no flicker).
+      const issueId = crypto.randomUUID();
       const data = createIssueSchema.parse({
+        id: issueId,
         draftId: triggerDraftId ?? undefined,
         organizationId: activeOrganization.id,
         title: value.title,
         description: value.description,
-        status: value.status,
+        stateId: value.stateId,
         priority: value.priority,
         labels: value.labels,
         teamId: value.teamId,
         projectId: value.projectId,
       });
 
-      createIssueMutation.mutate(
+      const issuesCollection = getIssuesCollection({
+        queryClient: qc,
+        organizationSlug: activeOrganization.slug,
+        teamSlug: submittedTeam.slug,
+      });
+      const now = new Date().toISOString();
+      const transaction = issuesCollection.insert(
         {
-          data,
+          id: issueId,
+          number: getNextIssueNumber(issuesCollection.toArray),
+          title: data.title,
+          teamId: data.teamId,
+          stateId: data.stateId,
+          assigneeId: null,
+          priority: data.priority,
+          createdAt: now,
+          updatedAt: now,
         },
-        {
-          onSuccess: () => {
-            toast.success("Issue created");
-            setDialogOpen(false);
-            qc.invalidateQueries({ queryKey: issueQueries.all() });
+        { metadata: { data } }
+      );
+
+      setDialogOpen(false);
+      toast.success("Issue created");
+
+      void transaction.isPersisted.promise
+        .then(() => {
+          if (triggerDraftId) {
             qc.invalidateQueries({ queryKey: issueDraftQueries.all() });
             qc.invalidateQueries({ queryKey: organizationQueries.all() });
-          },
-        }
-      );
+          }
+        })
+        .catch(() => {
+          toast.error("Issue creation failed");
+        });
     },
   });
 
@@ -259,14 +308,14 @@ export function CreateIssueDialog() {
       form.reset({
         title: triggerDraft.title ?? "",
         description: parsedDescription ?? editor.children,
-        status:
+        stateId:
           triggerDraft.status ??
           getDefaultWorkflowStateId(activeOrganization?.teams[0]?.workflowStates),
-        priority: triggerDraft.priority ?? priorityOptions[0].value,
+        priority: getIssuePriority(triggerDraft.priority ?? priorityOptions[0]?.value),
         labels: (triggerDraft.labels as string[]) ?? [],
         teamId: triggerDraft.teamId ?? activeOrganization?.teams[0]?.id ?? "",
         projectId: triggerDraft.projectId ?? null,
-      });
+      } satisfies CreateIssueFormValues);
 
       if (parsedDescription) {
         editor.tf.setValue(parsedDescription);
@@ -316,7 +365,7 @@ export function CreateIssueDialog() {
             id: triggerDraftId,
             title: form.state.values.title,
             description: form.state.values.description,
-            status: form.state.values.status,
+            stateId: form.state.values.stateId,
             priority: form.state.values.priority,
             labels: form.state.values.labels,
             teamId: form.state.values.teamId,
@@ -339,7 +388,7 @@ export function CreateIssueDialog() {
         data: {
           title: form.state.values.title,
           description: form.state.values.description,
-          status: form.state.values.status,
+          stateId: form.state.values.stateId,
           priority: form.state.values.priority,
           labels: form.state.values.labels,
           teamId: form.state.values.teamId,
@@ -426,13 +475,13 @@ export function CreateIssueDialog() {
                 if (value) {
                   form.setFieldValue("teamId", value.id);
 
-                  const currentStatus = form.getFieldValue("status");
+                  const currentStateId = form.getFieldValue("stateId");
                   const isValidStatus = value.workflowStates.some(
-                    (s) => s.id === currentStatus
+                    (s) => s.id === currentStateId
                   );
                   if (!isValidStatus) {
                     form.setFieldValue(
-                      "status",
+                      "stateId",
                       getDefaultWorkflowStateId(value.workflowStates)
                     );
                   }
@@ -583,7 +632,7 @@ export function CreateIssueDialog() {
           </div>
           <div className="flex items-center gap-2 p-3">
             <form.Field
-              name="status"
+              name="stateId"
               children={(field) => (
                 <ItemsCombobox
                   id={field.name}
@@ -655,7 +704,9 @@ export function CreateIssueDialog() {
                     (option) => option.value === field.state.value
                   )}
                   onValueChange={(value) =>
-                    field.handleChange(value?.value || priorityOptions[0].value)
+                    field.handleChange(
+                      getIssuePriority(value?.value ?? priorityOptions[0]?.value)
+                    )
                   }
                   placeholder="Set priority to..."
                   triggerProps={{
