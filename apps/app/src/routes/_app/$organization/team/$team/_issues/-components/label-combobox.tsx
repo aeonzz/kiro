@@ -1,11 +1,11 @@
 import * as React from "react";
 import { Icon } from "@/utils/icon";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 
 import type { FilterOption } from "@/types/inbox";
 import { cn } from "@/lib/utils";
-import { issueQueries } from "@/lib/query-factory";
+import { getIssuesCollection } from "@/lib/collections/issues";
 import { Badge } from "@/components/ui/badge";
 import { Combobox, ComboboxTrigger } from "@/components/ui/combobox";
 import { ItemsComboboxContent } from "@/components/items-combobox";
@@ -19,14 +19,16 @@ interface LabelComboboxProps {
 export function LabelCombobox({ issueId, issueLabels, allLabelOptions }: LabelComboboxProps) {
   const qc = useQueryClient();
   const { organization, team } = useParams({ from: "/_app/$organization/team/$team/_issues" });
-  const updateMutation = useMutation({
-    ...issueQueries.mutations.update(),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: issueQueries.lists({ organizationSlug: organization, teamSlug: team }).queryKey }),
+  const issuesCollection = getIssuesCollection({
+    queryClient: qc,
+    organizationSlug: organization,
+    teamSlug: team,
   });
 
   const setValue = (newOptions: FilterOption[]) => {
-    updateMutation.mutate({ data: { id: issueId, labelIds: newOptions.map((o) => o.value) } });
+    issuesCollection.update(issueId, (draft) => {
+      draft.labelIds = newOptions.map((o) => o.value);
+    });
   };
 
   return (

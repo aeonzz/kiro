@@ -1,11 +1,9 @@
 import {
   clearIssueDraftsFn,
-  createIssueFn,
   deleteIssueDraftFn,
   getTeamIssuesFn,
   getIssueDraftsFn,
   saveIssueDraftFn,
-  updateIssueFn,
 } from "@/services/issue/server-fn";
 import {
   deleteNotificationFn,
@@ -251,16 +249,6 @@ export const issueQueries = {
       queryFn: () =>
         getTeamIssuesFn({ data: { organizationSlug, teamSlug } }),
     }),
-  mutations: {
-    create: () => ({
-      mutationKey: [...issueQueries.all(), "create"],
-      mutationFn: createIssueFn,
-    }),
-    update: () => ({
-      mutationKey: [...issueQueries.all(), "update"],
-      mutationFn: updateIssueFn,
-    }),
-  },
 };
 
 export const projectQueries = {

@@ -25,12 +25,10 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { IssuePriority } from "@/types/enums";
+import type { Issue } from "@/types/issue";
 import { issueFilterOptions } from "@/config/team";
-import {
-  issueDraftQueries,
-  issueQueries,
-  organizationQueries,
-} from "@/lib/query-factory";
+import { issueDraftQueries, organizationQueries } from "@/lib/query-factory";
+import { getIssuesCollection } from "@/lib/collections/issues";
 import { createIssueSchema } from "@/services/issue/schema";
 import { useIssueDraftStore } from "@/hooks/use-issue-draft-store";
 import { useAuthenticatedSession } from "@/hooks/use-session";
@@ -118,6 +116,10 @@ function getDefaultWorkflowStateId<
   );
 }
 
+function getNextIssueNumber(issues: Array<{ number?: number | null }>) {
+  return issues.reduce((max, issue) => Math.max(max, issue.number ?? 0), 0) + 1;
+}
+
 export function CreateIssueDialog() {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const qc = useQueryClient();
@@ -156,10 +158,6 @@ export function CreateIssueDialog() {
   const height = expand ? "100%" : "auto";
   const width = expand ? "820px" : "768px";
 
-  const createIssueMutation = useMutation({
-    ...issueQueries.mutations.create(),
-  });
-
   const saveDraftMutation = useMutation({
     ...issueDraftQueries.mutations.save(),
   });
@@ -192,7 +190,20 @@ export function CreateIssueDialog() {
         return;
       }
 
+      const submittedTeam = activeOrganization.teams.find(
+        (t) => t.id === value.teamId
+      );
+
+      if (!submittedTeam) {
+        toast.error("Team unavailable");
+        return;
+      }
+
+      // Generate the id client-side so the optimistic row and the server row
+      // share a key (flicker-free insert).
+      const id = crypto.randomUUID();
       const data = createIssueSchema.parse({
+        id,
         draftId: triggerDraftId ?? undefined,
         organizationId: activeOrganization.id,
         title: value.title,
@@ -204,20 +215,36 @@ export function CreateIssueDialog() {
         projectId: value.projectId,
       });
 
-      createIssueMutation.mutate(
-        {
-          data,
-        },
-        {
-          onSuccess: () => {
-            toast.success("Issue created");
-            setDialogOpen(false);
-            qc.invalidateQueries({ queryKey: issueQueries.all() });
-            qc.invalidateQueries({ queryKey: issueDraftQueries.all() });
-            qc.invalidateQueries({ queryKey: organizationQueries.all() });
-          },
-        }
+      const issuesCollection = getIssuesCollection({
+        queryClient: qc,
+        organizationSlug: activeOrganization.slug,
+        teamSlug: submittedTeam.slug,
+      });
+
+      const now = new Date().toISOString();
+      const selectedState = submittedTeam.workflowStates.find(
+        (s) => s.id === data.status
       );
+
+      issuesCollection.insert(
+        {
+          id: data.id,
+          number: getNextIssueNumber(issuesCollection.toArray),
+          title: data.title,
+          stateId: data.status,
+          status: (selectedState?.type ?? "BACKLOG") as Issue["status"],
+          priority: data.priority,
+          labelIds: data.labels,
+          createdAt: now,
+          updatedAt: now,
+        },
+        { metadata: { data } }
+      );
+
+      toast.success("Issue created");
+      setDialogOpen(false);
+      qc.invalidateQueries({ queryKey: issueDraftQueries.all() });
+      qc.invalidateQueries({ queryKey: organizationQueries.all() });
     },
   });
 

@@ -13,9 +13,11 @@ import { useParams } from "@tanstack/react-router";
 
 import type { IconType } from "@/types/inbox";
 import type { Issue } from "@/types/issue";
+import { getWorkflowIcon, workflowGroupOrder } from "@/config";
 import { issueFilterOptions } from "@/config/team";
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
+import { useTeamWorkflowStates } from "@/hooks/use-team-workflow-states";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -34,6 +36,10 @@ import {
 
 import { IssueListItem } from "./issue-list-item";
 
+const workflowTypeOrder = new Map(
+  workflowGroupOrder.map((type, index) => [type, index])
+);
+
 interface IssueListProps extends StrictOmit<
   React.ComponentProps<"div">,
   "children"
@@ -46,6 +52,7 @@ export function IssueList({ className, issues = [], ...props }: IssueListProps) 
     from: "/_app/$organization/team/$team/_issues",
   });
   const { grouping } = useActiveIssueDisplayOptions(team);
+  const workflowStates = useTeamWorkflowStates(team);
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
@@ -82,21 +89,28 @@ export function IssueList({ className, issues = [], ...props }: IssueListProps) 
     > = {};
 
     if (grouping === "status") {
-      const statusOptions =
-        issueFilterOptions.find((o) => o.id === "status")?.options ?? [];
+      const orderedStates = [...workflowStates]
+        .filter((state) => state.type !== "DUPLICATE")
+        .sort(
+          (a, b) =>
+            (workflowTypeOrder.get(a.type) ?? Number.MAX_SAFE_INTEGER) -
+              (workflowTypeOrder.get(b.type) ?? Number.MAX_SAFE_INTEGER) ||
+            a.position - b.position
+        );
 
-      statusOptions.forEach((opt) => {
-        groups[opt.value] = {
-          label: opt.label,
-          icon: opt.icon,
-          color: opt.color || "var(--muted-foreground)",
+      orderedStates.forEach((state) => {
+        groups[state.id] = {
+          label: state.name,
+          icon: getWorkflowIcon(state.type),
+          color: state.color || "var(--muted-foreground)",
           issues: [],
         };
       });
 
       issues.forEach((issue) => {
-        if (groups[issue.status]) {
-          groups[issue.status].issues.push(issue);
+        const key = issue.stateId ?? issue.status;
+        if (groups[key]) {
+          groups[key].issues.push(issue);
         }
       });
     } else if (grouping === "priority") {
@@ -152,7 +166,7 @@ export function IssueList({ className, issues = [], ...props }: IssueListProps) 
       groupedIssues: filteredGroups,
       flattenedIssues: filteredGroups.flatMap((g) => g.issues),
     };
-  }, [issues, grouping]);
+  }, [issues, grouping, workflowStates]);
 
   let cumulativeIndex = 0;
 

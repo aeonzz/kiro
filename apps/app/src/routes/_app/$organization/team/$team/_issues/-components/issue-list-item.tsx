@@ -10,13 +10,13 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, useParams } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 
 import type { Issue } from "@/types/issue";
 import { getWorkflowIcon } from "@/config";
 import { issueFilterOptions } from "@/config/team";
-import { issueQueries } from "@/lib/query-factory";
+import { getIssuesCollection } from "@/lib/collections/issues";
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -68,14 +68,16 @@ export function IssueListItem({
     displayProperties,
   } = useActiveIssueDisplayOptions(team);
 
-  const updateMutation = useMutation({
-    ...issueQueries.mutations.update(),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: issueQueries.lists({ organizationSlug: organization, teamSlug: team }).queryKey }),
+  const issuesCollection = getIssuesCollection({
+    queryClient: qc,
+    organizationSlug: organization,
+    teamSlug: team,
   });
 
-  const handleUpdateIssue = (updates: Partial<Issue>) => {
-    updateMutation.mutate({ data: { id: issue.id, ...updates } });
+  const handleUpdateIssue = (changes: Partial<Issue>) => {
+    issuesCollection.update(issue.id, (draft) => {
+      Object.assign(draft, changes);
+    });
   };
 
   const priorityOptions =
@@ -216,13 +218,11 @@ export function IssueListItem({
               <ItemsCombobox
                 items={statusOptions}
                 value={statusOptions.find(
-                  (option) => option.value === issue.status
+                  (option) => option.value === issue.stateId
                 )}
                 onValueChange={(value) => {
                   if (value) {
-                    handleUpdateIssue({
-                      status: value.value as Issue["status"],
-                    });
+                    handleUpdateIssue({ stateId: value.value });
                   }
                 }}
                 placeholder="Set status to..."

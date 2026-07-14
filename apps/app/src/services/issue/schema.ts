@@ -19,6 +19,7 @@ export const issueDraftSchema = z.object({
 export type IssueDraft = z.infer<typeof issueDraftSchema>;
 
 export const createIssueSchema = z.object({
+  id: z.string(),
   draftId: z.string().optional(),
   organizationId: z.string(),
   teamId: z.string(),

@@ -9,7 +9,7 @@ function toIssueListItem(issue: {
   number: number;
   title: string;
   priority: IssuePriority;
-  state: { type: string };
+  state: { id: string; type: string };
   assigneeId: string | null;
   labels: Array<{ id: string }>;
   createdAt: Date;
@@ -19,6 +19,7 @@ function toIssueListItem(issue: {
     id: issue.id,
     number: issue.number,
     title: issue.title,
+    stateId: issue.state.id,
     status: issue.state.type as Issue["status"],
     priority: issue.priority,
     createdAt: issue.createdAt.toISOString(),
@@ -89,6 +90,7 @@ export const createIssue = async ({
 
     const created = await tx.issue.create({
       data: {
+        id: issue.id,
         number,
         title: issue.title,
         description: issue.description as Prisma.InputJsonValue,

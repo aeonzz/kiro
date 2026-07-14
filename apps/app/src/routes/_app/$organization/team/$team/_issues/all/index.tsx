@@ -1,7 +1,9 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useLiveQuery } from "@tanstack/react-db";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { issueQueries, teamQueries } from "@/lib/query-factory";
+import { getIssuesCollection } from "@/lib/collections/issues";
 import { useIssueDetailsPanelStore } from "@/hooks/use-details-panel-store";
 import { ContainerContent } from "@/components/container";
 import { Error } from "@/components/error";
@@ -22,6 +24,12 @@ export const Route = createFileRoute(
       throw notFound();
     }
 
+    // Warm the same query key the issues collection reads from so the list
+    // isn't empty on first paint (useLiveQuery is not suspense-backed).
+    void context.queryClient.ensureQueryData(
+      issueQueries.lists({ organizationSlug: organization, teamSlug: team })
+    );
+
     return {
       title: `${data.name} > All`,
     };
@@ -37,11 +45,19 @@ function RouteComponent() {
   const { team, organization } = Route.useParams();
   const isOpen = useIssueDetailsPanelStore((state) => state.isOpen);
 
+  const qc = useQueryClient();
   const { data } = useSuspenseQuery(
     teamQueries.detail({ organizationSlug: organization, slug: team })
   );
-  const { data: issues } = useSuspenseQuery(
-    issueQueries.lists({ organizationSlug: organization, teamSlug: team })
+
+  const issuesCollection = getIssuesCollection({
+    queryClient: qc,
+    organizationSlug: organization,
+    teamSlug: team,
+  });
+  const { data: issues = [] } = useLiveQuery(
+    (q) => q.from({ issue: issuesCollection }),
+    [issuesCollection]
   );
 
   if (!data) {

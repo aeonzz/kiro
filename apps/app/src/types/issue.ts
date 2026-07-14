@@ -6,6 +6,7 @@ export type Issue = {
   id: string;
   number?: number;
   title: string;
+  stateId?: string;
   status: WorkflowGroupType;
   priority: IssuePriority;
   createdAt: string;

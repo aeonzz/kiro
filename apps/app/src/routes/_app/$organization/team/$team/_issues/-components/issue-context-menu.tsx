@@ -9,12 +9,12 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useParams } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 import type { Issue } from "@/types/issue";
 import { getWorkflowIcon } from "@/config";
 import { issueFilterOptions } from "@/config/team";
-import { issueQueries } from "@/lib/query-factory";
+import { getIssuesCollection } from "@/lib/collections/issues";
 import { useTeamLabels } from "@/hooks/use-team-labels";
 import { useTeamWorkflowStates } from "@/hooks/use-team-workflow-states";
 import {
@@ -37,14 +37,16 @@ interface IssueContextMenuProps {
 export function IssueContextMenu({ issue }: IssueContextMenuProps) {
   const qc = useQueryClient();
   const { team, organization } = useParams({ from: "/_app/$organization/team/$team/_issues" });
-  const updateMutation = useMutation({
-    ...issueQueries.mutations.update(),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: issueQueries.lists({ organizationSlug: organization, teamSlug: team }).queryKey }),
+  const issuesCollection = getIssuesCollection({
+    queryClient: qc,
+    organizationSlug: organization,
+    teamSlug: team,
   });
 
-  const handleUpdate = (updates: Partial<Issue>) => {
-    updateMutation.mutate({ data: { id: issue.id, ...updates } });
+  const handleUpdate = (changes: Partial<Issue>) => {
+    issuesCollection.update(issue.id, (draft) => {
+      Object.assign(draft, changes);
+    });
   };
 
   const priorityOptions =
@@ -91,9 +93,9 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
           </ContextMenuSubTrigger>
           <ContextMenuSubContent>
             <ContextMenuRadioGroup
-              value={issue.status}
+              value={issue.stateId}
               onValueChange={(value) => {
-                if (value) handleUpdate({ status: value as Issue["status"] });
+                if (value) handleUpdate({ stateId: value });
               }}
             >
               {statusOptions.map((option) => (
