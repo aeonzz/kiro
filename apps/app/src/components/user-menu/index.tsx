@@ -5,6 +5,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
+import { clearPowerSync } from "@/lib/powersync/db";
 import { useAuthenticatedSession } from "@/hooks/use-session";
 
 import { useOrganization } from "../organization-context";
@@ -111,7 +112,8 @@ export function UserMenu() {
               onClick={async () =>
                 authClient.signOut({
                   fetchOptions: {
-                    onSuccess: () => {
+                    onSuccess: async () => {
+                      await clearPowerSync();
                       navigate({
                         to: "/login",
                         reloadDocument: true,

@@ -10,13 +10,12 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, useParams } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 
 import type { Issue } from "@/types/issue";
 import { getWorkflowIcon } from "@/config";
 import { issueFilterOptions } from "@/config/team";
-import { getIssuesCollection } from "@/lib/collections/issues";
+import { getIssuesPowerSyncCollection } from "@/lib/collections/issues-powersync";
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -35,8 +34,11 @@ import {
 import { InProgressIcon } from "@/components/icons";
 import { ItemsCombobox } from "@/components/items-combobox";
 
-import { useTeamLabels } from "@/hooks/use-team-labels";
-import { useTeamWorkflowStates } from "@/hooks/use-team-workflow-states";
+import {
+  usePowerSyncTeamLabels,
+  usePowerSyncWorkflowStates,
+  useTeamId,
+} from "@/lib/collections/team-metadata-powersync";
 import { IssueContextMenu } from "./issue-context-menu";
 import { LabelCombobox } from "./label-combobox";
 
@@ -53,7 +55,6 @@ export function IssueListItem({
   toggleId,
   issue,
 }: IssueListItemProps) {
-  const qc = useQueryClient();
   const { organization, team } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });
@@ -68,11 +69,7 @@ export function IssueListItem({
     displayProperties,
   } = useActiveIssueDisplayOptions(team);
 
-  const issuesCollection = getIssuesCollection({
-    queryClient: qc,
-    organizationSlug: organization,
-    teamSlug: team,
-  });
+  const issuesCollection = getIssuesPowerSyncCollection();
 
   const handleUpdateIssue = (changes: Partial<Issue>) => {
     issuesCollection.update(issue.id, (draft) => {
@@ -84,7 +81,8 @@ export function IssueListItem({
     issueFilterOptions.find((option) => option.id === "priority")?.options ??
     [];
 
-  const workflowStates = useTeamWorkflowStates(team);
+  const teamId = useTeamId(organization, team);
+  const workflowStates = usePowerSyncWorkflowStates(teamId);
   const statusOptions = React.useMemo(
     () =>
       workflowStates.map((state) => ({
@@ -96,7 +94,7 @@ export function IssueListItem({
     [workflowStates]
   );
 
-  const allLabelOptions = useTeamLabels(team);
+  const allLabelOptions = usePowerSyncTeamLabels(teamId);
 
   const issueLabels = React.useMemo(
     () => allLabelOptions.filter((option) => issue?.labelIds?.includes(option.value)),
@@ -127,13 +125,13 @@ export function IssueListItem({
             className={cn(
               "data-active:not-data-selected:bg-muted dark:data-active:not-data-selected:bg-muted/50 data-active:text-foreground data-[kb-visible=true]:ring-ring/50 [&_svg]:text-muted-foreground data-selected:bg-muted dark:not-data-selected:data-popup-open:bg-muted/50 not-data-selected:data-popup-open:bg-muted flex h-11 items-center gap-2 px-2 py-1.5 text-sm outline-none select-none data-[kb-visible=true]:ring-1 data-[kb-visible=true]:ring-inset [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
             )}
-            render={
-              <Link
-                to="/$organization/issue/$id"
-                params={{ organization, id: issue.id }}
-                state={(prev: any) => ({ ...prev, viewMode: "full" })}
-              />
-            }
+            // render={
+            //   <Link
+            //     to="/$organization/issue/$id"
+            //     params={{ organization, id: issue.id }}
+            //     state={(prev: any) => ({ ...prev, viewMode: "full" })}
+            //   />
+            // }
           />
         }
       >

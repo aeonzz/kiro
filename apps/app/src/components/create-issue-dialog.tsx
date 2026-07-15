@@ -25,11 +25,11 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { IssuePriority } from "@/types/enums";
-import type { Issue } from "@/types/issue";
 import { issueFilterOptions } from "@/config/team";
 import { issueDraftQueries, organizationQueries } from "@/lib/query-factory";
-import { getIssuesCollection } from "@/lib/collections/issues";
+import { getIssuesPowerSyncCollection } from "@/lib/collections/issues-powersync";
 import { createIssueSchema } from "@/services/issue/schema";
+import { deleteIssueDraftFn } from "@/services/issue/server-fn";
 import { useIssueDraftStore } from "@/hooks/use-issue-draft-store";
 import { useAuthenticatedSession } from "@/hooks/use-session";
 import {
@@ -215,31 +215,34 @@ export function CreateIssueDialog() {
         projectId: value.projectId,
       });
 
-      const issuesCollection = getIssuesCollection({
-        queryClient: qc,
-        organizationSlug: activeOrganization.slug,
-        teamSlug: submittedTeam.slug,
+      const issuesCollection = getIssuesPowerSyncCollection();
+      const now = new Date().toISOString();
+
+      // Insert the raw issue row into local SQLite. PowerSync applies it
+      // optimistically and uploads it to Postgres via the connector's
+      // uploadData -> uploadCrudFn (PUT) path. Labels aren't an issue column
+      // (m2m, not synced yet), so labels-on-create don't persist for now.
+      issuesCollection.insert({
+        id: data.id,
+        number: getNextIssueNumber(issuesCollection.toArray),
+        title: data.title,
+        description: JSON.stringify(data.description),
+        priority: data.priority,
+        teamId: data.teamId,
+        creatorId: user.id,
+        assigneeId: null,
+        stateId: data.status,
+        parentId: null,
+        projectId: data.projectId ?? null,
+        cycleId: null,
+        createdAt: now,
+        updatedAt: now,
       });
 
-      const now = new Date().toISOString();
-      const selectedState = submittedTeam.workflowStates.find(
-        (s) => s.id === data.status
-      );
-
-      issuesCollection.insert(
-        {
-          id: data.id,
-          number: getNextIssueNumber(issuesCollection.toArray),
-          title: data.title,
-          stateId: data.status,
-          status: (selectedState?.type ?? "BACKLOG") as Issue["status"],
-          priority: data.priority,
-          labelIds: data.labels,
-          createdAt: now,
-          updatedAt: now,
-        },
-        { metadata: { data } }
-      );
+      // The issue row can't carry draftId, so delete the source draft directly.
+      if (triggerDraftId) {
+        void deleteIssueDraftFn({ data: { draftId: triggerDraftId } });
+      }
 
       toast.success("Issue created");
       setDialogOpen(false);

@@ -13,6 +13,7 @@ import { format, formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
+import { clearPowerSync } from "@/lib/powersync/db";
 import { authQueries } from "@/lib/query-factory";
 import { formatUserAgent, getBrowserName } from "@/lib/ua-parser";
 import { cn } from "@/lib/utils";
@@ -90,7 +91,8 @@ export function SessionItem({
       if (isCurrent) {
         authClient.signOut({
           fetchOptions: {
-            onSuccess: () => {
+            onSuccess: async () => {
+              await clearPowerSync();
               setTimeout(() => {
                 navigate({
                   to: "/login",

@@ -177,3 +177,13 @@ model UserPreference {
   @@index([userId])
   @@map("user_preference")
 }
+
+model Jwks {
+  id         String    @id
+  publicKey  String
+  privateKey String
+  createdAt  DateTime  @db.Timestamptz(3)
+  expiresAt  DateTime? @db.Timestamptz(3)
+
+  @@map("jwks")
+}

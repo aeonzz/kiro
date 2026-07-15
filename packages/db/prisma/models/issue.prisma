@@ -27,7 +27,7 @@ model Issue {
     cycleId String?
     cycle   Cycle?  @relation(fields: [cycleId], references: [id])
 
-    labels   IssueLabel[]
+    labels   IssueLabelLink[]
     comments IssueComment[]
     history  IssueHistory[]
 
@@ -71,13 +71,30 @@ model IssueLabel {
     teamId String
     team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-    issues Issue[]
+    issues IssueLabelLink[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     @@unique([teamId, name])
     @@map("issue_label")
+}
+
+model IssueLabelLink {
+    id String @id @default(uuid())
+
+    issueId String
+    issue   Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+    labelId String
+    label   IssueLabel @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+
+    @@unique([issueId, labelId])
+    @@index([issueId])
+    @@index([labelId])
+    @@map("issue_label_link")
 }
 
 model IssueHistory {

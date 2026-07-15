@@ -1,7 +1,7 @@
 import { prisma } from "@kiro/db";
 import { APIError, betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { organization } from "better-auth/plugins";
+import { jwt, organization } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 
 export const auth = betterAuth({
@@ -155,6 +155,15 @@ export const auth = betterAuth({
             });
           }
         },
+      },
+    }),
+    jwt({
+      // Tokens minted here are what PowerSync verifies (via /api/auth/jwks).
+      // `aud` must match the audience configured on the PowerSync instance;
+      // `sub` defaults to the user id -> becomes auth.user_id() in sync rules.
+      jwt: {
+        audience: process.env.POWERSYNC_JWT_AUDIENCE ?? "powersync",
+        expirationTime: "1h",
       },
     }),
   ],

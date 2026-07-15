@@ -7,6 +7,13 @@ import { nitro } from "nitro/vite";
 export default defineConfig({
   server: {
     port: 3000,
+    allowedHosts: true,
+  },
+  optimizeDeps: {
+    // Keep wa-sqlite out of Vite's dep pre-bundling so its `.wasm` loads from
+    // node_modules (next to the JS glue) instead of a `.vite/deps` path that
+    // 404s. @powersync/web stays optimized so its CJS dep (js-logger) still works.
+    exclude: ["@journeyapps/wa-sqlite"],
   },
   ssr: {
     noExternal: [/katex/, /lowlight/, /platejs/],

@@ -17,7 +17,10 @@ import { getWorkflowIcon, workflowGroupOrder } from "@/config";
 import { issueFilterOptions } from "@/config/team";
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
-import { useTeamWorkflowStates } from "@/hooks/use-team-workflow-states";
+import {
+  usePowerSyncWorkflowStates,
+  useTeamId,
+} from "@/lib/collections/team-metadata-powersync";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -48,11 +51,12 @@ interface IssueListProps extends StrictOmit<
 }
 
 export function IssueList({ className, issues = [], ...props }: IssueListProps) {
-  const { team } = useParams({
+  const { organization, team } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });
   const { grouping } = useActiveIssueDisplayOptions(team);
-  const workflowStates = useTeamWorkflowStates(team);
+  const teamId = useTeamId(organization, team);
+  const workflowStates = usePowerSyncWorkflowStates(teamId);
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
@@ -90,7 +94,6 @@ export function IssueList({ className, issues = [], ...props }: IssueListProps) 
 
     if (grouping === "status") {
       const orderedStates = [...workflowStates]
-        .filter((state) => state.type !== "DUPLICATE")
         .sort(
           (a, b) =>
             (workflowTypeOrder.get(a.type) ?? Number.MAX_SAFE_INTEGER) -

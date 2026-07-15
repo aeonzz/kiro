@@ -1,11 +1,9 @@
 import * as React from "react";
 import { Icon } from "@/utils/icon";
-import { useQueryClient } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
 
 import type { FilterOption } from "@/types/inbox";
 import { cn } from "@/lib/utils";
-import { getIssuesCollection } from "@/lib/collections/issues";
+import { setIssueLabels } from "@/lib/collections/issue-label-links-powersync";
 import { Badge } from "@/components/ui/badge";
 import { Combobox, ComboboxTrigger } from "@/components/ui/combobox";
 import { ItemsComboboxContent } from "@/components/items-combobox";
@@ -17,18 +15,15 @@ interface LabelComboboxProps {
 }
 
 export function LabelCombobox({ issueId, issueLabels, allLabelOptions }: LabelComboboxProps) {
-  const qc = useQueryClient();
-  const { organization, team } = useParams({ from: "/_app/$organization/team/$team/_issues" });
-  const issuesCollection = getIssuesCollection({
-    queryClient: qc,
-    organizationSlug: organization,
-    teamSlug: team,
-  });
+  const [openLabelValue, setOpenLabelValue] = React.useState<string | null>(
+    null
+  );
 
   const setValue = (newOptions: FilterOption[]) => {
-    issuesCollection.update(issueId, (draft) => {
-      draft.labelIds = newOptions.map((o) => o.value);
-    });
+    setIssueLabels(
+      issueId,
+      newOptions.map((o) => o.value)
+    );
   };
 
   return (
@@ -38,7 +33,12 @@ export function LabelCombobox({ issueId, issueLabels, allLabelOptions }: LabelCo
           key={item.value}
           items={allLabelOptions}
           value={issueLabels}
-          onValueChange={setValue}
+          open={openLabelValue === item.value}
+          onOpenChange={(open) => setOpenLabelValue(open ? item.value : null)}
+          onValueChange={(newOptions) => {
+            setValue(newOptions);
+            setOpenLabelValue(null);
+          }}
           multiple
         >
           <ComboboxTrigger

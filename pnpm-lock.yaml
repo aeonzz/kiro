@@ -41,6 +41,9 @@ importers:
       '@hugeicons/react':
         specifier: ^1.1.9
         version: 1.1.9(react@19.2.7)
+      '@journeyapps/wa-sqlite':
+        specifier: ^1.7.2
+        version: 1.7.2
       '@kiro/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -104,6 +107,15 @@ importers:
       '@platejs/toggle':
         specifier: ^52.3.10
         version: 52.3.10(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.17)(platejs@52.3.21(@types/react@19.2.17)(immer@10.2.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(scheduler@0.27.0)(use-sync-external-store@1.6.0(react@19.2.7)))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@powersync/react':
+        specifier: ^1.10.0
+        version: 1.10.0(@powersync/common@1.57.2)(react@19.2.7)
+      '@powersync/web':
+        specifier: ^1.39.0
+        version: 1.39.0(@journeyapps/wa-sqlite@1.7.2)(@powersync/common@1.57.2)
+      '@tanstack/powersync-db-collection':
+        specifier: ^0.1.52
+        version: 0.1.52(@powersync/common@1.57.2)(typescript@5.9.3)
       '@tanstack/query-db-collection':
         specifier: ^1.0.47
         version: 1.0.47(@tanstack/query-core@5.101.2)(typescript@5.9.3)
@@ -1064,6 +1076,9 @@ packages:
       '@types/node':
         optional: true
 
+  '@journeyapps/wa-sqlite@1.7.2':
+    resolution: {integrity: sha512-EVRMzqHtHgJBFcTGOgQ5/YlxrYFSXLFFztC5yo6+jQx2mqFR+a1kkLV4IirquiBzIonjmYXfBtvZ26fmI8r9Nw==}
+
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
 
@@ -1338,6 +1353,22 @@ packages:
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
+
+  '@powersync/common@1.57.2':
+    resolution: {integrity: sha512-cOsmvBFBK0yvpwjaI46Lm3xCMRaTaydQQ4RolED3Upj6/kawGZHhkh4Guve3nmOSQ/0sGCuiFOcl4Gv9Mp6dOA==}
+
+  '@powersync/react@1.10.0':
+    resolution: {integrity: sha512-orM29qocbF8zYTBM27j9nPNztyplpbNVaw8djpqxl8N2wESqHTbHOKpatg+Fa5aofgjzmrkiGwevJvCbiWYYWQ==}
+    peerDependencies:
+      '@powersync/common': ^1.51.0
+      react: '*'
+
+  '@powersync/web@1.39.0':
+    resolution: {integrity: sha512-hl0V8wC4T44cLKG89/ePB97DsVboyVFkT5/WT9SxhIVQNs+zCaTg800UKQscNchUJyVjNHQwTdycjYsKBpqnOQ==}
+    hasBin: true
+    peerDependencies:
+      '@journeyapps/wa-sqlite': ^1.5.0
+      '@powersync/common': ^1.57.2
 
   '@preact/signals-core@1.14.4':
     resolution: {integrity: sha512-HNB6HYeYKhQbJ1aKl+YRjrS4+QWHLKX6qKoUsfS/m0vqzsVaEBiZiaKbG/e+NKk2ch5ALQr/ihWaMHxiCuuWHA==}
@@ -2288,6 +2319,11 @@ packages:
     resolution: {integrity: sha512-eQ1MyLKCHyXiH7NbdmB80W77OhiMgGBUb+qDx/8WMGbwg5Lf/NlfD0TfNYAqY77i8V3AxoDoYdICrQE5ADw4Yw==}
     engines: {node: '>=18'}
 
+  '@tanstack/powersync-db-collection@0.1.52':
+    resolution: {integrity: sha512-PL5rLyY0qmBWrZZCZDHj8nK7dhTvt+O3/8Z+AOgZyEW/OT3+EEcZgeKiE3L7/4WMqsK7ClLNDLyh8TJ/bO7tNQ==}
+    peerDependencies:
+      '@powersync/common': ^1.41.0
+
   '@tanstack/query-core@5.101.2':
     resolution: {integrity: sha512-hH5MLoJhF7KaIGd7q3xTXGXvslI+GYlM1Z/35aSHHWaCJWB7XvTSHYuV3eM7tw+aE0mT/xMro4M4Q9rCGHT0lw==}
 
@@ -2952,9 +2988,16 @@ packages:
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
 
+  comlink@4.4.2:
+    resolution: {integrity: sha512-OxGdvBmJuNKSCMO4NTl1L47VRp6xn2wG4F/2hYzB6tiCb709otOxtEYCSvK80PtjODfXXZu8ds+Nw5kVCjqd2g==}
+
   commander@11.1.0:
     resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
     engines: {node: '>=16'}
+
+  commander@12.1.0:
+    resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
+    engines: {node: '>=18'}
 
   commander@14.0.3:
     resolution: {integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==}
@@ -4090,6 +4133,9 @@ packages:
       react:
         optional: true
 
+  js-logger@1.6.1:
+    resolution: {integrity: sha512-yTgMCPXVjhmg28CuUH8CKjU+cIKL/G+zTu4Fn4lQxs8mRFH/03QTNvEFngcxfg/gRDiQAOoyCKmMTOm9ayOzXA==}
+
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -4611,6 +4657,10 @@ packages:
 
   outvariant@1.4.3:
     resolution: {integrity: sha512-+Sl2UErvtsoajRDKCE5/dBz4DIvHXQQnAxtQTF04OJxY0+DyZXSo5P5Bb7XYWOh81syohlYL24hbDwxedPUJCA==}
+
+  p-defer@4.0.1:
+    resolution: {integrity: sha512-Mr5KC5efvAK5VUptYEIopP1bakB85k2IWXaRC0rsh1uwn1L6M0LVml8OIQ4Gudg4oyZakf7FmeRLkMMtZW1i5A==}
+    engines: {node: '>=12'}
 
   p-limit@2.3.0:
     resolution: {integrity: sha512-//88mFWSJx8lxCzwdAABTJL2MyWB12+eIY7MDL2SqLmAkeKU9qxRvWuSyTjm3FUmpBEMuFfckAIqEaVGUDxb6w==}
@@ -6645,6 +6695,8 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.20.1
 
+  '@journeyapps/wa-sqlite@1.7.2': {}
+
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -7012,6 +7064,22 @@ snapshots:
       - react-native
       - scheduler
       - use-sync-external-store
+
+  '@powersync/common@1.57.2':
+    dependencies:
+      js-logger: 1.6.1
+
+  '@powersync/react@1.10.0(@powersync/common@1.57.2)(react@19.2.7)':
+    dependencies:
+      '@powersync/common': 1.57.2
+      react: 19.2.7
+
+  '@powersync/web@1.39.0(@journeyapps/wa-sqlite@1.7.2)(@powersync/common@1.57.2)':
+    dependencies:
+      '@journeyapps/wa-sqlite': 1.7.2
+      '@powersync/common': 1.57.2
+      comlink: 4.4.2
+      commander: 12.1.0
 
   '@preact/signals-core@1.14.4': {}
 
@@ -7802,6 +7870,18 @@ snapshots:
 
   '@tanstack/pacer-lite@0.2.2': {}
 
+  '@tanstack/powersync-db-collection@0.1.52(@powersync/common@1.57.2)(typescript@5.9.3)':
+    dependencies:
+      '@powersync/common': 1.57.2
+      '@standard-schema/spec': 1.1.0
+      '@tanstack/db': 0.6.14(typescript@5.9.3)
+      '@tanstack/store': 0.9.3
+      debug: 4.4.3
+      p-defer: 4.0.1
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+
   '@tanstack/query-core@5.101.2': {}
 
   '@tanstack/query-db-collection@1.0.47(@tanstack/query-core@5.101.2)(typescript@5.9.3)':
@@ -8535,7 +8615,11 @@ snapshots:
 
   color-name@1.1.4: {}
 
+  comlink@4.4.2: {}
+
   commander@11.1.0: {}
+
+  commander@12.1.0: {}
 
   commander@14.0.3: {}
 
@@ -9502,6 +9586,8 @@ snapshots:
       '@types/react': 19.2.17
       react: 19.2.7
 
+  js-logger@1.6.1: {}
+
   js-tokens@4.0.0: {}
 
   js-video-url-parser@0.5.1: {}
@@ -10089,6 +10175,8 @@ snapshots:
       strip-ansi: 7.2.0
 
   outvariant@1.4.3: {}
+
+  p-defer@4.0.1: {}
 
   p-limit@2.3.0:
     dependencies:

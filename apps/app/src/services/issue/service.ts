@@ -11,7 +11,7 @@ function toIssueListItem(issue: {
   priority: IssuePriority;
   state: { id: string; type: string };
   assigneeId: string | null;
-  labels: Array<{ id: string }>;
+  labels: Array<{ labelId: string }>;
   createdAt: Date;
   updatedAt: Date;
 }): Issue {
@@ -25,7 +25,7 @@ function toIssueListItem(issue: {
     createdAt: issue.createdAt.toISOString(),
     updatedAt: issue.updatedAt.toISOString(),
     assigneeId: issue.assigneeId ?? undefined,
-    labelIds: issue.labels.map((label) => label.id),
+    labelIds: issue.labels.map((link) => link.labelId),
   };
 }
 
@@ -100,7 +100,7 @@ export const createIssue = async ({
         stateId: issue.status,
         projectId: issue.projectId || null,
         labels: {
-          connect: issue.labels.map((id) => ({ id })),
+          create: issue.labels.map((labelId) => ({ labelId })),
         },
       },
       include: {
@@ -191,7 +191,10 @@ export const updateIssue = async ({
       ...(issue.priority && { priority: issue.priority }),
       ...(issue.assigneeId !== undefined && { assigneeId: issue.assigneeId }),
       ...(issue.labelIds && {
-        labels: { set: issue.labelIds.map((id) => ({ id })) },
+        labels: {
+          deleteMany: {},
+          create: issue.labelIds.map((labelId) => ({ labelId })),
+        },
       }),
     },
     include: {

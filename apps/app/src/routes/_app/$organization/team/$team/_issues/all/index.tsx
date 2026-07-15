@@ -1,9 +1,18 @@
+import * as React from "react";
 import { useLiveQuery } from "@tanstack/react-db";
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
-import { issueQueries, teamQueries } from "@/lib/query-factory";
-import { getIssuesCollection } from "@/lib/collections/issues";
+import { teamQueries } from "@/lib/query-factory";
+import {
+  getIssuesPowerSyncCollection,
+  powerSyncRowToIssue,
+} from "@/lib/collections/issues-powersync";
+import { getIssueLabelLinksCollection } from "@/lib/collections/issue-label-links-powersync";
+import {
+  usePowerSyncWorkflowStates,
+  useTeamId,
+} from "@/lib/collections/team-metadata-powersync";
 import { useIssueDetailsPanelStore } from "@/hooks/use-details-panel-store";
 import { ContainerContent } from "@/components/container";
 import { Error } from "@/components/error";
@@ -24,12 +33,6 @@ export const Route = createFileRoute(
       throw notFound();
     }
 
-    // Warm the same query key the issues collection reads from so the list
-    // isn't empty on first paint (useLiveQuery is not suspense-backed).
-    void context.queryClient.ensureQueryData(
-      issueQueries.lists({ organizationSlug: organization, teamSlug: team })
-    );
-
     return {
       title: `${data.name} > All`,
     };
@@ -45,20 +48,14 @@ function RouteComponent() {
   const { team, organization } = Route.useParams();
   const isOpen = useIssueDetailsPanelStore((state) => state.isOpen);
 
-  const qc = useQueryClient();
   const { data } = useSuspenseQuery(
     teamQueries.detail({ organizationSlug: organization, slug: team })
   );
 
-  const issuesCollection = getIssuesCollection({
-    queryClient: qc,
-    organizationSlug: organization,
-    teamSlug: team,
-  });
-  const { data: issues = [] } = useLiveQuery(
-    (q) => q.from({ issue: issuesCollection }),
-    [issuesCollection]
-  );
+  // PowerSync (WASM SQLite) is browser-only, so defer the live-query read until
+  // after mount to keep SSR/first render safe.
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
 
   if (!data) {
     throw notFound();
@@ -66,10 +63,67 @@ function RouteComponent() {
 
   return (
     <ContainerContent className="flex flex-1">
-      <IssueList issues={issues} />
+      {mounted ? (
+        <PowerSyncIssueList organization={organization} team={team} />
+      ) : (
+        <IssueList issues={[]} />
+      )}
       <DetailsSidePanel title="All issues" team={data.name} isOpen={isOpen}>
         <FilterTabs />
       </DetailsSidePanel>
     </ContainerContent>
   );
+}
+
+function PowerSyncIssueList({
+  organization,
+  team,
+}: {
+  organization: string;
+  team: string;
+}) {
+  const teamId = useTeamId(organization, team);
+  const workflowStates = usePowerSyncWorkflowStates(teamId);
+
+  const collection = React.useMemo(() => getIssuesPowerSyncCollection(), []);
+  const linkCollection = React.useMemo(
+    () => getIssueLabelLinksCollection(),
+    []
+  );
+
+  const { data: rows = [] } = useLiveQuery(
+    (q) => q.from({ issue: collection }),
+    [collection]
+  );
+  const { data: links = [] } = useLiveQuery(
+    (q) => q.from({ link: linkCollection }),
+    [linkCollection]
+  );
+
+  const labelsByIssue = React.useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const link of links) {
+      if (!link.issueId || !link.labelId) continue;
+      const list = map.get(link.issueId) ?? [];
+      list.push(link.labelId);
+      map.set(link.issueId, list);
+    }
+    return map;
+  }, [links]);
+
+  const issues = React.useMemo(
+    () =>
+      rows
+        .filter((row) => row.teamId === teamId)
+        .map((row) =>
+          powerSyncRowToIssue(
+            row,
+            workflowStates,
+            labelsByIssue.get(row.id as string) ?? []
+          )
+        ),
+    [rows, teamId, workflowStates, labelsByIssue]
+  );
+
+  return <IssueList issues={issues} />;
 }

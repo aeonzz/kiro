@@ -2,6 +2,7 @@ import * as React from "react";
 import { getUserPreferencesFn } from "@/services/user/get";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
+import { PowerSyncProvider } from "@/lib/powersync/provider";
 import { usePreferencesStore } from "@/hooks/use-preference-store";
 
 export const Route = createFileRoute("/_app")({
@@ -34,5 +35,9 @@ function RouteComponent() {
     }
   }, [preferences]);
 
-  return <Outlet />;
+  return (
+    <PowerSyncProvider>
+      <Outlet />
+    </PowerSyncProvider>
+  );
 }

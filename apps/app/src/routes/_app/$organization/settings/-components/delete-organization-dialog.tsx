@@ -5,6 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
+import { clearPowerSync } from "@/lib/powersync/db";
 import { organizationQueries } from "@/lib/query-factory";
 import {
   AlertDialog,
@@ -58,7 +59,8 @@ export function DeleteOrganizationDialog() {
             setTimeout(() => {
               authClient.signOut({
                 fetchOptions: {
-                  onSuccess: () => {
+                  onSuccess: async () => {
+                    await clearPowerSync();
                     navigate({
                       to: "/login",
                       reloadDocument: true,
@@ -90,7 +92,8 @@ export function DeleteOrganizationDialog() {
             setTimeout(() => {
               authClient.signOut({
                 fetchOptions: {
-                  onSuccess: () => {
+                  onSuccess: async () => {
+                    await clearPowerSync();
                     navigate({
                       to: "/login",
                       reloadDocument: true,

@@ -1,5 +1,6 @@
-import { MOCK_USERS } from "@/mocks/users";
 import * as React from "react";
+import { getWorkflowIcon } from "@/config";
+import { MOCK_USERS } from "@/mocks/users";
 import { Icon } from "@/utils/icon";
 import {
   EditUser02Icon,
@@ -9,14 +10,20 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useParams } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
 
 import type { Issue } from "@/types/issue";
-import { getWorkflowIcon } from "@/config";
 import { issueFilterOptions } from "@/config/team";
-import { getIssuesCollection } from "@/lib/collections/issues";
-import { useTeamLabels } from "@/hooks/use-team-labels";
-import { useTeamWorkflowStates } from "@/hooks/use-team-workflow-states";
+import {
+  addIssueLabel,
+  removeIssueLabel,
+} from "@/lib/collections/issue-label-links-powersync";
+import { getIssuesPowerSyncCollection } from "@/lib/collections/issues-powersync";
+import {
+  usePowerSyncTeamLabels,
+  usePowerSyncWorkflowStates,
+  useTeamId,
+} from "@/lib/collections/team-metadata-powersync";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   ContextMenuCheckboxItem,
   ContextMenuContent,
@@ -27,7 +34,6 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
 } from "@/components/ui/context-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { InProgressIcon } from "@/components/icons";
 
 interface IssueContextMenuProps {
@@ -35,13 +41,10 @@ interface IssueContextMenuProps {
 }
 
 export function IssueContextMenu({ issue }: IssueContextMenuProps) {
-  const qc = useQueryClient();
-  const { team, organization } = useParams({ from: "/_app/$organization/team/$team/_issues" });
-  const issuesCollection = getIssuesCollection({
-    queryClient: qc,
-    organizationSlug: organization,
-    teamSlug: team,
+  const { organization, team } = useParams({
+    from: "/_app/$organization/team/$team/_issues",
   });
+  const issuesCollection = getIssuesPowerSyncCollection();
 
   const handleUpdate = (changes: Partial<Issue>) => {
     issuesCollection.update(issue.id, (draft) => {
@@ -52,7 +55,8 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
   const priorityOptions =
     issueFilterOptions.find((o) => o.id === "priority")?.options ?? [];
 
-  const workflowStates = useTeamWorkflowStates(team);
+  const teamId = useTeamId(organization, team);
+  const workflowStates = usePowerSyncWorkflowStates(teamId);
   const statusOptions = React.useMemo(
     () =>
       workflowStates.map((state) => ({
@@ -64,7 +68,7 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
     [workflowStates]
   );
 
-  const allLabelOptions = useTeamLabels(team);
+  const allLabelOptions = usePowerSyncTeamLabels(teamId);
 
   const assigneesOptions = [
     {
@@ -84,14 +88,14 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
   ];
 
   return (
-    <ContextMenuContent className="min-w-52">
+    <ContextMenuContent className="min-w-44">
       <ContextMenuGroup>
         <ContextMenuSub>
           <ContextMenuSubTrigger shortcut="S">
             <InProgressIcon />
             Status
           </ContextMenuSubTrigger>
-          <ContextMenuSubContent>
+          <IssueContextMenuSubContent>
             <ContextMenuRadioGroup
               value={issue.stateId}
               onValueChange={(value) => {
@@ -111,14 +115,14 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
                 </ContextMenuRadioItem>
               ))}
             </ContextMenuRadioGroup>
-          </ContextMenuSubContent>
+          </IssueContextMenuSubContent>
         </ContextMenuSub>
         <ContextMenuSub>
           <ContextMenuSubTrigger shortcut="A">
             <HugeiconsIcon icon={EditUser02Icon} strokeWidth={2} />
             Assignee
           </ContextMenuSubTrigger>
-          <ContextMenuSubContent>
+          <IssueContextMenuSubContent>
             <ContextMenuRadioGroup
               value={issue.assigneeId}
               onValueChange={(value) => {
@@ -146,14 +150,14 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
                 </ContextMenuRadioItem>
               ))}
             </ContextMenuRadioGroup>
-          </ContextMenuSubContent>
+          </IssueContextMenuSubContent>
         </ContextMenuSub>
         <ContextMenuSub>
           <ContextMenuSubTrigger shortcut="P">
             <HugeiconsIcon icon={FullSignalIcon} strokeWidth={2} />
             Priority
           </ContextMenuSubTrigger>
-          <ContextMenuSubContent>
+          <IssueContextMenuSubContent>
             <ContextMenuRadioGroup
               value={issue.priority}
               onValueChange={(value) => {
@@ -174,26 +178,24 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
                 </ContextMenuRadioItem>
               ))}
             </ContextMenuRadioGroup>
-          </ContextMenuSubContent>
+          </IssueContextMenuSubContent>
         </ContextMenuSub>
         <ContextMenuSub>
           <ContextMenuSubTrigger shortcut="L">
             <HugeiconsIcon icon={LabelIcon} strokeWidth={2} />
             Labels
           </ContextMenuSubTrigger>
-          <ContextMenuSubContent>
+          <IssueContextMenuSubContent>
             <ContextMenuGroup>
               {allLabelOptions.map((option) => (
                 <ContextMenuCheckboxItem
                   key={option.value}
                   checked={issue.labelIds.includes(option.value)}
                   onCheckedChange={(checked) => {
-                    handleUpdate({
-                      labelIds: checked
-                        ? [...issue.labelIds, option.value]
-                        : issue.labelIds.filter((id) => id !== option.value),
-                    });
+                    if (checked) addIssueLabel(issue.id, option.value);
+                    else removeIssueLabel(issue.id, option.value);
                   }}
+                  closeOnClick
                 >
                   {option.icon && (
                     <Icon icon={option.icon} color={option.color} />
@@ -202,10 +204,21 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
                 </ContextMenuCheckboxItem>
               ))}
             </ContextMenuGroup>
-          </ContextMenuSubContent>
+          </IssueContextMenuSubContent>
         </ContextMenuSub>
       </ContextMenuGroup>
     </ContextMenuContent>
   );
 }
 
+function IssueContextMenuSubContent({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <ContextMenuSubContent className="min-w-52">
+      {children}
+    </ContextMenuSubContent>
+  );
+}

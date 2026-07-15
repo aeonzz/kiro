@@ -48,6 +48,9 @@ export function ItemsCombobox<T extends FilterOption>({
   triggerProps,
   contentProps,
   isMuted = false,
+  open: openProp,
+  onOpenChange,
+  onValueChange,
   ...props
 }: ItemsComboboxProps<T>) {
   const {
@@ -56,9 +59,31 @@ export function ItemsCombobox<T extends FilterOption>({
     className,
     ...restTriggerProps
   } = triggerProps ?? {};
+  const [open, setOpen] = React.useState(false);
+
+  const handleOpenChange: NonNullable<
+    React.ComponentProps<typeof Combobox<T, false>>["onOpenChange"]
+  > = (nextOpen, eventDetails) => {
+    setOpen(nextOpen);
+    onOpenChange?.(nextOpen, eventDetails);
+  };
+
+  const handleValueChange: NonNullable<
+    React.ComponentProps<typeof Combobox<T, false>>["onValueChange"]
+  > = (value, eventDetails) => {
+    onValueChange?.(value, eventDetails);
+    handleOpenChange(false, eventDetails);
+  };
 
   return (
-    <Combobox items={items} multiple={false} {...props}>
+    <Combobox
+      items={items}
+      multiple={false}
+      open={openProp ?? open}
+      onOpenChange={handleOpenChange}
+      onValueChange={handleValueChange}
+      {...props}
+    >
       <Button
         variant={variant}
         size={isIcon ? "icon-xs" : "xs"}
@@ -158,10 +183,36 @@ export function MultiItemsCombobox<T extends FilterOption>({
   label,
   icon,
   contentProps,
+  open: openProp,
+  onOpenChange,
+  onValueChange,
   ...props
 }: MultiItemsComboboxProps<T>) {
+  const [open, setOpen] = React.useState(false);
+
+  const handleOpenChange: NonNullable<
+    React.ComponentProps<typeof Combobox<T, true>>["onOpenChange"]
+  > = (nextOpen, eventDetails) => {
+    setOpen(nextOpen);
+    onOpenChange?.(nextOpen, eventDetails);
+  };
+
+  const handleValueChange: NonNullable<
+    React.ComponentProps<typeof Combobox<T, true>>["onValueChange"]
+  > = (value, eventDetails) => {
+    onValueChange?.(value, eventDetails);
+    handleOpenChange(false, eventDetails);
+  };
+
   return (
-    <Combobox items={items} multiple={true} {...props}>
+    <Combobox
+      items={items}
+      multiple={true}
+      open={openProp ?? open}
+      onOpenChange={handleOpenChange}
+      onValueChange={handleValueChange}
+      {...props}
+    >
       <Button
         variant="outline"
         size="xs"
@@ -240,6 +291,9 @@ export function BadgedMultiItemsCombobox<T extends FilterOption>({
   kbd,
   contentProps,
   triggerProps,
+  open: openProp,
+  onOpenChange,
+  onValueChange,
   ...props
 }: StrictOmit<
   React.ComponentProps<typeof Combobox<T, true>>,
@@ -257,8 +311,31 @@ export function BadgedMultiItemsCombobox<T extends FilterOption>({
     "children"
   >;
 }) {
+  const [open, setOpen] = React.useState(false);
+
+  const handleOpenChange: NonNullable<
+    React.ComponentProps<typeof Combobox<T, true>>["onOpenChange"]
+  > = (nextOpen, eventDetails) => {
+    setOpen(nextOpen);
+    onOpenChange?.(nextOpen, eventDetails);
+  };
+
+  const handleValueChange: NonNullable<
+    React.ComponentProps<typeof Combobox<T, true>>["onValueChange"]
+  > = (value, eventDetails) => {
+    onValueChange?.(value, eventDetails);
+    handleOpenChange(false, eventDetails);
+  };
+
   return (
-    <Combobox items={items} multiple={true} {...props}>
+    <Combobox
+      items={items}
+      multiple={true}
+      open={openProp ?? open}
+      onOpenChange={handleOpenChange}
+      onValueChange={handleValueChange}
+      {...props}
+    >
       <ComboboxTrigger
         isIcon
         render={
