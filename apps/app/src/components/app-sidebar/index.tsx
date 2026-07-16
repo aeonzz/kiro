@@ -37,6 +37,7 @@ import {
   SidebarMenuItem,
 } from "../ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+
 import { UserMenu } from "../user-menu";
 import { sidebarCustomizationHandle } from "./sidebar-control";
 import { TeamNav } from "./team-nav";

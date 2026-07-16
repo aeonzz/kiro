@@ -29,7 +29,10 @@ function memoizeCollection<T>(factory: () => T) {
   };
 }
 
-const getOrganizationsCollection = memoizeCollection(() =>
+// Exported so other local-first read paths (e.g. the organizations collection)
+// reuse the *same* synced collection instead of opening a second sync listener
+// on the same underlying SQLite table.
+export const getOrganizationsCollection = memoizeCollection(() =>
   createCollection(
     powerSyncCollectionOptions({
       database: getPowerSyncDb(),
@@ -38,7 +41,7 @@ const getOrganizationsCollection = memoizeCollection(() =>
   )
 );
 
-const getTeamsCollection = memoizeCollection(() =>
+export const getTeamsCollection = memoizeCollection(() =>
   createCollection(
     powerSyncCollectionOptions({
       database: getPowerSyncDb(),
@@ -47,7 +50,7 @@ const getTeamsCollection = memoizeCollection(() =>
   )
 );
 
-const getWorkflowStatesCollection = memoizeCollection(() =>
+export const getWorkflowStatesCollection = memoizeCollection(() =>
   createCollection(
     powerSyncCollectionOptions({
       database: getPowerSyncDb(),
@@ -56,11 +59,38 @@ const getWorkflowStatesCollection = memoizeCollection(() =>
   )
 );
 
-const getIssueLabelsCollection = memoizeCollection(() =>
+export const getIssueLabelsCollection = memoizeCollection(() =>
   createCollection(
     powerSyncCollectionOptions({
       database: getPowerSyncDb(),
       table: AppSchema.props.issue_label,
+    })
+  )
+);
+
+export const getMembersCollection = memoizeCollection(() =>
+  createCollection(
+    powerSyncCollectionOptions({
+      database: getPowerSyncDb(),
+      table: AppSchema.props.member,
+    })
+  )
+);
+
+export const getUsersCollection = memoizeCollection(() =>
+  createCollection(
+    powerSyncCollectionOptions({
+      database: getPowerSyncDb(),
+      table: AppSchema.props.user,
+    })
+  )
+);
+
+export const getProjectsCollection = memoizeCollection(() =>
+  createCollection(
+    powerSyncCollectionOptions({
+      database: getPowerSyncDb(),
+      table: AppSchema.props.project,
     })
   )
 );
@@ -92,6 +122,53 @@ export function useTeamId(
     return teams.find((t) => t.organizationId === orgId && t.slug === teamSlug)
       ?.id;
   }, [orgs, teams, orgSlug, teamSlug]);
+}
+
+export type PowerSyncTeam = {
+  id: string;
+  name: string;
+  slug: string;
+  organizationId: string;
+};
+
+/**
+ * Resolve a team by (organization slug, team slug) from the local `organization`
+ * and `team` tables. Returns `isLoading` so callers can distinguish "still
+ * hydrating" from "no such team" (and avoid a premature not-found). Local-first:
+ * no network, works offline.
+ */
+export function usePowerSyncTeam(
+  orgSlug: string,
+  teamSlug: string
+): { team: PowerSyncTeam | null; isLoading: boolean } {
+  const orgCollection = React.useMemo(() => getOrganizationsCollection(), []);
+  const teamCollection = React.useMemo(() => getTeamsCollection(), []);
+
+  const { data: orgs = [], isLoading: orgsLoading } = useLiveQuery(
+    (q) => q.from({ org: orgCollection }),
+    [orgCollection]
+  );
+  const { data: teams = [], isLoading: teamsLoading } = useLiveQuery(
+    (q) => q.from({ team: teamCollection }),
+    [teamCollection]
+  );
+
+  const team = React.useMemo(() => {
+    const orgId = orgs.find((o) => o.slug === orgSlug)?.id;
+    if (!orgId) return null;
+    const match = teams.find(
+      (t) => t.organizationId === orgId && t.slug === teamSlug
+    );
+    if (!match) return null;
+    return {
+      id: match.id as string,
+      name: (match.name as string) ?? "",
+      slug: (match.slug as string) ?? "",
+      organizationId: match.organizationId as string,
+    };
+  }, [orgs, teams, orgSlug, teamSlug]);
+
+  return { team, isLoading: orgsLoading || teamsLoading };
 }
 
 export type PowerSyncWorkflowState = {

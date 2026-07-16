@@ -1,5 +1,7 @@
 import { PowerSyncDatabase } from "@powersync/web";
 
+import { clearOfflineCache } from "@/lib/offline-cache";
+
 import { BackendConnector } from "./connector";
 import { AppSchema } from "./schema";
 
@@ -51,6 +53,7 @@ export function connectPowerSync() {
  * the connect guard so the next sign-in reconnects a fresh, empty database.
  */
 export async function clearPowerSync() {
+  clearOfflineCache();
   if (!db) return;
   await db.disconnectAndClear();
   connectStarted = false;

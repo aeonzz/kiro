@@ -91,15 +91,62 @@ const team = new Table(
   { indexes: { organization: ["organizationId"], slug: ["slug"] } }
 );
 
-// Mirrors Postgres `organization` (@@map("organization")). Synced so an org
-// slug can be resolved to its id locally (team slugs are only unique per org).
+// Mirrors Postgres `organization` (@@map("organization")). Synced so the org
+// (identity + branding) resolves locally/offline without the server list query.
 const organization = new Table(
   {
     name: column.text,
     slug: column.text,
+    logo: column.text,
+    metadata: column.text, // JSON stored as text
     createdAt: column.text,
   },
   { indexes: { slug: ["slug"] } }
+);
+
+// Mirrors Postgres `member` (@@map("member")). Synced so org membership + roles
+// (used for `userRole` / owner checks) resolve locally.
+const member = new Table(
+  {
+    organizationId: column.text,
+    userId: column.text,
+    role: column.text,
+    createdAt: column.text,
+  },
+  { indexes: { organization: ["organizationId"], user: ["userId"] } }
+);
+
+// Mirrors Postgres `user` (@@map("user")). Only the fields the UI shows for a
+// member (name/email/avatar) are synced. Scope sync rules to co-members of the
+// signed-in user's orgs — do NOT sync the whole user table.
+const user = new Table({
+  name: column.text,
+  email: column.text,
+  image: column.text,
+  emailVerified: column.integer, // boolean 0/1
+  createdAt: column.text,
+  updatedAt: column.text,
+});
+
+// Mirrors Postgres `project` (@@map("project")).
+const project = new Table(
+  {
+    name: column.text,
+    summary: column.text,
+    slug: column.text,
+    icon: column.text,
+    color: column.text,
+    status: column.text, // ProjectStatus enum
+    priority: column.text, // IssuePriority enum
+    leadId: column.text,
+    teamId: column.text,
+    organizationId: column.text,
+    startDate: column.text,
+    targetDate: column.text,
+    createdAt: column.text,
+    updatedAt: column.text,
+  },
+  { indexes: { team: ["teamId"], organization: ["organizationId"] } }
 );
 
 export const AppSchema = new Schema({
@@ -109,6 +156,9 @@ export const AppSchema = new Schema({
   issue_label_link,
   team,
   organization,
+  member,
+  user,
+  project,
 });
 
 // Row types inferred from the schema, for use across the app.
@@ -118,3 +168,7 @@ export type WorkflowStateRecord = Database["workflow_state"];
 export type IssueLabelRecord = Database["issue_label"];
 export type IssueLabelLinkRecord = Database["issue_label_link"];
 export type TeamRecord = Database["team"];
+export type OrganizationRecord = Database["organization"];
+export type MemberRecord = Database["member"];
+export type UserRecord = Database["user"];
+export type ProjectRecord = Database["project"];

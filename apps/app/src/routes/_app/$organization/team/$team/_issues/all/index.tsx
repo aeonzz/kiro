@@ -1,18 +1,18 @@
 import * as React from "react";
 import { useLiveQuery } from "@tanstack/react-db";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
-import { teamQueries } from "@/lib/query-factory";
 import {
   getIssuesPowerSyncCollection,
   powerSyncRowToIssue,
 } from "@/lib/collections/issues-powersync";
 import { getIssueLabelLinksCollection } from "@/lib/collections/issue-label-links-powersync";
 import {
+  usePowerSyncTeam,
   usePowerSyncWorkflowStates,
   useTeamId,
 } from "@/lib/collections/team-metadata-powersync";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { useIssueDetailsPanelStore } from "@/hooks/use-details-panel-store";
 import { ContainerContent } from "@/components/container";
 import { Error } from "@/components/error";
@@ -24,21 +24,8 @@ import { DetailsSidePanel } from "../../-components/details-side-panel";
 export const Route = createFileRoute(
   "/_app/$organization/team/$team/_issues/all/"
 )({
-  loader: async ({ params: { organization, team }, context }) => {
-    const data = await context.queryClient.ensureQueryData(
-      teamQueries.detail({ organizationSlug: organization, slug: team })
-    );
-
-    if (!data) {
-      throw notFound();
-    }
-
-    return {
-      title: `${data.name} > All`,
-    };
-  },
-  head: ({ loaderData }) => ({
-    meta: loaderData ? [{ title: loaderData.title }] : undefined,
+  head: ({ params }) => ({
+    meta: [{ title: `${params.team} · All` }],
   }),
   errorComponent: Error,
   component: RouteComponent,
@@ -48,30 +35,36 @@ function RouteComponent() {
   const { team, organization } = Route.useParams();
   const isOpen = useIssueDetailsPanelStore((state) => state.isOpen);
 
-  const { data } = useSuspenseQuery(
-    teamQueries.detail({ organizationSlug: organization, slug: team })
-  );
-
   // PowerSync (WASM SQLite) is browser-only, so defer the live-query read until
-  // after mount to keep SSR/first render safe.
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
-
-  if (!data) {
-    throw notFound();
-  }
+  // after hydration to keep SSR/first render safe.
+  const hydrated = useHydrated();
 
   return (
     <ContainerContent className="flex flex-1">
-      {mounted ? (
+      {hydrated ? (
         <PowerSyncIssueList organization={organization} team={team} />
       ) : (
         <IssueList issues={[]} />
       )}
-      <DetailsSidePanel title="All issues" team={data.name} isOpen={isOpen}>
-        <FilterTabs />
-      </DetailsSidePanel>
+      <TeamDetailsPanel organization={organization} team={team} isOpen={isOpen} />
     </ContainerContent>
+  );
+}
+
+function TeamDetailsPanel({
+  organization,
+  team,
+  isOpen,
+}: {
+  organization: string;
+  team: string;
+  isOpen: boolean;
+}) {
+  const { team: teamData } = usePowerSyncTeam(organization, team);
+  return (
+    <DetailsSidePanel title="All issues" team={teamData?.name ?? ""} isOpen={isOpen}>
+      <FilterTabs />
+    </DetailsSidePanel>
   );
 }
 

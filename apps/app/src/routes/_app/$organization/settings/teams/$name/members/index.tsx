@@ -1,8 +1,9 @@
 import { ArrowLeft01Icon, UserAdd01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 
+import { usePowerSyncTeam } from "@/lib/collections/team-metadata-powersync";
 import { teamQueries } from "@/lib/query-factory";
 import { Button } from "@/components/ui/button";
 import { DialogTrigger } from "@/components/ui/dialog";
@@ -31,21 +32,8 @@ import { columns } from "./-components/columns";
 export const Route = createFileRoute(
   "/_app/$organization/settings/teams/$name/members/"
 )({
-  loader: async ({ params: { organization, name }, context }) => {
-    const data = await context.queryClient.ensureQueryData(
-      teamQueries.detail({ organizationSlug: organization, slug: name })
-    );
-
-    if (!data) {
-      throw notFound();
-    }
-
-    return {
-      title: `${data.name} > Members`,
-    };
-  },
-  head: ({ loaderData }) => ({
-    meta: loaderData ? [{ title: loaderData.title }] : undefined,
+  head: ({ params }) => ({
+    meta: [{ title: `${params.name} · Members` }],
   }),
   errorComponent: Error,
   notFoundComponent: () => {
@@ -62,7 +50,10 @@ const viewOptions = [
 function RouteComponent() {
   const { name, organization } = Route.useParams();
 
-  const { data } = useSuspenseQuery(
+  const { team: teamData } = usePowerSyncTeam(organization, name);
+
+  // Non-blocking: seeds cache for mutations; provides teammembers when online.
+  const { data } = useQuery(
     teamQueries.detail({ organizationSlug: organization, slug: name })
   );
 
@@ -75,7 +66,7 @@ function RouteComponent() {
         showTooltip={false}
       >
         <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
-        <span>{data?.name}</span>
+        <span>{teamData?.name ?? ""}</span>
       </BackButton>
       <SettingsTableContainer>
         <SettingsTableHeader>

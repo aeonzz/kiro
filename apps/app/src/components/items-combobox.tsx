@@ -397,7 +397,7 @@ export function ItemsComboboxContent({
     <ComboboxContent className={cn("min-w-60", className)} {...props}>
       <ComboboxPopupInput placeholder={placeholder} kbd={kbd} />
       <ComboboxEmpty>No items found.</ComboboxEmpty>
-      <ComboboxList>
+      <ComboboxList className="max-h-none">
         {(item: FilterOption) => (
           <ComboboxItem key={item.value} value={item}>
             {item.avatarUrl ? (

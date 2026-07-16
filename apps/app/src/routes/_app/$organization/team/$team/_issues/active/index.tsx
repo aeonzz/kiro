@@ -1,7 +1,5 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
-import { teamQueries } from "@/lib/query-factory";
 import { ContainerContent } from "@/components/container";
 import { Error } from "@/components/error";
 
@@ -11,43 +9,20 @@ import { FilterTabs } from "../-components/filter-tabs";
 export const Route = createFileRoute(
   "/_app/$organization/team/$team/_issues/active/"
 )({
-  loader: async ({ params: { organization, team }, context }) => {
-    const data = await context.queryClient.ensureQueryData(
-      teamQueries.detail({ organizationSlug: organization, slug: team })
-    );
-
-    if (!data) {
-      throw notFound();
-    }
-
-    return {
-      title: `${data.name} > Active`,
-    };
-  },
-  head: ({ loaderData }) => ({
-    meta: loaderData ? [{ title: loaderData.title }] : undefined,
+  head: ({ params }) => ({
+    meta: [{ title: `${params.team} · Active` }],
   }),
   errorComponent: Error,
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { team, organization } = Route.useParams();
-
-  const { data } = useSuspenseQuery(
-    teamQueries.detail({ organizationSlug: organization, slug: team })
-  );
-
-  if (!data) {
-    throw notFound();
-  }
-
+  // The parent `_issues` route validates the team locally; this leaf only needs
+  // to render its content (no network / no server team query).
   return (
     <ContainerContent className="flex">
       <div className="flex-1"></div>
-      {/* <DetailsSidePanel title="Active issues" team={data.name}> */}
-        <FilterTabs />
-      {/* </DetailsSidePanel> */}
+      <FilterTabs />
     </ContainerContent>
   );
 }

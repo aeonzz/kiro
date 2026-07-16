@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   createFileRoute,
   notFound,
@@ -8,7 +7,7 @@ import {
 } from "@tanstack/react-router";
 
 import { teamIssueTabs } from "@/config/team";
-import { teamQueries } from "@/lib/query-factory";
+import { usePowerSyncTeam } from "@/lib/collections/team-metadata-powersync";
 import { isNavLinkActive } from "@/lib/utils";
 import { useLastVisitedStore } from "@/hooks/use-last-visited-store";
 import { Container } from "@/components/container";
@@ -18,21 +17,8 @@ import { Header } from "./-components/header";
 import { IssueToolbar } from "./-components/issue-toolbar";
 
 export const Route = createFileRoute("/_app/$organization/team/$team/_issues")({
-  loader: async ({ params: { organization, team }, context }) => {
-    const data = await context.queryClient.ensureQueryData(
-      teamQueries.detail({ organizationSlug: organization, slug: team })
-    );
-
-    if (!data) {
-      throw notFound();
-    }
-
-    return {
-      title: `${data.name} > All`,
-    };
-  },
-  head: ({ loaderData }) => ({
-    meta: loaderData ? [{ title: loaderData.title }] : undefined,
+  head: ({ params }) => ({
+    meta: [{ title: params.team }],
   }),
   errorComponent: Error,
   component: RouteComponent,
@@ -43,9 +29,8 @@ function RouteComponent() {
   const { pathname } = useLocation();
   const setLastIssueTab = useLastVisitedStore((state) => state.setLastIssueTab);
 
-  const { data } = useSuspenseQuery(
-    teamQueries.detail({ organizationSlug: organization, slug: team })
-  );
+  // Team is resolved locally from PowerSync (no network) so this works offline.
+  const { team: teamData, isLoading } = usePowerSyncTeam(organization, team);
 
   React.useEffect(() => {
     const isIssueTab = teamIssueTabs.some((tab) =>
@@ -57,13 +42,15 @@ function RouteComponent() {
     }
   }, [pathname, organization, team, setLastIssueTab]);
 
-  if (!data) {
+  // Only 404 once the local tables have hydrated — otherwise a real team would
+  // flash not-found while the collection is still loading.
+  if (!isLoading && !teamData) {
     throw notFound();
   }
 
   return (
     <Container>
-      <Header teamName={data.name} />
+      <Header teamName={teamData?.name ?? ""} />
       <IssueToolbar />
       <Outlet />
     </Container>

@@ -5,8 +5,12 @@ import { useLocation, useNavigate } from "@tanstack/react-router";
 
 import type { IssueDraft, Member, Organization, Team } from "@/types/schema-types";
 import { HomeViewValue } from "@/config/preferences";
-import { organizationQueries } from "@/lib/query-factory";
+import { usePowerSyncOrganizations } from "@/lib/collections/organizations-powersync";
+import { usePowerSyncReady } from "@/lib/collections/powersync-bootstrap";
+import { issueDraftQueries } from "@/lib/query-factory";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { usePreferencesStore } from "@/hooks/use-preference-store";
+import { useSession } from "@/hooks/use-session";
 import { NotFound } from "@/components/not-found";
 
 type ContextOrganization = StrictOmit<
@@ -31,13 +35,60 @@ const OrganizationContext = React.createContext<
 
 const RESERVED_SLUGS = ["login", "join", "api"];
 
+// Stable context served during SSR and the first hydration render, before the
+// browser-only PowerSync provider takes over. Module-level so the reference is
+// constant (no spurious re-renders in consumers).
+const PENDING_VALUE: OrganizationContextValue = {
+  organizations: [],
+  isPending: true,
+  activeOrganization: null,
+};
+
+/**
+ * SSR-safe shell. PowerSync collections only exist in the browser, so until the
+ * client has hydrated we serve a "pending" context; then we mount the real,
+ * client-only provider which reads PowerSync directly (no state-lifting bridge).
+ */
 export function OrganizationProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { data: userOrganizations, isPending: userOrganizationsPending } =
-    useQuery(organizationQueries.list());
+  const hydrated = useHydrated();
+
+  if (!hydrated) {
+    return (
+      <OrganizationContext.Provider value={PENDING_VALUE}>
+        {children}
+      </OrganizationContext.Provider>
+    );
+  }
+
+  return <OrganizationProviderClient>{children}</OrganizationProviderClient>;
+}
+
+/**
+ * Client-only provider. Reads the local-first organizations from PowerSync and
+ * warms every org-scoped collection in parallel; `ready` gates the whole shell
+ * behind one loader (no staggered pop-in) until teams and issues are both ready.
+ */
+function OrganizationProviderClient({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = useSession();
+  const currentUserId = session?.user?.id;
+
+  const { organizations } = usePowerSyncOrganizations();
+  const ready = usePowerSyncReady();
+
+  // Cast the local org shape (string dates, empty issueDrafts) to the context
+  // org type at this single boundary; downstream consumers read these fields
+  // loosely. `issueDrafts` is injected below from the server draft query.
+  const userOrganizations = organizations as unknown as ContextOrganization[];
+  const userOrganizationsPending = !ready;
+
   const navigate = useNavigate();
   const location = useLocation();
   const homeView = usePreferencesStore((s) => s.homeView);
@@ -70,6 +121,13 @@ export function OrganizationProvider({
     if (!userOrganizations || !effectiveSlug) return null;
     return userOrganizations.find((o) => o.slug === effectiveSlug) || null;
   }, [userOrganizations, effectiveSlug]);
+
+  // Issue drafts stay server-backed (not synced to PowerSync). Fetched for the
+  // active org and injected onto `activeOrganization` below; empty offline.
+  const { data: issueDrafts } = useQuery({
+    ...issueDraftQueries.lists({ organizationSlug: effectiveSlug ?? "" }),
+    enabled: !!effectiveSlug,
+  });
 
   React.useEffect(() => {
     if (slug && !isReserved) {
@@ -109,7 +167,12 @@ export function OrganizationProvider({
           ...activeOrganization,
           logo: activeOrganization.logo ?? null,
           metadata: activeOrganization.metadata ?? null,
-          userRole: activeOrganization.members?.[0]?.role ?? null,
+          // Resolve the signed-in user's role (owner checks); empty offline.
+          userRole:
+            activeOrganization.members?.find((m) => m.userId === currentUserId)
+              ?.role ?? null,
+          issueDrafts: (issueDrafts ??
+            []) as ContextOrganization["issueDrafts"],
         }
       : null;
 
@@ -128,7 +191,13 @@ export function OrganizationProvider({
       isPending: userOrganizationsPending,
       activeOrganization: activeOrg,
     };
-  }, [userOrganizations, userOrganizationsPending, activeOrganization]);
+  }, [
+    userOrganizations,
+    userOrganizationsPending,
+    activeOrganization,
+    issueDrafts,
+    currentUserId,
+  ]);
 
   if (!userOrganizationsPending && slug && !isReserved && !activeOrganization) {
     return <NotFound />;

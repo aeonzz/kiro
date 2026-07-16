@@ -1,9 +1,9 @@
 import {
   useMutation,
+  useQuery,
   useQueryClient,
-  useSuspenseQuery,
 } from "@tanstack/react-query";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { issueDraftQueries, organizationQueries } from "@/lib/query-factory";
 import {
@@ -24,17 +24,6 @@ import { Error } from "@/components/error";
 import { IssueDraftList } from "./-components/issue-draft-list";
 
 export const Route = createFileRoute("/_app/$organization/drafts/")({
-  loader: async ({ params: { organization }, context }) => {
-    const data = await context.queryClient.ensureQueryData(
-      issueDraftQueries.lists({
-        organizationSlug: organization,
-      })
-    );
-
-    if (!data) {
-      throw notFound();
-    }
-  },
   errorComponent: Error,
   component: RouteComponent,
 });
@@ -43,11 +32,14 @@ function RouteComponent() {
   const { organization } = Route.useParams();
   const qc = useQueryClient();
 
-  const { data } = useSuspenseQuery(
+  // Drafts are server-backed (not synced to PowerSync). Non-suspense query so
+  // navigation completes offline with an empty list instead of hanging.
+  const { data } = useQuery(
     issueDraftQueries.lists({
       organizationSlug: organization,
     })
   );
+  const drafts = data ?? [];
 
   const clearMutation = useMutation({
     ...issueDraftQueries.mutations.clear(),
@@ -60,7 +52,7 @@ function RouteComponent() {
     <Container>
       <ContainerHeader inset>
         <h2>Drafts</h2>
-        {data.length > 0 && (
+        {drafts.length > 0 && (
           <AlertDialog>
             <Button
               className="ml-auto"
@@ -107,7 +99,7 @@ function RouteComponent() {
           </AlertDialog>
         )}
       </ContainerHeader>
-      <IssueDraftList drafts={data} />
+      <IssueDraftList drafts={drafts} />
     </Container>
   );
 }

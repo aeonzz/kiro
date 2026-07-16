@@ -1,5 +1,5 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { authQueries } from "@/lib/query-factory";
 import { Error } from "@/components/error";
@@ -11,15 +11,6 @@ import { Sessions } from "./-components/sessions";
 export const Route = createFileRoute(
   "/_app/$organization/settings/account/security/"
 )({
-  loader: async ({ context }) => {
-    const data = await context.queryClient.ensureQueryData(
-      authQueries.sessions()
-    );
-
-    if (!data) {
-      throw notFound();
-    }
-  },
   head: () => ({
     meta: [{ title: "Security & access", description: "Security & access" }],
   }),
@@ -31,7 +22,7 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  const { data: sessions } = useSuspenseQuery(authQueries.sessions());
+  const { data: sessions } = useQuery(authQueries.sessions());
 
   return (
     <SettingsContainer>

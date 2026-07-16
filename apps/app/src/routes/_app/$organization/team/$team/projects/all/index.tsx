@@ -1,7 +1,6 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
-import { teamQueries } from "@/lib/query-factory";
+import { usePowerSyncTeam } from "@/lib/collections/team-metadata-powersync";
 import { useProjectsPanelStore } from "@/hooks/use-details-panel-store";
 import { ContainerContent } from "@/components/container";
 
@@ -19,18 +18,14 @@ function RouteComponent() {
 
   const isOpen = useProjectsPanelStore((state) => state.isOpen);
 
-  const { data } = useSuspenseQuery(
-    teamQueries.detail({ organizationSlug: organization, slug: team })
-  );
-
-  if (!data) {
-    throw notFound();
-  }
+  // Team name is read locally from PowerSync (parent `projects` route validates
+  // the team); works offline with no server query.
+  const { team: teamData } = usePowerSyncTeam(organization, team);
 
   return (
     <ContainerContent className="flex flex-1">
       <ProjectsList />
-      <DetailsSidePanel title="Projects" team={data.name} isOpen={isOpen}>
+      <DetailsSidePanel title="Projects" team={teamData?.name ?? ""} isOpen={isOpen}>
         {/* <FilterTabs /> */}
       </DetailsSidePanel>
     </ContainerContent>

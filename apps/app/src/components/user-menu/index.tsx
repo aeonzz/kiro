@@ -1,15 +1,18 @@
 import * as React from "react";
 import { ArrowDown01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useQuery, useStatus } from "@powersync/react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
 import { clearPowerSync } from "@/lib/powersync/db";
+import { useOnline } from "@/hooks/use-online";
 import { useAuthenticatedSession } from "@/hooks/use-session";
 
 import { useOrganization } from "../organization-context";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { DotmSquare6 } from "../ui/dotm-square-6";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +35,19 @@ export function UserMenu() {
   const { activeOrganization } = useOrganization();
 
   const [open, setOpen] = React.useState(false);
+  const online = useOnline();
+  const { connected } = useStatus();
+  const { data: crudRows } = useQuery("SELECT COUNT(*) as count FROM ps_crud");
+  const pendingCount = (crudRows?.[0] as { count: number } | undefined)?.count ?? 0;
+
+  // Only surface "Syncing" while draining a backlog that built up offline.
+  // A normal online edit uploads instantly and would otherwise flash the label.
+  const hasOfflineBacklog = React.useRef(false);
+  if (!online && pendingCount > 0) hasOfflineBacklog.current = true;
+  if (pendingCount === 0) hasOfflineBacklog.current = false;
+
+  const isSyncing =
+    online && connected && hasOfflineBacklog.current && pendingCount > 0;
 
   return (
     <SidebarMenu>
@@ -50,19 +66,28 @@ export function UserMenu() {
                 {activeOrganization?.name?.slice(0, 2).toUpperCase() ?? "??"}
               </AvatarFallback>
             </Avatar>
-            <span className="text-xs-plus min-w-0 flex-1 truncate leading-none font-semibold">
-              {activeOrganization?.name}
-            </span>
+            {!online ? (
+              <span className="text-xs-plus flex items-center gap-1.5 leading-none font-semibold">
+                <span className="bg-destructive/80 size-1.5 shrink-0 rounded-full" />
+                Offline{pendingCount > 0 ? ` ${pendingCount}` : ""}
+              </span>
+            ) : isSyncing ? (
+              <span className="text-xs-plus flex items-center gap-1.5 leading-none font-semibold">
+                <DotmSquare6 size={18} dotSize={2.5} speed={1} />
+                Syncing{pendingCount > 0 ? ` ${pendingCount}` : ""}
+              </span>
+            ) : (
+              <span className="text-xs-plus min-w-0 flex-1 truncate leading-none font-semibold">
+                {activeOrganization?.name}
+              </span>
+            )}
             <HugeiconsIcon
               icon={ArrowDown01Icon}
               strokeWidth={2}
               className="ml-auto"
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-[232px]"
-            align="start"
-          >
+          <DropdownMenuContent className="w-[232px]" align="start">
             <DropdownMenuItem
               render={
                 <Link

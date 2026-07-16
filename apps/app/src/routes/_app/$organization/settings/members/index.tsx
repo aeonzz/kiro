@@ -1,5 +1,5 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { organizationQueries } from "@/lib/query-factory";
 import { Button } from "@/components/ui/button";
@@ -19,15 +19,6 @@ import { MemberActionItems } from "./-components/actions";
 import { columns } from "./-components/columns";
 
 export const Route = createFileRoute("/_app/$organization/settings/members/")({
-  loader: async ({ params: { organization }, context }) => {
-    const data = await context.queryClient.ensureQueryData(
-      organizationQueries.detail({ slug: organization })
-    );
-
-    if (!data) {
-      throw notFound();
-    }
-  },
   head: () => ({
     meta: [{ title: "Members", description: "Members" }],
   }),
@@ -47,7 +38,7 @@ const viewOptions = [
 function RouteComponent() {
   const { organization } = Route.useParams();
 
-  const { data } = useSuspenseQuery(
+  const { data } = useQuery(
     organizationQueries.detail({ slug: organization })
   );
 

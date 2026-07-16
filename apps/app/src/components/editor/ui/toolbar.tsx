@@ -5,6 +5,7 @@ import { ArrowDownIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { cn } from "@/lib/utils";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -84,11 +85,7 @@ export function ToolbarButton({
   className,
   ...props
 }: ToolbarButtonProps) {
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useHydrated();
 
   const content = (
     <ToolbarPrimitive.Button

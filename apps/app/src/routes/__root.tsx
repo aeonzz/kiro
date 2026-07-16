@@ -18,7 +18,14 @@ import { evlogErrorHandler } from "evlog/nitro/v3";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/not-found";
 import Providers from "@/components/providers";
+import {
+  readOfflineCache,
+  SESSION_CACHE_KEY,
+  writeOfflineCache,
+} from "@/lib/offline-cache";
 import appCss from "@/styles/app.css?url";
+
+type SessionResult = Awaited<ReturnType<typeof getSessionFn>>;
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -27,8 +34,20 @@ export const Route = createRootRouteWithContext<{
     middleware: [createMiddleware().server(evlogErrorHandler)],
   },
   beforeLoad: async () => {
-    const session = await getSessionFn();
-    return { session };
+    // Runs on every navigation. `getSessionFn` is a server RPC, so it rejects
+    // offline — fall back to the last known session (cached on the client) so
+    // navigation keeps working locally instead of throwing.
+    try {
+      const session = await getSessionFn();
+      writeOfflineCache(SESSION_CACHE_KEY, session);
+      return { session };
+    } catch (err) {
+      const cached = readOfflineCache<SessionResult>(SESSION_CACHE_KEY);
+      if (cached) {
+        return { session: cached };
+      }
+      throw err;
+    }
   },
   head: () => ({
     meta: [

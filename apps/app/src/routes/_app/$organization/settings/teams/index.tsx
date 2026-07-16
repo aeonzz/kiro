@@ -1,5 +1,5 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { teamQueries } from "@/lib/query-factory";
 import { Button } from "@/components/ui/button";
@@ -17,15 +17,6 @@ import { TeamActionItems } from "./-components/actions";
 import { columns } from "./-components/columns";
 
 export const Route = createFileRoute("/_app/$organization/settings/teams/")({
-  loader: async ({ params: { organization }, context }) => {
-    const data = await context.queryClient.ensureQueryData(
-      teamQueries.lists({ organizationSlug: organization })
-    );
-
-    if (!data) {
-      throw notFound();
-    }
-  },
   head: () => ({
     meta: [{ title: "Teams", description: "Teams" }],
   }),
@@ -45,7 +36,7 @@ const viewOptions = [
 function RouteComponent() {
   const { organization } = Route.useParams();
 
-  const { data } = useSuspenseQuery(
+  const { data } = useQuery(
     teamQueries.lists({ organizationSlug: organization })
   );
 

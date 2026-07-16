@@ -1,7 +1,6 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound, Outlet } from "@tanstack/react-router";
 
-import { teamQueries } from "@/lib/query-factory";
+import { usePowerSyncTeam } from "@/lib/collections/team-metadata-powersync";
 import { Container } from "@/components/container";
 import { Error } from "@/components/error";
 
@@ -10,15 +9,6 @@ import { ProjectToolbar } from "./-components/project-toolbar";
 
 export const Route = createFileRoute("/_app/$organization/team/$team/projects")(
   {
-    loader: async ({ params: { organization, team }, context }) => {
-      const data = await context.queryClient.ensureQueryData(
-        teamQueries.detail({ organizationSlug: organization, slug: team })
-      );
-
-      if (!data) {
-        throw notFound();
-      }
-    },
     errorComponent: Error,
     component: RouteComponent,
   }
@@ -27,17 +17,18 @@ export const Route = createFileRoute("/_app/$organization/team/$team/projects")(
 function RouteComponent() {
   const { team, organization } = Route.useParams();
 
-  const { data } = useSuspenseQuery(
-    teamQueries.detail({ organizationSlug: organization, slug: team })
-  );
+  // Team is resolved locally from PowerSync (no network) so this works offline.
+  const { team: teamData, isLoading } = usePowerSyncTeam(organization, team);
 
-  if (!data) {
+  // Only 404 once the local tables have hydrated — otherwise a real team would
+  // flash not-found while the collection is still loading.
+  if (!isLoading && !teamData) {
     throw notFound();
   }
 
   return (
     <Container>
-      <Header teamName={data.name} />
+      <Header teamName={teamData?.name ?? ""} />
       <ProjectToolbar />
       <Outlet />
     </Container>

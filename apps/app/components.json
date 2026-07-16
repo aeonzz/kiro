@@ -21,6 +21,7 @@
     "hooks": "@/hooks"
   },
   "registries": {
-    "@plate": "https://platejs.org/r/{name}.json"
+    "@plate": "https://platejs.org/r/{name}.json",
+    "@dotmatrix": "https://dotmatrix.zzzzshawn.cloud/r/{name}.json"
   }
 }

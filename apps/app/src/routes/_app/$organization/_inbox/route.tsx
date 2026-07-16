@@ -1,11 +1,6 @@
 import * as React from "react";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  createFileRoute,
-  notFound,
-  Outlet,
-  useLocation,
-} from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import { useDefaultLayout } from "react-resizable-panels";
 import { z } from "zod";
 
@@ -29,18 +24,6 @@ const inboxSearchSchema = z.object({
 
 export const Route = createFileRoute("/_app/$organization/_inbox")({
   validateSearch: inboxSearchSchema,
-  loader: async ({ params: { organization }, context }) => {
-    const data = await context.queryClient.ensureQueryData(
-      notificationQueries.lists({
-        organizationSlug: organization,
-        userId: context.session.user.id,
-      })
-    );
-
-    if (!data) {
-      throw notFound();
-    }
-  },
   errorComponent: Error,
   component: RouteComponent,
 });
@@ -55,7 +38,9 @@ function RouteComponent() {
     storage: localStorage,
   });
 
-  const { data } = useSuspenseQuery(
+  // Notifications are server-only (not synced to PowerSync). Non-suspense query
+  // so navigation completes offline with an empty inbox instead of hanging.
+  const { data } = useQuery(
     notificationQueries.lists({
       organizationSlug: organization,
       userId: session.user.id,

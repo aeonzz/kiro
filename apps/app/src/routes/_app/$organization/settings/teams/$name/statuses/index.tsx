@@ -1,8 +1,12 @@
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
+import {
+  usePowerSyncTeam,
+  usePowerSyncWorkflowStates,
+} from "@/lib/collections/team-metadata-powersync";
 import { teamQueries } from "@/lib/query-factory";
 import { BackButton } from "@/components/back-button";
 import { Error } from "@/components/error";
@@ -14,21 +18,8 @@ import { WorkflowStatuses } from "./-components/workflow-statuses";
 export const Route = createFileRoute(
   "/_app/$organization/settings/teams/$name/statuses/"
 )({
-  loader: async ({ params: { organization, name }, context }) => {
-    const data = await context.queryClient.ensureQueryData(
-      teamQueries.detail({ organizationSlug: organization, slug: name })
-    );
-
-    if (!data) {
-      throw notFound();
-    }
-
-    return {
-      title: `${data.name} > Issue statuses`,
-    };
-  },
-  head: ({ loaderData }) => ({
-    meta: loaderData ? [{ title: loaderData.title }] : undefined,
+  head: ({ params }) => ({
+    meta: [{ title: `${params.name} · Issue statuses` }],
   }),
   errorComponent: Error,
   notFoundComponent: () => {
@@ -40,16 +31,23 @@ export const Route = createFileRoute(
 function RouteComponent() {
   const { name, organization } = Route.useParams();
 
-  const { data } = useSuspenseQuery(
+  const { team: teamData, isLoading } = usePowerSyncTeam(organization, name);
+
+  // Non-blocking: seeds the react-query cache for mutation invalidation.
+  const { data } = useQuery(
     teamQueries.detail({ organizationSlug: organization, slug: name })
   );
 
-  if (!data) {
+  // Prefer server payload (has _count on states), fall back to local.
+  const localStates = usePowerSyncWorkflowStates(teamData?.id);
+  const states = data?.workflowStates ?? (localStates as any);
+
+  if (!isLoading && !teamData) {
     throw notFound();
   }
 
   return (
-    <SettingsContainer key={data.id}>
+    <SettingsContainer key={teamData?.id ?? name}>
       <BackButton
         to="/$organization/settings/teams/$name"
         variant="ghost"
@@ -57,7 +55,7 @@ function RouteComponent() {
         showTooltip={false}
       >
         <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
-        <span>{data?.name}</span>
+        <span>{teamData?.name ?? ""}</span>
       </BackButton>
       <div className="space-y-1.5">
         <h1 className="text-foreground text-2xl font-medium">Issue statuses</h1>
@@ -66,7 +64,7 @@ function RouteComponent() {
           to completion.
         </p>
       </div>
-      <WorkflowStatuses states={data.workflowStates} />
+      <WorkflowStatuses states={states ?? []} />
     </SettingsContainer>
   );
 }
