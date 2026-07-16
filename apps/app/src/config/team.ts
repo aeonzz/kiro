@@ -1,28 +1,35 @@
 import {
   AlertSquareIcon,
-  CheckmarkCircle01Icon,
-  CircleArrowLeftRightIcon,
+  Calendar01Icon,
+  CalendarCheckIn01Icon,
+  CalendarCheckOut01Icon,
+  CalendarSyncIcon,
   CircleIcon,
+  Clock01Icon,
   DashedLine01Icon,
-  DashedLineCircleIcon,
+  Flag01Icon,
+  Folder01Icon,
   FullSignalIcon,
+  LabelIcon,
   LowSignalIcon,
   MediumSignalIcon,
-  MultiplicationSignCircleIcon,
-  PlayCircleIcon,
+  User02Icon,
 } from "@hugeicons/core-free-icons";
 
 import { ProjectStatus } from "@/types/enums";
 import type { FilterOptions } from "@/types/inbox";
 import type { TeamIssueTab } from "@/types/team";
 import {
+  workflowGroupLabels,
+  workflowGroupOrder,
+  workflowIconMap,
+} from "@/config/workflow";
+import {
   BacklogIcon,
   CancelledIcon,
   CopyIcon,
   DoneIcon,
   InProgressIcon,
-  InReviewIcon,
-  TodoIcon,
 } from "@/components/icons";
 
 export const teamIssueTabs: Array<TeamIssueTab> = [
@@ -341,6 +348,40 @@ export const issueFilterTabs = [
   },
 ];
 
+export const dueDateOptions = [
+  { value: "overdue", label: "Overdue" },
+  { value: "1d-from-now", label: "1 day from now" },
+  { value: "3d-from-now", label: "3 days from now" },
+  { value: "1w-from-now", label: "1 week from now" },
+  { value: "1m-from-now", label: "1 month from now" },
+  { value: "3m-from-now", label: "3 months from now" },
+  { value: "no-due-date", label: "No due date" },
+];
+
+export const dateRangeOptions = [
+  { value: "1d", label: "1 day ago" },
+  { value: "3d", label: "3 days ago" },
+  { value: "1w", label: "1 week ago" },
+  { value: "1m", label: "1 month ago" },
+  { value: "3m", label: "3 months ago" },
+  { value: "6m", label: "6 months ago" },
+  { value: "1y", label: "1 year ago" },
+];
+
+export const completedDateOptions = [
+  { value: "no-completed-date", label: "No completed date" },
+  ...dateRangeOptions,
+];
+
+export const timeInStatusOptions = [
+  { value: "1d", label: "1 day" },
+  { value: "1w", label: "1 week" },
+  { value: "2w", label: "2 weeks" },
+  { value: "1m", label: "1 month" },
+  { value: "3m", label: "3 months" },
+  { value: "6m", label: "6 months" },
+];
+
 export const issueFilterOptions: FilterOptions[] = [
   {
     id: "status",
@@ -348,50 +389,7 @@ export const issueFilterOptions: FilterOptions[] = [
     multiLabel: "statuses",
     multiIcon: true,
     icon: BacklogIcon,
-    options: [
-      {
-        value: "BACKLOG",
-        label: "Backlog",
-        icon: BacklogIcon,
-        color: "var(--muted-foreground)",
-      },
-      {
-        value: "UNSTARTED",
-        label: "Todo",
-        icon: TodoIcon,
-        color: "var(--muted-foreground)",
-      },
-      {
-        value: "STARTED",
-        label: "In Progress",
-        icon: InProgressIcon,
-        color: "oklch(79.5% 0.184 86.047)",
-      },
-      {
-        value: "IN_REVIEW",
-        label: "In Review",
-        icon: InReviewIcon,
-        color: "oklch(72.3% 0.219 149.579)",
-      },
-      {
-        value: "COMPLETED",
-        label: "Done",
-        icon: DoneIcon,
-        color: "oklch(58.5% 0.233 277.117)",
-      },
-      {
-        value: "CANCELLED",
-        label: "Cancelled",
-        icon: CancelledIcon,
-        color: "var(--muted-foreground)",
-      },
-      {
-        value: "DUPLICATE",
-        label: "Duplicate",
-        icon: CancelledIcon,
-        color: "var(--muted-foreground)",
-      },
-    ],
+    options: [],
   },
   {
     id: "status-type",
@@ -399,38 +397,40 @@ export const issueFilterOptions: FilterOptions[] = [
     multiLabel: "status types",
     multiIcon: true,
     icon: CircleIcon,
-    options: [
-      {
-        value: "triage",
-        label: "Triage",
-        icon: CircleArrowLeftRightIcon,
-      },
-      {
-        value: "backlog",
-        label: "Backlog",
-        icon: DashedLineCircleIcon,
-      },
-      {
-        value: "unstarted",
-        label: "Unstarted",
-        icon: CircleIcon,
-      },
-      {
-        value: "started",
-        label: "Started",
-        icon: PlayCircleIcon,
-      },
-      {
-        value: "completed",
-        label: "Completed",
-        icon: CheckmarkCircle01Icon,
-      },
-      {
-        value: "cancelled",
-        label: "Cancelled",
-        icon: MultiplicationSignCircleIcon,
-      },
-    ],
+    options: workflowGroupOrder.map((type) => ({
+      value: type,
+      label: workflowGroupLabels[type],
+      icon: workflowIconMap[type],
+    })),
+  },
+  {
+    id: "label",
+    label: "Labels",
+    multiLabel: "labels",
+    multiIcon: true,
+    icon: LabelIcon,
+    options: [],
+  },
+  {
+    id: "assignee",
+    label: "Assignee",
+    multiLabel: "assignees",
+    icon: User02Icon,
+    options: [],
+  },
+  {
+    id: "creator",
+    label: "Creator",
+    multiLabel: "creators",
+    icon: User02Icon,
+    options: [],
+  },
+  {
+    id: "project",
+    label: "Project",
+    multiLabel: "projects",
+    icon: Folder01Icon,
+    options: [],
   },
   {
     id: "priority",
@@ -464,6 +464,48 @@ export const issueFilterOptions: FilterOptions[] = [
         icon: LowSignalIcon,
       },
     ],
+  },
+  {
+    id: "due-date",
+    label: "Due date",
+    multiLabel: "due dates",
+    icon: Flag01Icon,
+    options: dueDateOptions,
+  },
+  {
+    id: "created-date",
+    label: "Created date",
+    multiLabel: "created dates",
+    icon: Calendar01Icon,
+    options: dateRangeOptions,
+  },
+  {
+    id: "updated-date",
+    label: "Updated date",
+    multiLabel: "updated dates",
+    icon: CalendarSyncIcon,
+    options: dateRangeOptions,
+  },
+  {
+    id: "started-date",
+    label: "Started date",
+    multiLabel: "started dates",
+    icon: CalendarCheckIn01Icon,
+    options: dateRangeOptions,
+  },
+  {
+    id: "completed-date",
+    label: "Completed date",
+    multiLabel: "completed dates",
+    icon: CalendarCheckOut01Icon,
+    options: completedDateOptions,
+  },
+  {
+    id: "time-in-status",
+    label: "Time in current status",
+    multiLabel: "time ranges",
+    icon: Clock01Icon,
+    options: timeInStatusOptions,
   },
 ];
 

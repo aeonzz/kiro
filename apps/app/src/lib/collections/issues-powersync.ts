@@ -55,6 +55,8 @@ export function powerSyncRowToIssue(
     status: (state?.type ?? "BACKLOG") as Issue["status"],
     priority: ((row.priority as string | null) ?? "NO_PRIORITY") as Issue["priority"],
     assigneeId: (row.assigneeId as string | null) ?? undefined,
+    creatorId: (row.creatorId as string | null) ?? undefined,
+    projectId: (row.projectId as string | null) ?? undefined,
     labelIds,
     createdAt: (row.createdAt as string | null) ?? "",
     updatedAt: (row.updatedAt as string | null) ?? "",

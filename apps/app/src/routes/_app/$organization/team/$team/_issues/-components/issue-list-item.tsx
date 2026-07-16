@@ -1,9 +1,7 @@
 import * as React from "react";
-import { MOCK_USERS } from "@/mocks/users";
 import { formatDate } from "@/utils/format-date";
 import { Icon } from "@/utils/icon";
 import {
-  EditUser02Icon,
   FullSignalIcon,
   LabelIcon,
   User02Icon,
@@ -35,6 +33,7 @@ import { InProgressIcon } from "@/components/icons";
 import { ItemsCombobox } from "@/components/items-combobox";
 
 import {
+  usePowerSyncOrgMembers,
   usePowerSyncTeamLabels,
   usePowerSyncWorkflowStates,
   useTeamId,
@@ -95,25 +94,20 @@ export function IssueListItem({
   );
 
   const allLabelOptions = usePowerSyncTeamLabels(teamId);
+  const orgMembers = usePowerSyncOrgMembers(organization);
 
   const issueLabels = React.useMemo(
     () => allLabelOptions.filter((option) => issue?.labelIds?.includes(option.value)),
     [allLabelOptions, issue?.labelIds]
   );
 
-  const assigneesOptions = [
-    {
-      value: "unassigned",
-      label: "No assignee",
-      icon: User02Icon,
-      color: "text-muted-foreground",
-    },
-    ...MOCK_USERS.map((user) => ({
-      value: user.id,
-      label: user.name,
-      avatarUrl: user.avatarUrl,
-    })),
-  ];
+  const assigneesOptions = React.useMemo(
+    () => [
+      { value: "unassigned", label: "No assignee", icon: User02Icon, color: "text-muted-foreground" },
+      ...orgMembers.map((m) => ({ value: m.value, label: m.label, avatarUrl: m.avatarUrl })),
+    ],
+    [orgMembers]
+  );
 
   return (
     <ContextMenu>
@@ -269,11 +263,18 @@ export function IssueListItem({
             >
               <ItemsCombobox
                 items={assigneesOptions}
-                defaultValue={
+                value={
                   assigneesOptions.find(
                     (option) => option.value === issue.assigneeId
                   ) ?? assigneesOptions[0]
                 }
+                onValueChange={(value) => {
+                  if (value) {
+                    handleUpdateIssue({
+                      assigneeId: value.value === "unassigned" ? undefined : (value.value as Issue["assigneeId"]),
+                    });
+                  }
+                }}
                 placeholder="Assign to..."
                 kbd="A"
                 isIcon

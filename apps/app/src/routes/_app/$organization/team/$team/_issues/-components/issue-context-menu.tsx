@@ -1,6 +1,4 @@
 import * as React from "react";
-import { getWorkflowIcon } from "@/config";
-import { MOCK_USERS } from "@/mocks/users";
 import { Icon } from "@/utils/icon";
 import {
   EditUser02Icon,
@@ -19,10 +17,11 @@ import {
 } from "@/lib/collections/issue-label-links-powersync";
 import { getIssuesPowerSyncCollection } from "@/lib/collections/issues-powersync";
 import {
+  usePowerSyncOrgMembers,
   usePowerSyncTeamLabels,
-  usePowerSyncWorkflowStates,
   useTeamId,
 } from "@/lib/collections/team-metadata-powersync";
+import { useIssueStatusOptions } from "@/hooks/use-issue-status";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   ContextMenuCheckboxItem,
@@ -56,19 +55,9 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
     issueFilterOptions.find((o) => o.id === "priority")?.options ?? [];
 
   const teamId = useTeamId(organization, team);
-  const workflowStates = usePowerSyncWorkflowStates(teamId);
-  const statusOptions = React.useMemo(
-    () =>
-      workflowStates.map((state) => ({
-        value: state.id,
-        label: state.name,
-        icon: getWorkflowIcon(state.type),
-        color: state.color,
-      })),
-    [workflowStates]
-  );
-
+  const statusOptions = useIssueStatusOptions(team);
   const allLabelOptions = usePowerSyncTeamLabels(teamId);
+  const orgMembers = usePowerSyncOrgMembers(organization);
 
   const assigneesOptions = [
     {
@@ -78,12 +67,12 @@ export function IssueContextMenu({ issue }: IssueContextMenuProps) {
       color: "text-muted-foreground",
       avatarUrl: undefined,
     },
-    ...MOCK_USERS.map((user) => ({
-      value: user.id,
-      label: user.name,
-      icon: undefined,
-      color: undefined,
-      avatarUrl: user.avatarUrl,
+    ...orgMembers.map((m) => ({
+      value: m.value,
+      label: m.label,
+      icon: undefined as typeof User02Icon | undefined,
+      color: undefined as string | undefined,
+      avatarUrl: m.avatarUrl,
     })),
   ];
 

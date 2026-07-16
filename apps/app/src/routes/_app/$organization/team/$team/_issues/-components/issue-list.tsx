@@ -1,11 +1,12 @@
 import * as React from "react";
-import { MOCK_USERS } from "@/mocks/users";
+import { getWorkflowIcon, workflowGroupOrder } from "@/config";
 import type { StrictOmit } from "@/types";
 import { Icon } from "@/utils/icon";
 import {
   ArrowDown01Icon,
   ArrowRight01Icon,
   CommandIcon,
+  FilterIcon,
   User02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -13,14 +14,15 @@ import { useParams } from "@tanstack/react-router";
 
 import type { IconType } from "@/types/inbox";
 import type { Issue } from "@/types/issue";
-import { getWorkflowIcon, workflowGroupOrder } from "@/config";
 import { issueFilterOptions } from "@/config/team";
-import { cn } from "@/lib/utils";
-import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
 import {
+  usePowerSyncOrgMembers,
   usePowerSyncWorkflowStates,
   useTeamId,
 } from "@/lib/collections/team-metadata-powersync";
+import { cn } from "@/lib/utils";
+import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
+import { useIssueFilters } from "@/hooks/use-issue-filter-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -29,6 +31,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { ListBox } from "@/components/ui/list-box";
 import {
   ActionBar,
@@ -50,13 +58,19 @@ interface IssueListProps extends StrictOmit<
   issues?: Issue[];
 }
 
-export function IssueList({ className, issues = [], ...props }: IssueListProps) {
+export function IssueList({
+  className,
+  issues = [],
+  ...props
+}: IssueListProps) {
   const { organization, team } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });
   const { grouping } = useActiveIssueDisplayOptions(team);
   const teamId = useTeamId(organization, team);
   const workflowStates = usePowerSyncWorkflowStates(teamId);
+  const orgMembers = usePowerSyncOrgMembers(organization);
+  const { filters, clearFilters } = useIssueFilters(team);
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
@@ -93,13 +107,12 @@ export function IssueList({ className, issues = [], ...props }: IssueListProps) 
     > = {};
 
     if (grouping === "status") {
-      const orderedStates = [...workflowStates]
-        .sort(
-          (a, b) =>
-            (workflowTypeOrder.get(a.type) ?? Number.MAX_SAFE_INTEGER) -
-              (workflowTypeOrder.get(b.type) ?? Number.MAX_SAFE_INTEGER) ||
-            a.position - b.position
-        );
+      const orderedStates = [...workflowStates].sort(
+        (a, b) =>
+          (workflowTypeOrder.get(a.type) ?? Number.MAX_SAFE_INTEGER) -
+            (workflowTypeOrder.get(b.type) ?? Number.MAX_SAFE_INTEGER) ||
+          a.position - b.position
+      );
 
       orderedStates.forEach((state) => {
         groups[state.id] = {
@@ -141,10 +154,10 @@ export function IssueList({ className, issues = [], ...props }: IssueListProps) 
         issues: [],
       };
 
-      MOCK_USERS.forEach((user) => {
-        groups[user.id] = {
-          label: user.name,
-          icon: user.avatarUrl,
+      orgMembers.forEach((member) => {
+        groups[member.value] = {
+          label: member.label,
+          icon: member.avatarUrl,
           color: "var(--muted-foreground)",
           issues: [],
         };
@@ -169,7 +182,7 @@ export function IssueList({ className, issues = [], ...props }: IssueListProps) 
       groupedIssues: filteredGroups,
       flattenedIssues: filteredGroups.flatMap((g) => g.issues),
     };
-  }, [issues, grouping, workflowStates]);
+  }, [issues, grouping, workflowStates, orgMembers]);
 
   let cumulativeIndex = 0;
 
@@ -180,6 +193,31 @@ export function IssueList({ className, issues = [], ...props }: IssueListProps) 
     >
       <div className="h-full min-h-0 overflow-y-auto">
         <div className="h-full" {...props}>
+          {flattenedIssues.length === 0 && filters.length > 0 && (
+            <Empty className="h-full border-none">
+              <EmptyHeader>
+                <div className="border-border mb-1 rounded-xl border border-dashed p-6">
+                  <HugeiconsIcon
+                    icon={FilterIcon}
+                    size={26}
+                    strokeWidth={1.5}
+                    className="text-muted-foreground"
+                  />
+                </div>
+                <EmptyTitle>No issues matching the filters</EmptyTitle>
+                <EmptyDescription>
+                  Try adjusting or clearing your filters.
+                </EmptyDescription>
+              </EmptyHeader>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => clearFilters()}
+              >
+                Clear filters
+              </Button>
+            </Empty>
+          )}
           <ListBox items={flattenedIssues}>
             {groupedIssues.map((group, index) => (
               <Collapsible key={group.id} defaultOpen>

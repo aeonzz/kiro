@@ -1,7 +1,9 @@
 import * as React from "react";
 import { Icon } from "@/utils/icon";
-import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { Cancel01Icon, User02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import type { FilterOption, FilterOptions } from "@/types/inbox";
 import { cn } from "@/lib/utils";
@@ -28,15 +30,34 @@ export interface GenericFilter {
 
 interface FilterChipProps extends React.ComponentProps<"div"> {
   filter: GenericFilter;
-  filterConfig?: FilterOptions; // Configuration for this specific filter type
+  filterConfig?: FilterOptions;
+  optionCounts?: Record<string, number>;
   onRemove: (id: string) => void;
   onUpdateOperator: (id: string, operator: FilterOperator) => void;
   onToggleValue: (id: string, option: FilterOption) => void;
 }
 
+function OptionIcon({ option }: { option: FilterOption }) {
+  if (option.avatarUrl) {
+    return (
+      <Avatar className="size-4!">
+        <AvatarImage src={option.avatarUrl} />
+        <AvatarFallback>
+          <HugeiconsIcon icon={User02Icon} size={10} />
+        </AvatarFallback>
+      </Avatar>
+    );
+  }
+  if (option.icon) {
+    return <Icon icon={option.icon} strokeWidth={2} color={option.color} />;
+  }
+  return null;
+}
+
 export function FilterChip({
   filter,
   filterConfig,
+  optionCounts,
   onRemove,
   onUpdateOperator,
   onToggleValue,
@@ -49,7 +70,18 @@ export function FilterChip({
   const displayOperator =
     filter.operator === "is not" ? "is not" : isMulti ? "is any of" : "is";
 
-  const options = filter.options;
+  // Icons and colors are React components — they don't survive JSON serialization
+  // in the persisted store. Merge them back from filterConfig at render time.
+  const options = React.useMemo(() => {
+    if (!filterConfig) return filter.options;
+    const configMap = new Map(filterConfig.options.map((o) => [o.value, o]));
+    return filter.options.map((o) => {
+      const config = configMap.get(o.value);
+      return config
+        ? { ...o, icon: o.icon ?? config.icon, color: o.color ?? config.color, avatarUrl: o.avatarUrl ?? config.avatarUrl }
+        : o;
+    });
+  }, [filter.options, filterConfig]);
   const valueLabel =
     filter.options.length > 1
       ? `${filter.options.length} ${filterConfig?.multiLabel ?? "items"}`
@@ -146,7 +178,7 @@ export function FilterChip({
                         strokeWidth={2}
                         color={option.color}
                         className={cn(
-                          "bg-muted rounded-full outline-1 duration-200 outline-none not-first:-ml-1 group-hover/button:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] group-aria-expanded/button:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))]"
+                          "bg-muted rounded-full outline-1 duration-200 outline-none not-first:-ml-1.5 group-hover/button:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))] group-aria-expanded/button:bg-[color-mix(in_oklab,var(--muted)90%,var(--muted-foreground))]"
                         )}
                       />
                     )
@@ -154,8 +186,15 @@ export function FilterChip({
             </span>
           ) : (
             !isMulti &&
-            options.map(
-              (option) =>
+            options.map((option) =>
+              option.avatarUrl ? (
+                <Avatar key={option.value} className="size-4! @max-md/inbox-panel:hidden">
+                  <AvatarImage src={option.avatarUrl} />
+                  <AvatarFallback>
+                    <HugeiconsIcon icon={User02Icon} size={10} />
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
                 option.icon && (
                   <Icon
                     key={option.value}
@@ -165,6 +204,7 @@ export function FilterChip({
                     className="rounded-full duration-200 outline-none not-first:-ml-1 @max-md/inbox-panel:hidden"
                   />
                 )
+              )
             )
           )}
           <span className="whitespace-nowrap">{valueLabel}</span>
@@ -189,44 +229,40 @@ export function FilterChip({
                 }}
                 closeOnClick
               >
-                {option.icon && (
-                  <Icon
-                    icon={option.icon}
-                    strokeWidth={2}
-                    color={option.color}
-                  />
+                <OptionIcon option={option} />
+                <span className="flex-1">{option.label}</span>
+                {optionCounts?.[option.value] !== undefined && (
+                  <span className="text-muted-foreground tabular-nums">
+                    {optionCounts[option.value]}
+                  </span>
                 )}
-                {option.label}
               </DropdownMenuCheckboxItem>
             ))}
           </DropdownMenuGroup>
           {filteredSelectedOptions.length > 0 &&
             filteredAvailableOptions.length > 0 && <DropdownMenuSeparator />}
           <DropdownMenuGroup>
-            {filteredAvailableOptions.map((subOption) => {
-              return (
-                <DropdownMenuCheckboxItem
-                  key={subOption.value}
-                  inset
-                  checked={false}
-                  onCheckedChange={() => {
-                    setTimeout(() => {
-                      onToggleValue(filter.id, subOption);
-                    }, 150);
-                  }}
-                  closeOnClick
-                >
-                  {subOption.icon && (
-                    <Icon
-                      icon={subOption.icon}
-                      strokeWidth={2}
-                      color={subOption.color}
-                    />
-                  )}
-                  {subOption.label}
-                </DropdownMenuCheckboxItem>
-              );
-            })}
+            {filteredAvailableOptions.map((subOption) => (
+              <DropdownMenuCheckboxItem
+                key={subOption.value}
+                inset
+                checked={false}
+                onCheckedChange={() => {
+                  setTimeout(() => {
+                    onToggleValue(filter.id, subOption);
+                  }, 150);
+                }}
+                closeOnClick
+              >
+                <OptionIcon option={subOption} />
+                <span className="flex-1">{subOption.label}</span>
+                {optionCounts?.[subOption.value] !== undefined && (
+                  <span className="text-muted-foreground tabular-nums">
+                    {optionCounts[subOption.value]}
+                  </span>
+                )}
+              </DropdownMenuCheckboxItem>
+            ))}
           </DropdownMenuGroup>
           {filteredSelectedOptions.length === 0 &&
             filteredAvailableOptions.length === 0 && (

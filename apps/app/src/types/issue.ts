@@ -12,5 +12,7 @@ export type Issue = {
   createdAt: string;
   updatedAt: string;
   assigneeId?: string;
+  creatorId?: string;
+  projectId?: string;
   labelIds: string[];
 };

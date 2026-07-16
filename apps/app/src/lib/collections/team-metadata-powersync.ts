@@ -205,6 +205,81 @@ export function usePowerSyncWorkflowStates(
   );
 }
 
+export type PowerSyncMemberOption = {
+  value: string;
+  label: string;
+  avatarUrl?: string;
+};
+
+/**
+ * Members of an organization, joined with user data, read from local SQLite.
+ * Accepts the org slug and resolves to userId-keyed options (matching Issue.assigneeId).
+ */
+export function usePowerSyncOrgMembers(
+  orgSlug: string
+): PowerSyncMemberOption[] {
+  const orgCollection = React.useMemo(() => getOrganizationsCollection(), []);
+  const memberCollection = React.useMemo(() => getMembersCollection(), []);
+  const userCollection = React.useMemo(() => getUsersCollection(), []);
+
+  const { data: orgs = [] } = useLiveQuery(
+    (q) => q.from({ org: orgCollection }),
+    [orgCollection]
+  );
+  const { data: members = [] } = useLiveQuery(
+    (q) => q.from({ member: memberCollection }),
+    [memberCollection]
+  );
+  const { data: users = [] } = useLiveQuery(
+    (q) => q.from({ user: userCollection }),
+    [userCollection]
+  );
+
+  return React.useMemo(() => {
+    const orgId = orgs.find((o) => o.slug === orgSlug)?.id as string | undefined;
+    if (!orgId) return [];
+    const userMap = new Map(users.map((u) => [u.id as string, u]));
+    return members
+      .filter((m) => m.organizationId === orgId)
+      .map((m) => {
+        const user = userMap.get(m.userId as string);
+        return {
+          value: m.userId as string,
+          label: (user?.name as string) ?? (user?.email as string) ?? "Unknown",
+          avatarUrl: (user?.image as string) ?? undefined,
+        };
+      });
+  }, [orgs, members, users, orgSlug]);
+}
+
+export type PowerSyncProjectOption = {
+  value: string;
+  label: string;
+  color?: string;
+};
+
+/** Project options for a team, read from local SQLite. */
+export function usePowerSyncTeamProjects(
+  teamId: string | undefined
+): PowerSyncProjectOption[] {
+  const collection = React.useMemo(() => getProjectsCollection(), []);
+  const { data: projects = [] } = useLiveQuery(
+    (q) => q.from({ project: collection }),
+    [collection]
+  );
+  return React.useMemo(
+    () =>
+      projects
+        .filter((p) => p.teamId === teamId)
+        .map((p) => ({
+          value: p.id as string,
+          label: (p.name as string) ?? "",
+          color: (p.color as string) ?? undefined,
+        })),
+    [projects, teamId]
+  );
+}
+
 export type PowerSyncLabelOption = {
   value: string;
   label: string;

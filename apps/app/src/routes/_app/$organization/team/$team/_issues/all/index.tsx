@@ -12,8 +12,10 @@ import {
   usePowerSyncWorkflowStates,
   useTeamId,
 } from "@/lib/collections/team-metadata-powersync";
+import { applyFilters, getDateBuckets } from "@/lib/filter";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useIssueDetailsPanelStore } from "@/hooks/use-details-panel-store";
+import { useIssueFilters } from "@/hooks/use-issue-filter-store";
 import { ContainerContent } from "@/components/container";
 import { Error } from "@/components/error";
 
@@ -68,6 +70,18 @@ function TeamDetailsPanel({
   );
 }
 
+const issueFilterFieldMap = {
+  status: (issue: { stateId?: string }) => issue.stateId,
+  "status-type": (issue: { status: string }) => issue.status,
+  priority: (issue: { priority: string }) => issue.priority,
+  assignee: (issue: { assigneeId?: string }) => issue.assigneeId,
+  creator: (issue: { creatorId?: string }) => issue.creatorId,
+  project: (issue: { projectId?: string }) => issue.projectId,
+  "created-date": (issue: { createdAt: string }) => getDateBuckets(issue.createdAt),
+  "updated-date": (issue: { updatedAt: string }) => getDateBuckets(issue.updatedAt),
+  label: (issue: { labelIds: string[] }) => issue.labelIds,
+};
+
 function PowerSyncIssueList({
   organization,
   team,
@@ -77,6 +91,7 @@ function PowerSyncIssueList({
 }) {
   const teamId = useTeamId(organization, team);
   const workflowStates = usePowerSyncWorkflowStates(teamId);
+  const { filters } = useIssueFilters(team);
 
   const collection = React.useMemo(() => getIssuesPowerSyncCollection(), []);
   const linkCollection = React.useMemo(
@@ -118,5 +133,10 @@ function PowerSyncIssueList({
     [rows, teamId, workflowStates, labelsByIssue]
   );
 
-  return <IssueList issues={issues} />;
+  const filteredIssues = React.useMemo(
+    () => applyFilters(issues, filters, issueFilterFieldMap),
+    [issues, filters]
+  );
+
+  return <IssueList issues={filteredIssues} />;
 }
