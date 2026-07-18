@@ -35,6 +35,7 @@ import { ItemsCombobox } from "@/components/items-combobox";
 import {
   usePowerSyncOrgMembers,
   usePowerSyncTeamLabels,
+  usePowerSyncTeamProjects,
   usePowerSyncWorkflowStates,
   useTeamId,
 } from "@/lib/collections/team-metadata-powersync";
@@ -95,6 +96,12 @@ export function IssueListItem({
 
   const allLabelOptions = usePowerSyncTeamLabels(teamId);
   const orgMembers = usePowerSyncOrgMembers(organization);
+  const teamProjects = usePowerSyncTeamProjects(teamId);
+
+  const issueProject = React.useMemo(
+    () => teamProjects.find((p) => p.value === issue.projectId),
+    [teamProjects, issue.projectId]
+  );
 
   const issueLabels = React.useMemo(
     () => allLabelOptions.filter((option) => issue?.labelIds?.includes(option.value)),
@@ -246,6 +253,17 @@ export function IssueListItem({
           {issue.title}
         </span>
         <div className="ml-auto flex items-center gap-1">
+          {displayProperties.includes("project") && issueProject && (
+            <span className="text-muted-foreground flex items-center gap-1 text-xs">
+              {issueProject.color && (
+                <span
+                  className="size-2 rounded-full shrink-0"
+                  style={{ backgroundColor: issueProject.color }}
+                />
+              )}
+              <span className="max-w-24 truncate">{issueProject.label}</span>
+            </span>
+          )}
           {displayProperties.includes("labels") && (
             <div
               onClick={(e) => e.stopPropagation()}

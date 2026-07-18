@@ -1,9 +1,18 @@
 import * as React from "react";
-import { getWorkflowIcon, workflowGroupOrder } from "@/config";
 import type { StrictOmit } from "@/types";
 import { Icon } from "@/utils/icon";
 import {
-  ArrowDown01Icon,
+  closestCenter,
+  DndContext,
+  DragOverlay,
+  type DragOverEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import {
   ArrowRight01Icon,
   CommandIcon,
   FilterIcon,
@@ -11,16 +20,19 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useParams } from "@tanstack/react-router";
+import { createPortal } from "react-dom";
 
-import type { IconType } from "@/types/inbox";
 import type { Issue } from "@/types/issue";
-import { issueFilterOptions } from "@/config/team";
 import {
   usePowerSyncOrgMembers,
+  usePowerSyncTeamLabels,
+  usePowerSyncTeamProjects,
   usePowerSyncWorkflowStates,
   useTeamId,
 } from "@/lib/collections/team-metadata-powersync";
 import { cn } from "@/lib/utils";
+import { useGroupedIssues } from "@/hooks/use-grouped-issues";
+import { useIssueDrag } from "@/hooks/use-issue-drag";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
 import { useIssueFilters } from "@/hooks/use-issue-filter-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -44,17 +56,10 @@ import {
   ActionBarContent,
   ActionBarSeparator,
 } from "@/components/action-bar";
-
 import { IssueListItem } from "./issue-list-item";
+import { DragInfoBar } from "./drag-info-bar";
 
-const workflowTypeOrder = new Map(
-  workflowGroupOrder.map((type, index) => [type, index])
-);
-
-interface IssueListProps extends StrictOmit<
-  React.ComponentProps<"div">,
-  "children"
-> {
+interface IssueListProps extends StrictOmit<React.ComponentProps<"div">, "children"> {
   issues?: Issue[];
 }
 
@@ -66,127 +71,53 @@ export function IssueList({
   const { organization, team } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });
-  const { grouping } = useActiveIssueDisplayOptions(team);
+  const config = useActiveIssueDisplayOptions(team);
   const teamId = useTeamId(organization, team);
   const workflowStates = usePowerSyncWorkflowStates(teamId);
   const orgMembers = usePowerSyncOrgMembers(organization);
+  const teamProjects = usePowerSyncTeamProjects(teamId);
+  const teamLabels = usePowerSyncTeamLabels(teamId);
   const { filters, clearFilters } = useIssueFilters(team);
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
+  const { grouping, ordering } = config;
+
+  const { groupedIssues, flattenedIssues } = useGroupedIssues({
+    issues,
+    config,
+    workflowStates,
+    orgMembers,
+    teamProjects,
+    teamLabels,
+  });
+
+  const {
+    sensors,
+    activeIssue,
+    overId,
+    ctrlHeld,
+    overGroupId,
+    isDraggingToOtherGroup,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd,
+  } = useIssueDrag({ groupedIssues, flattenedIssues, grouping, ordering });
+
   const toggleId = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
 
-  const { groupedIssues, flattenedIssues } = React.useMemo(() => {
-    if (!grouping || grouping === "none") {
-      return {
-        groupedIssues: [
-          { id: "none", label: "All issues", issues, color: "var(--muted)" },
-        ],
-        flattenedIssues: issues,
-      };
-    }
-
-    const groups: Record<
-      string,
-      {
-        label: string;
-        icon?: IconType | string;
-        color: string;
-        issues: Array<Issue>;
-      }
-    > = {};
-
-    if (grouping === "status") {
-      const orderedStates = [...workflowStates].sort(
-        (a, b) =>
-          (workflowTypeOrder.get(a.type) ?? Number.MAX_SAFE_INTEGER) -
-            (workflowTypeOrder.get(b.type) ?? Number.MAX_SAFE_INTEGER) ||
-          a.position - b.position
-      );
-
-      orderedStates.forEach((state) => {
-        groups[state.id] = {
-          label: state.name,
-          icon: getWorkflowIcon(state.type),
-          color: state.color || "var(--muted-foreground)",
-          issues: [],
-        };
-      });
-
-      issues.forEach((issue) => {
-        const key = issue.stateId ?? issue.status;
-        if (groups[key]) {
-          groups[key].issues.push(issue);
-        }
-      });
-    } else if (grouping === "priority") {
-      const priorityOptions =
-        issueFilterOptions.find((o) => o.id === "priority")?.options ?? [];
-      priorityOptions.forEach((opt) => {
-        groups[opt.value] = {
-          label: opt.label,
-          icon: opt.icon,
-          color: "var(--muted-foreground)",
-          issues: [],
-        };
-      });
-
-      issues.forEach((issue) => {
-        if (groups[issue.priority]) {
-          groups[issue.priority].issues.push(issue);
-        }
-      });
-    } else if (grouping === "assignee") {
-      groups["unassigned"] = {
-        label: "No assignee",
-        icon: User02Icon,
-        color: "var(--muted-foreground)",
-        issues: [],
-      };
-
-      orgMembers.forEach((member) => {
-        groups[member.value] = {
-          label: member.label,
-          icon: member.avatarUrl,
-          color: "var(--muted-foreground)",
-          issues: [],
-        };
-      });
-
-      issues.forEach((issue) => {
-        const id = issue.assigneeId || "unassigned";
-        if (groups[id]) {
-          groups[id].issues.push(issue);
-        }
-      });
-    }
-
-    const filteredGroups = Object.entries(groups)
-      .filter(([_, group]) => group.issues.length > 0)
-      .map(([id, group]) => ({
-        id,
-        ...group,
-      }));
-
-    return {
-      groupedIssues: filteredGroups,
-      flattenedIssues: filteredGroups.flatMap((g) => g.issues),
-    };
-  }, [issues, grouping, workflowStates, orgMembers]);
+  const { grouping: _g, ...restProps } = { grouping, ...props };
 
   let cumulativeIndex = 0;
 
-  return (
+  const listContent = (
     <div
       ref={setContainer}
       className={cn("relative h-full min-w-0 flex-1", className)}
@@ -209,25 +140,17 @@ export function IssueList({
                   Try adjusting or clearing your filters.
                 </EmptyDescription>
               </EmptyHeader>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => clearFilters()}
-              >
+              <Button variant="outline" size="sm" onClick={() => clearFilters()}>
                 Clear filters
               </Button>
             </Empty>
           )}
           <ListBox items={flattenedIssues}>
-            {groupedIssues.map((group, index) => (
+            {groupedIssues.map((group, groupIndex) => (
               <Collapsible key={group.id} defaultOpen>
                 {grouping !== "none" && (
                   <CollapsibleTrigger
-                    style={
-                      {
-                        "--bg-color": group.color,
-                      } as React.CSSProperties
-                    }
+                    style={{ "--bg-color": group.color } as React.CSSProperties}
                     className={cn(
                       "group/trigger border-border/50 before:from-muted-foreground/2 relative h-9 w-full border-b outline-none before:absolute before:inset-0 before:bg-linear-to-l before:to-transparent before:content-['']",
                       "to-muted-foreground/2 bg-linear-to-r from-(--bg-color)/5"
@@ -243,7 +166,12 @@ export function IssueList({
                             icon={ArrowRight01Icon}
                             className="text-muted-foreground size-3.5 transition-transform duration-200 group-data-panel-open/trigger:rotate-90"
                           />
-                          {group.icon &&
+                          {grouping === "label" && group.id !== "no-label" ? (
+                            <div
+                              className="size-2.5 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: group.color }}
+                            />
+                          ) : group.icon &&
                             (typeof group.icon === "string" ? (
                               <Avatar className="size-4.5!">
                                 <AvatarImage src={group.icon} />
@@ -277,21 +205,36 @@ export function IssueList({
                 <CollapsibleContent>
                   <div
                     className={cn(
-                      "border-border/50 flex flex-col border-b",
-                      index === groupedIssues.length - 1 && "border-b-0!"
+                      "border-border/50 flex flex-col border-b transition-shadow",
+                      groupIndex === groupedIssues.length - 1 && "border-b-0!",
+                      isDraggingToOtherGroup && !ctrlHeld && overGroupId === group.id &&
+                        "ring-1 ring-inset ring-primary/50"
                     )}
                   >
                     {group.issues.map((issue) => {
                       const index = cumulativeIndex++;
                       const isSelected = selectedIds.has(issue.id);
+                      const noOpSameGroup =
+                        !isDraggingToOtherGroup &&
+                        ["title", "created", "updated", "status", "assignee", "project"].includes(ordering ?? "");
+                      const showIndicator =
+                        activeIssue !== null &&
+                        overId === issue.id &&
+                        activeIssue.id !== issue.id &&
+                        (!isDraggingToOtherGroup || ctrlHeld) &&
+                        !noOpSameGroup;
                       return (
-                        <IssueListItem
-                          key={issue.id}
-                          index={index}
-                          isSelected={isSelected}
-                          toggleId={toggleId}
-                          issue={issue}
-                        />
+                        <React.Fragment key={issue.id}>
+                          <SortableIssueListItem
+                            issue={issue}
+                            index={index}
+                            isSelected={isSelected}
+                            toggleId={toggleId}
+                            isDragEnabled={true}
+                            isBeingDragged={activeIssue?.id === issue.id}
+                          />
+                          {showIndicator && <DropIndicator />}
+                        </React.Fragment>
                       );
                     })}
                   </div>
@@ -319,6 +262,90 @@ export function IssueList({
           </ActionBarContent>
         </ActionBar>
       </div>
+    </div>
+  );
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragOver={({ over }: DragOverEvent) => handleDragOver((over?.id as string) ?? null)}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={flattenedIssues.map((i) => i.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        {listContent}
+      </SortableContext>
+      {createPortal(
+        <DragOverlay dropAnimation={null}>
+          {activeIssue && <IssueListItemDragClone issue={activeIssue} />}
+        </DragOverlay>,
+        document.body
+      )}
+      <DragInfoBar
+        open={activeIssue !== null && ((ordering && ordering !== "manual") || !!isDraggingToOtherGroup)}
+        ordering={ordering ?? ""}
+        grouping={grouping}
+        container={container}
+        isDraggingToOtherGroup={!!isDraggingToOtherGroup}
+        ctrlHeld={ctrlHeld}
+      />
+    </DndContext>
+  );
+}
+
+function DropIndicator() {
+  return (
+    <div className="relative h-0 w-full">
+      <div className="bg-primary absolute inset-x-0 top-0 h-px rounded-full" />
+    </div>
+  );
+}
+
+function IssueListItemDragClone({ issue }: { issue: Issue }) {
+  return (
+    <div className="bg-background border-border flex h-11 items-center gap-2 rounded-md border px-2 py-1.5 text-sm opacity-90 shadow-lg">
+      <span className="text-xs-plus min-w-0 truncate font-medium leading-none tracking-wide">
+        {issue.title}
+      </span>
+    </div>
+  );
+}
+
+function SortableIssueListItem({
+  issue,
+  index,
+  isSelected,
+  toggleId,
+  isDragEnabled,
+  isBeingDragged,
+}: {
+  issue: Issue;
+  index: number;
+  isSelected: boolean;
+  toggleId: (id: string) => void;
+  isDragEnabled: boolean;
+  isBeingDragged: boolean;
+}) {
+  const { attributes, listeners, setNodeRef } = useSortable({
+    id: issue.id,
+    disabled: !isDragEnabled,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...(isDragEnabled ? { ...attributes, ...listeners } : {})}
+    >
+      <IssueListItem
+        issue={issue}
+        index={index}
+        isSelected={isSelected}
+        toggleId={toggleId}
+      />
     </div>
   );
 }

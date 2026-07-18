@@ -27,6 +27,8 @@ const buttonVariants = cva(
           "hover:shadow-[0_0_0_1px_var(--accent)] hover:bg-accent hover:text-foreground dark:hover:bg-accent/70 dark:hover:shadow-[0_0_0_1px_var(--accent)]/70 aria-expanded:bg-accent dark:aria-expanded:bg-accent/70 aria-expanded:text-foreground aria-expanded:shadow-[0_0_0_1px_var(--accent)] dark:aria-expanded:shadow-[0_0_0_1px_var(--accent)]/70",
         ghostPopup:
           "hover:shadow-[0_0_0_1px_var(--accent)] hover:bg-accent hover:text-foreground dark:hover:bg-[color-mix(in_oklab,var(--accent)98%,var(--accent-foreground))] aria-expanded:bg-accent dark:aria-expanded:bg-[color-mix(in_oklab,var(--accent)98%,var(--accent-foreground))] aria-expanded:text-foreground aria-expanded:shadow-[0_0_0_1px_var(--accent)]",
+        ghostText:
+          "text-muted-foreground hover:text-foreground aria-expanded:text-foreground",
         destructive:
           "shadow-[0_0_0_1px_var(--destructive)]/25 bg-destructive/10 hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30",
         ghostDestructive:

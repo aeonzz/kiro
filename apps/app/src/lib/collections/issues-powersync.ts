@@ -57,7 +57,9 @@ export function powerSyncRowToIssue(
     assigneeId: (row.assigneeId as string | null) ?? undefined,
     creatorId: (row.creatorId as string | null) ?? undefined,
     projectId: (row.projectId as string | null) ?? undefined,
+    parentId: (row.parentId as string | null) ?? undefined,
     labelIds,
+    position: (row.position as number | null) ?? undefined,
     createdAt: (row.createdAt as string | null) ?? "",
     updatedAt: (row.updatedAt as string | null) ?? "",
   };

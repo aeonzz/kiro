@@ -16,10 +16,12 @@ import { applyFilters, getDateBuckets } from "@/lib/filter";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useIssueDetailsPanelStore } from "@/hooks/use-details-panel-store";
 import { useIssueFilters } from "@/hooks/use-issue-filter-store";
+import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
 import { ContainerContent } from "@/components/container";
 import { Error } from "@/components/error";
 
 import { FilterTabs } from "../-components/filter-tabs";
+import { IssueBoard } from "../-components/issue-board";
 import { IssueList } from "../-components/issue-list";
 import { DetailsSidePanel } from "../../-components/details-side-panel";
 
@@ -41,10 +43,12 @@ function RouteComponent() {
   // after hydration to keep SSR/first render safe.
   const hydrated = useHydrated();
 
+  const { layout } = useActiveIssueDisplayOptions(team);
+
   return (
     <ContainerContent className="flex flex-1">
       {hydrated ? (
-        <PowerSyncIssueList organization={organization} team={team} />
+        <PowerSyncIssueList organization={organization} team={team} layout={layout} />
       ) : (
         <IssueList issues={[]} />
       )}
@@ -85,9 +89,11 @@ const issueFilterFieldMap = {
 function PowerSyncIssueList({
   organization,
   team,
+  layout,
 }: {
   organization: string;
   team: string;
+  layout: "list" | "board";
 }) {
   const teamId = useTeamId(organization, team);
   const workflowStates = usePowerSyncWorkflowStates(teamId);
@@ -138,5 +144,6 @@ function PowerSyncIssueList({
     [issues, filters]
   );
 
+  if (layout === "board") return <IssueBoard issues={filteredIssues} />;
   return <IssueList issues={filteredIssues} />;
 }

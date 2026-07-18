@@ -38,6 +38,10 @@ function toIssueWriteData(
   if ("projectId" in data) out.projectId = (data.projectId as string) ?? null;
   if ("parentId" in data) out.parentId = (data.parentId as string) ?? null;
   if ("cycleId" in data) out.cycleId = (data.cycleId as string) ?? null;
+  if (data.position !== undefined && data.position !== null) {
+    const pos = Number(data.position);
+    if (!isNaN(pos)) out.position = pos;
+  }
 
   const description = parseDescription(data.description);
   if (description !== undefined) out.description = description;

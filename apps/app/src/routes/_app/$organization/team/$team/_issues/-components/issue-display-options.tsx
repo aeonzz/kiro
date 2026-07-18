@@ -140,21 +140,23 @@ export function IssueDisplayOptions({
                 setOrdering(value.value);
               }}
             >
-              <Button
-                variant="outline"
-                size="icon-xs"
-                className="[&>svg]:text-foreground"
-                onClick={() =>
-                  setDirection(direction === "asc" ? "desc" : "asc")
-                }
-                tooltip={direction === "asc" ? "Ascending" : "Descending"}
-              >
-                <HugeiconsIcon
-                  icon={Sorting01Icon}
-                  strokeWidth={2}
-                  className={cn(direction === "asc" && "scale-y-[-1]")}
-                />
-              </Button>
+              {ordering !== "manual" && (
+                <Button
+                  variant="outline"
+                  size="icon-xs"
+                  className="[&>svg]:text-foreground"
+                  onClick={() =>
+                    setDirection(direction === "asc" ? "desc" : "asc")
+                  }
+                  tooltip={direction === "asc" ? "Ascending" : "Descending"}
+                >
+                  <HugeiconsIcon
+                    icon={Sorting01Icon}
+                    strokeWidth={2}
+                    className={cn(direction === "asc" && "scale-y-[-1]")}
+                  />
+                </Button>
+              )}
             </OptionControlSelect>
           </div>
         </div>

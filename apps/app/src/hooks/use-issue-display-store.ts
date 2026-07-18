@@ -24,7 +24,7 @@ export const DEFAULT_CONFIG: IssueDisplayConfig = {
   grouping:
     issueGroupOptions.find((o) => o.value === "status")?.value ?? "status",
   ordering:
-    issueOrderOptions.find((o) => o.value === "manual")?.value ?? "manual",
+    issueOrderOptions.find((o) => o.value === "priority")?.value ?? "priority",
   direction: "desc",
   completedIssues:
     completedIssuesOptions.find((o) => o.value === "all")?.value ?? "all",

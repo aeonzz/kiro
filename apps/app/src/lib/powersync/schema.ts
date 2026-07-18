@@ -26,6 +26,7 @@ const issue = new Table(
     parentId: column.text,
     projectId: column.text,
     cycleId: column.text,
+    position: column.real,
     createdAt: column.text,
     updatedAt: column.text,
   },
