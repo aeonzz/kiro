@@ -16,7 +16,7 @@ import {
   verticalListSortingStrategy,
   type SortingStrategy,
 } from "@dnd-kit/sortable";
-import { FilterIcon, User02Icon } from "@hugeicons/core-free-icons";
+import { User02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useParams } from "@tanstack/react-router";
 import { createPortal } from "react-dom";
@@ -33,36 +33,53 @@ import { cn } from "@/lib/utils";
 import { useGroupedIssues, type IssueGroup } from "@/hooks/use-grouped-issues";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
 import { useIssueDrag } from "@/hooks/use-issue-drag";
-import { useIssueFilters } from "@/hooks/use-issue-filter-store";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@/components/ui/empty";
+  useIssueFilters,
+  useIssuePanelFilters,
+} from "@/hooks/use-issue-filter-store";
+import { useIssueTabKey } from "@/hooks/use-issue-tab-key";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { orderingLabels } from "./drag-info-bar";
+import { GroupCreateIssueButton } from "./group-create-issue-button";
 import { IssueBoardCard } from "./issue-board-card";
+import { IssueEmptyState } from "./issue-empty-state";
+import { IssuesHiddenBar } from "./issues-hidden-bar";
 
 const noOpSortingStrategy: SortingStrategy = () => null;
 
 interface IssueBoardProps {
   issues?: Issue[];
+  hiddenCount?: number;
   className?: string;
 }
 
-export function IssueBoard({ issues = [], className }: IssueBoardProps) {
+export function IssueBoard({
+  issues = [],
+  hiddenCount = 0,
+  className,
+}: IssueBoardProps) {
   const { organization, team } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });
-  const config = useActiveIssueDisplayOptions(team);
+  const tabKey = useIssueTabKey(team);
+  const config = useActiveIssueDisplayOptions(tabKey);
   const teamId = useTeamId(organization, team);
   const workflowStates = usePowerSyncWorkflowStates(teamId);
   const orgMembers = usePowerSyncOrgMembers(organization);
   const teamProjects = usePowerSyncTeamProjects(teamId);
   const teamLabels = usePowerSyncTeamLabels(teamId);
-  const { filters, clearFilters } = useIssueFilters(team);
+  // Both scopes narrow the list, so both have to count towards "are there
+  // filters" and both have to go when the user clears — clearing only the
+  // toolbar's would leave issues hidden with the bar still claiming so.
+  const { filters, clearFilters } = useIssueFilters(tabKey);
+  const { filters: panelFilters, clearFilters: clearPanelFilters } =
+    useIssuePanelFilters(tabKey);
+  const hasFilters = filters.length + panelFilters.length > 0;
+  const clearAllFilters = () => {
+    clearFilters();
+    clearPanelFilters();
+  };
 
   const { groupedIssues } = useGroupedIssues({
     issues,
@@ -85,7 +102,9 @@ export function IssueBoard({ issues = [], className }: IssueBoardProps) {
     (args) => {
       const pointerCollisions = pointerWithin(args);
       const collisions =
-        pointerCollisions.length > 0 ? pointerCollisions : rectIntersection(args);
+        pointerCollisions.length > 0
+          ? pointerCollisions
+          : rectIntersection(args);
       const overId = getFirstCollision(collisions, "id");
       if (overId == null) return collisions;
 
@@ -127,46 +146,42 @@ export function IssueBoard({ issues = [], className }: IssueBoardProps) {
       sensors={sensors}
       collisionDetection={collisionDetection}
       onDragStart={handleDragStart}
-      onDragOver={({ over }: DragOverEvent) => handleDragOver((over?.id as string) ?? null)}
+      onDragOver={({ over }: DragOverEvent) =>
+        handleDragOver((over?.id as string) ?? null)
+      }
       onDragEnd={handleDragEnd}
     >
-      {flattenedIssues.length === 0 && filters.length > 0 ? (
-        <Empty className="h-full border-none">
-          <EmptyHeader>
-            <div className="border-border mb-1 rounded-xl border border-dashed p-6">
-              <HugeiconsIcon
-                icon={FilterIcon}
-                size={26}
-                strokeWidth={1.5}
-                className="text-muted-foreground"
-              />
-            </div>
-            <EmptyTitle>No issues matching the filters</EmptyTitle>
-            <EmptyDescription>
-              Try adjusting or clearing your filters.
-            </EmptyDescription>
-          </EmptyHeader>
-          <Button variant="outline" size="sm" onClick={() => clearFilters()}>
-            Clear filters
-          </Button>
-        </Empty>
+      {flattenedIssues.length === 0 ? (
+        <IssueEmptyState
+          hasFilters={hasFilters}
+          onClearFilters={clearAllFilters}
+          teamId={teamId}
+        />
       ) : (
-        <div
-          className={cn(
-            "flex h-full min-w-0 flex-1 gap-2 overflow-x-auto p-5.5",
-            className
-          )}
-        >
-          {groupedIssues.map((group) => (
-            <BoardColumn
-              key={group.id}
-              group={group}
-              activeId={activeIssue?.id ?? null}
-              overId={overId}
-              ordering={config.ordering}
-              ctrlHeld={ctrlHeld}
-            />
-          ))}
+        <div className="flex h-full min-w-0 flex-1 flex-col">
+          <div
+            className={cn(
+              "flex min-h-0 flex-1 gap-2 overflow-x-auto p-5.5",
+              className
+            )}
+          >
+            {groupedIssues.map((group) => (
+              <BoardColumn
+                key={group.id}
+                group={group}
+                activeId={activeIssue?.id ?? null}
+                overId={overId}
+                ordering={config.ordering}
+                ctrlHeld={ctrlHeld}
+                grouping={config.grouping}
+                teamId={teamId}
+              />
+            ))}
+          </div>
+          <IssuesHiddenBar
+            hiddenCount={hiddenCount}
+            onClear={clearAllFilters}
+          />
         </div>
       )}
       {createPortal(
@@ -185,12 +200,16 @@ function BoardColumn({
   overId,
   ordering,
   ctrlHeld,
+  grouping,
+  teamId,
 }: {
   group: IssueGroup;
   activeId: string | null;
   overId: string | null;
   ordering?: string;
   ctrlHeld: boolean;
+  grouping: string;
+  teamId?: string;
 }) {
   const issueIds = group.issues.map((i) => i.id);
   const { setNodeRef } = useDroppable({ id: group.id });
@@ -203,8 +222,11 @@ function BoardColumn({
     activeId !== null && group.issues.some((i) => i.id === activeId);
   const isCrossColumnHover =
     activeId !== null && isHoveringThisColumn && !isActiveInThisColumn;
-  const isSortable = !ordering || ordering === "manual" || ordering === "priority";
-  const sortingStrategy = isSortable ? verticalListSortingStrategy : noOpSortingStrategy;
+  const isSortable =
+    !ordering || ordering === "manual" || ordering === "priority";
+  const sortingStrategy = isSortable
+    ? verticalListSortingStrategy
+    : noOpSortingStrategy;
   // Show the info overlay whenever the dragged item hovers a card and the drop
   // won't produce an intuitive reorder: either a different column (changes the
   // group), or the same column when the ordering isn't manually sortable.
@@ -220,7 +242,7 @@ function BoardColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        "border-border/50 flex w-84 shrink-0 flex-col rounded-xl bg-[color-mix(in_oklab,var(--background),var(--sidebar)_70%)] gap-2"
+        "border-border/50 flex w-84 shrink-0 flex-col gap-2 rounded-xl bg-[color-mix(in_oklab,var(--background),var(--sidebar)_70%)]"
       )}
     >
       <div
@@ -248,18 +270,24 @@ function BoardColumn({
         <span className="text-muted-foreground text-xs tabular-nums">
           {group.issues.length}
         </span>
+        <GroupCreateIssueButton
+          grouping={grouping}
+          groupId={group.id}
+          teamId={teamId}
+          className="ml-auto"
+        />
       </div>
 
       <SortableContext items={issueIds} strategy={sortingStrategy}>
         <div className="relative m-2 mt-0 flex min-h-0 flex-1 flex-col">
-          <div className="flex flex-1 flex-col gap-1.5 overflow-y-auto pr-1 rounded-md">
+          <div className="flex flex-1 flex-col gap-1.5 overflow-y-auto rounded-md pr-1">
             {group.issues.map((issue) => (
               <IssueBoardCard key={issue.id} issue={issue} />
             ))}
           </div>
           {showInfo && (
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-md bg-black/80 p-4">
-              <span className="text-foreground text-xs-plus font-medium leading-none">
+              <span className="text-foreground text-xs-plus leading-none font-medium">
                 Board ordered by {orderingLabel}
               </span>
               {ordering === "priority" && (

@@ -10,6 +10,7 @@ import type { FilterOptions, IconType } from "@/types/inbox";
 import { issueFilterOptions } from "@/config/team";
 import { cn } from "@/lib/utils";
 import { useIssueFilters } from "@/hooks/use-issue-filter-store";
+import { useIssueTabKey } from "@/hooks/use-issue-tab-key";
 import { useIssueStatusOptions } from "@/hooks/use-issue-status";
 import {
   useTeamId,
@@ -46,7 +47,7 @@ export function IssueFilterMenu({
   const { team, organization } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });
-  const { addFilter, filters } = useIssueFilters(team);
+  const { addFilter, filters } = useIssueFilters(useIssueTabKey(team));
   const teamId = useTeamId(organization, team);
   const statusOptions = useIssueStatusOptions(team);
   const teamLabels = usePowerSyncTeamLabels(teamId);

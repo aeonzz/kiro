@@ -1,21 +1,22 @@
 import * as React from "react";
-import { useLiveQuery } from "@tanstack/react-db";
 import { useParams } from "@tanstack/react-router";
 
 import { issueFilterOptions } from "@/config/team";
-import { cn } from "@/lib/utils";
-import { getDateBuckets } from "@/lib/filter";
-import { getIssuesPowerSyncCollection } from "@/lib/collections/issues-powersync";
-import { getIssueLabelLinksCollection } from "@/lib/collections/issue-label-links-powersync";
 import {
-  useTeamId,
+  usePowerSyncOrgMembers,
   usePowerSyncTeamLabels,
   usePowerSyncTeamProjects,
-  usePowerSyncOrgMembers,
+  useTeamId,
 } from "@/lib/collections/team-metadata-powersync";
+import { cn } from "@/lib/utils";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { useIssueFilters } from "@/hooks/use-issue-filter-store";
+import {
+  useIssueFilters,
+  useIssuePanelFilters,
+} from "@/hooks/use-issue-filter-store";
+import { useIssueOptionCounts } from "@/hooks/use-issue-option-counts";
 import { useIssueStatusOptions } from "@/hooks/use-issue-status";
+import { useIssueTabKey } from "@/hooks/use-issue-tab-key";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { FilterChip } from "@/components/filter-chip";
@@ -31,7 +32,12 @@ export function IssueToolbar({
   const { team, organization } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });
-  const { filters, clearFilters } = useIssueFilters(team);
+  const tabKey = useIssueTabKey(team);
+  const { filters, clearFilters } = useIssueFilters(tabKey);
+  // The panel's filters draw no chips, so Clear is the only way back out of
+  // them — it has to see and empty that scope too.
+  const { filters: panelFilters, clearFilters: clearPanelFilters } =
+    useIssuePanelFilters(tabKey);
   const hydrated = useHydrated();
 
   return (
@@ -62,13 +68,16 @@ export function IssueToolbar({
               </Button>
             </div>
           )}
-          {filters.length > 0 && (
+          {filters.length + panelFilters.length > 0 && (
             <React.Fragment>
               <Separator orientation="vertical" className="my-1" />
               <Button
                 variant="ghost"
                 size="xs"
-                onClick={() => clearFilters()}
+                onClick={() => {
+                  clearFilters();
+                  clearPanelFilters();
+                }}
                 tooltip={{
                   content: "Clear all filters",
                   kbd: ["Alt", "⇧", "F"],
@@ -92,7 +101,7 @@ function IssueToolbarFilters({
   team: string;
 }) {
   const { filters, removeFilter, toggleFilterValue, updateFilterOperator } =
-    useIssueFilters(team);
+    useIssueFilters(useIssueTabKey(team));
   const teamId = useTeamId(organization, team);
   const statusOptions = useIssueStatusOptions(team);
   const teamLabels = usePowerSyncTeamLabels(teamId);
@@ -112,61 +121,7 @@ function IssueToolbarFilters({
     [statusOptions, teamLabels, orgMembers, teamProjects]
   );
 
-  const issueCollection = React.useMemo(() => getIssuesPowerSyncCollection(), []);
-  const linkCollection = React.useMemo(() => getIssueLabelLinksCollection(), []);
-  const { data: rows = [] } = useLiveQuery(
-    (q) => q.from({ issue: issueCollection }),
-    [issueCollection]
-  );
-  const { data: links = [] } = useLiveQuery(
-    (q) => q.from({ link: linkCollection }),
-    [linkCollection]
-  );
-
-  const teamIssueIds = React.useMemo(() => {
-    const ids = new Set<string>();
-    for (const row of rows) {
-      if (row.teamId === teamId && row.id) ids.add(row.id as string);
-    }
-    return ids;
-  }, [rows, teamId]);
-
-  const optionCountsByFilterId = React.useMemo(() => {
-    const byState: Record<string, number> = {};
-    const byLabel: Record<string, number> = {};
-    const byAssignee: Record<string, number> = {};
-    const byCreator: Record<string, number> = {};
-    const byProject: Record<string, number> = {};
-    const byPriority: Record<string, number> = {};
-    const byCreatedDate: Record<string, number> = {};
-    const byUpdatedDate: Record<string, number> = {};
-    for (const row of rows) {
-      if (row.teamId !== teamId) continue;
-      const stateId = row.stateId as string;
-      if (stateId) byState[stateId] = (byState[stateId] ?? 0) + 1;
-      const assigneeId = row.assigneeId as string | undefined;
-      byAssignee[assigneeId ?? "unassigned"] = (byAssignee[assigneeId ?? "unassigned"] ?? 0) + 1;
-      const creatorId = row.creatorId as string | undefined;
-      if (creatorId) byCreator[creatorId] = (byCreator[creatorId] ?? 0) + 1;
-      const projectId = row.projectId as string | undefined;
-      if (projectId) byProject[projectId] = (byProject[projectId] ?? 0) + 1;
-      const priority = row.priority as string;
-      if (priority) byPriority[priority] = (byPriority[priority] ?? 0) + 1;
-      for (const bucket of getDateBuckets(row.createdAt as string)) {
-        byCreatedDate[bucket] = (byCreatedDate[bucket] ?? 0) + 1;
-      }
-      for (const bucket of getDateBuckets(row.updatedAt as string)) {
-        byUpdatedDate[bucket] = (byUpdatedDate[bucket] ?? 0) + 1;
-      }
-    }
-    for (const link of links) {
-      const issueId = link.issueId as string;
-      const labelId = link.labelId as string;
-      if (!issueId || !labelId || !teamIssueIds.has(issueId)) continue;
-      byLabel[labelId] = (byLabel[labelId] ?? 0) + 1;
-    }
-    return { status: byState, label: byLabel, assignee: byAssignee, creator: byCreator, project: byProject, priority: byPriority, "created-date": byCreatedDate, "updated-date": byUpdatedDate };
-  }, [rows, links, teamId, teamIssueIds]);
+  const optionCountsByFilterId = useIssueOptionCounts(teamId);
 
   return (
     <>
@@ -175,10 +130,12 @@ function IssueToolbarFilters({
           key={filter.id}
           filter={filter}
           filterConfig={filterOptions.find((f) => f.id === filter.filterId)}
-          optionCounts={optionCountsByFilterId[filter.filterId as keyof typeof optionCountsByFilterId]}
+          optionCounts={optionCountsByFilterId[filter.filterId]}
           onRemove={(id) => removeFilter(id)}
           onToggleValue={(id, value) => toggleFilterValue(id, value)}
-          onUpdateOperator={(id, operator) => updateFilterOperator(id, operator)}
+          onUpdateOperator={(id, operator) =>
+            updateFilterOperator(id, operator)
+          }
         />
       ))}
       <IssueFilterMenu

@@ -16,6 +16,7 @@ import { issueFilterOptions } from "@/config/team";
 import { getIssuesPowerSyncCollection } from "@/lib/collections/issues-powersync";
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
+import { useIssueTabKey } from "@/hooks/use-issue-tab-key";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -67,7 +68,7 @@ export function IssueListItem({
     showSubIssues,
     showEmptyGroups,
     displayProperties,
-  } = useActiveIssueDisplayOptions(team);
+  } = useActiveIssueDisplayOptions(useIssueTabKey(team));
 
   const issuesCollection = getIssuesPowerSyncCollection();
 

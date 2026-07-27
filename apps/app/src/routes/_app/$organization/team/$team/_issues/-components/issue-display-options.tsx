@@ -18,6 +18,7 @@ import {
 } from "@/config/team";
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
+import { useIssueTabKey } from "@/hooks/use-issue-tab-key";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -65,7 +66,7 @@ export function IssueDisplayOptions({
     isDefault,
     layout,
     setLayout,
-  } = useActiveIssueDisplayOptions(team);
+  } = useActiveIssueDisplayOptions(useIssueTabKey(team));
 
   const selectedGrouping = issueGroupOptions.find((f) => f.value === grouping);
   const selectedOrdering = issueOrderOptions.find((f) => f.value === ordering);

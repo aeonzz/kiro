@@ -20,6 +20,14 @@ export type IssueGroup = {
   issues: Issue[];
 };
 
+// The app-wide stand-ins for "this issue has no value on that dimension".
+// Grouping uses them as group ids, option counts as bucket keys, and the route
+// field maps project onto them so a filter can select the empty bucket. Compare
+// against these rather than retyping the strings.
+export const GROUP_ID_UNASSIGNED = "unassigned";
+export const GROUP_ID_NO_PROJECT = "no-project";
+export const GROUP_ID_NO_LABEL = "no-label";
+
 const workflowTypeOrder = new Map(
   workflowGroupOrder.map((type, index) => [type, index])
 );
@@ -261,7 +269,7 @@ export function useGroupedIssues({
         if (groups[issue.priority]) groups[issue.priority].issues.push(issue);
       });
     } else if (grouping === "assignee") {
-      groups["unassigned"] = {
+      groups[GROUP_ID_UNASSIGNED] = {
         label: "No assignee",
         icon: User02Icon,
         color: "var(--muted-foreground)",
@@ -276,11 +284,11 @@ export function useGroupedIssues({
         };
       });
       visibleIssues.forEach((issue) => {
-        const id = issue.assigneeId || "unassigned";
+        const id = issue.assigneeId || GROUP_ID_UNASSIGNED;
         if (groups[id]) groups[id].issues.push(issue);
       });
     } else if (grouping === "project") {
-      groups["no-project"] = {
+      groups[GROUP_ID_NO_PROJECT] = {
         label: "No project",
         color: "var(--muted-foreground)",
         issues: [],
@@ -293,11 +301,11 @@ export function useGroupedIssues({
         };
       });
       visibleIssues.forEach((issue) => {
-        const id = issue.projectId || "no-project";
+        const id = issue.projectId || GROUP_ID_NO_PROJECT;
         if (groups[id]) groups[id].issues.push(issue);
       });
     } else if (grouping === "label") {
-      groups["no-label"] = {
+      groups[GROUP_ID_NO_LABEL] = {
         label: "No label",
         color: "var(--muted-foreground)",
         issues: [],
@@ -311,7 +319,7 @@ export function useGroupedIssues({
       });
       visibleIssues.forEach((issue) => {
         if (!issue.labelIds || issue.labelIds.length === 0) {
-          groups["no-label"].issues.push(issue);
+          groups[GROUP_ID_NO_LABEL].issues.push(issue);
         } else {
           issue.labelIds.forEach((labelId) => {
             if (groups[labelId]) groups[labelId].issues.push(issue);

@@ -19,6 +19,7 @@ import {
 } from "@/lib/collections/team-metadata-powersync";
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
+import { useIssueTabKey } from "@/hooks/use-issue-tab-key";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   ContextMenu,
@@ -37,7 +38,7 @@ export function IssueBoardCard({ issue, isDragOverlay }: IssueBoardCardProps) {
   const { organization, team } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });
-  const { displayProperties } = useActiveIssueDisplayOptions(team);
+  const { displayProperties } = useActiveIssueDisplayOptions(useIssueTabKey(team));
   const teamId = useTeamId(organization, team);
   const workflowStates = usePowerSyncWorkflowStates(teamId);
   const orgMembers = usePowerSyncOrgMembers(organization);
@@ -113,7 +114,7 @@ export function IssueBoardCard({ issue, isDragOverlay }: IssueBoardCardProps) {
             {...attributes}
             {...listeners}
             className={cn(
-              "bg-card group flex cursor-default flex-col rounded-lg px-3 py-2 pr-1 shadow-xs",
+              "bg-card hover:bg-[color-mix(in_oklab,var(--card),var(--card-foreground)_3%)] group flex cursor-default flex-col rounded-lg px-3 py-2 pr-1 shadow-xs transition-colors",
               isDragging && "opacity-40",
               isDragOverlay && "shadow-lg"
             )}

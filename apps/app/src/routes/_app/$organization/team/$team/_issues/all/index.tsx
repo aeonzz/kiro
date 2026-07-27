@@ -2,21 +2,29 @@ import * as React from "react";
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { getIssueLabelLinksCollection } from "@/lib/collections/issue-label-links-powersync";
 import {
   getIssuesPowerSyncCollection,
   powerSyncRowToIssue,
 } from "@/lib/collections/issues-powersync";
-import { getIssueLabelLinksCollection } from "@/lib/collections/issue-label-links-powersync";
 import {
   usePowerSyncTeam,
   usePowerSyncWorkflowStates,
   useTeamId,
 } from "@/lib/collections/team-metadata-powersync";
 import { applyFilters, getDateBuckets } from "@/lib/filter";
-import { useHydrated } from "@/hooks/use-hydrated";
 import { useIssueDetailsPanelStore } from "@/hooks/use-details-panel-store";
-import { useIssueFilters } from "@/hooks/use-issue-filter-store";
+import {
+  GROUP_ID_NO_PROJECT,
+  GROUP_ID_UNASSIGNED,
+} from "@/hooks/use-grouped-issues";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
+import {
+  useIssueFilters,
+  useIssuePanelFilters,
+} from "@/hooks/use-issue-filter-store";
+import { IssueTabProvider, useIssueTabKey } from "@/hooks/use-issue-tab-key";
 import { ContainerContent } from "@/components/container";
 import { Error } from "@/components/error";
 
@@ -38,22 +46,23 @@ export const Route = createFileRoute(
 function RouteComponent() {
   const { team, organization } = Route.useParams();
   const isOpen = useIssueDetailsPanelStore((state) => state.isOpen);
-
-  // PowerSync (WASM SQLite) is browser-only, so defer the live-query read until
-  // after hydration to keep SSR/first render safe.
   const hydrated = useHydrated();
 
-  const { layout } = useActiveIssueDisplayOptions(team);
-
   return (
-    <ContainerContent className="flex flex-1">
-      {hydrated ? (
-        <PowerSyncIssueList organization={organization} team={team} layout={layout} />
-      ) : (
-        <IssueList issues={[]} />
-      )}
-      <TeamDetailsPanel organization={organization} team={team} isOpen={isOpen} />
-    </ContainerContent>
+    <IssueTabProvider tab="all">
+      <ContainerContent className="flex flex-1">
+        {hydrated ? (
+          <PowerSyncIssueList organization={organization} team={team} />
+        ) : (
+          <IssueList issues={[]} />
+        )}
+        <TeamDetailsPanel
+          organization={organization}
+          team={team}
+          isOpen={isOpen}
+        />
+      </ContainerContent>
+    </IssueTabProvider>
   );
 }
 
@@ -68,7 +77,11 @@ function TeamDetailsPanel({
 }) {
   const { team: teamData } = usePowerSyncTeam(organization, team);
   return (
-    <DetailsSidePanel title="All issues" team={teamData?.name ?? ""} isOpen={isOpen}>
+    <DetailsSidePanel
+      title="All issues"
+      team={teamData?.name ?? ""}
+      isOpen={isOpen}
+    >
       <FilterTabs />
     </DetailsSidePanel>
   );
@@ -78,26 +91,34 @@ const issueFilterFieldMap = {
   status: (issue: { stateId?: string }) => issue.stateId,
   "status-type": (issue: { status: string }) => issue.status,
   priority: (issue: { priority: string }) => issue.priority,
-  assignee: (issue: { assigneeId?: string }) => issue.assigneeId,
+  // Fall back to the sentinel rather than null: applyFilters turns a nullish
+  // accessor result into no values at all, which can never match the
+  // "No assignee"/"No project" options the filter surfaces offer.
+  assignee: (issue: { assigneeId?: string }) =>
+    issue.assigneeId ?? GROUP_ID_UNASSIGNED,
   creator: (issue: { creatorId?: string }) => issue.creatorId,
-  project: (issue: { projectId?: string }) => issue.projectId,
-  "created-date": (issue: { createdAt: string }) => getDateBuckets(issue.createdAt),
-  "updated-date": (issue: { updatedAt: string }) => getDateBuckets(issue.updatedAt),
+  project: (issue: { projectId?: string }) =>
+    issue.projectId ?? GROUP_ID_NO_PROJECT,
+  "created-date": (issue: { createdAt: string }) =>
+    getDateBuckets(issue.createdAt),
+  "updated-date": (issue: { updatedAt: string }) =>
+    getDateBuckets(issue.updatedAt),
   label: (issue: { labelIds: string[] }) => issue.labelIds,
 };
 
 function PowerSyncIssueList({
   organization,
   team,
-  layout,
 }: {
   organization: string;
   team: string;
-  layout: "list" | "board";
 }) {
   const teamId = useTeamId(organization, team);
   const workflowStates = usePowerSyncWorkflowStates(teamId);
-  const { filters } = useIssueFilters(team);
+  const tabKey = useIssueTabKey(team);
+  const { filters } = useIssueFilters(tabKey);
+  const { filters: panelFilters } = useIssuePanelFilters(tabKey);
+  const { layout } = useActiveIssueDisplayOptions(tabKey);
 
   const collection = React.useMemo(() => getIssuesPowerSyncCollection(), []);
   const linkCollection = React.useMemo(
@@ -140,10 +161,16 @@ function PowerSyncIssueList({
   );
 
   const filteredIssues = React.useMemo(
-    () => applyFilters(issues, filters, issueFilterFieldMap),
-    [issues, filters]
+    () =>
+      applyFilters(issues, [...filters, ...panelFilters], issueFilterFieldMap),
+    [issues, filters, panelFilters]
   );
 
-  if (layout === "board") return <IssueBoard issues={filteredIssues} />;
-  return <IssueList issues={filteredIssues} />;
+  // Measured before grouping so it counts what the filters removed, not what
+  // the display options fold away.
+  const hiddenCount = issues.length - filteredIssues.length;
+
+  if (layout === "board")
+    return <IssueBoard issues={filteredIssues} hiddenCount={hiddenCount} />;
+  return <IssueList issues={filteredIssues} hiddenCount={hiddenCount} />;
 }

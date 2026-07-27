@@ -15,7 +15,6 @@ import {
 import {
   ArrowRight01Icon,
   CommandIcon,
-  FilterIcon,
   User02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -31,10 +30,17 @@ import {
   useTeamId,
 } from "@/lib/collections/team-metadata-powersync";
 import { cn } from "@/lib/utils";
-import { useGroupedIssues } from "@/hooks/use-grouped-issues";
-import { useIssueDrag } from "@/hooks/use-issue-drag";
+import {
+  GROUP_ID_NO_LABEL,
+  useGroupedIssues,
+} from "@/hooks/use-grouped-issues";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
-import { useIssueFilters } from "@/hooks/use-issue-filter-store";
+import { useIssueDrag } from "@/hooks/use-issue-drag";
+import {
+  useIssueFilters,
+  useIssuePanelFilters,
+} from "@/hooks/use-issue-filter-store";
+import { useIssueTabKey } from "@/hooks/use-issue-tab-key";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -43,12 +49,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@/components/ui/empty";
 import { ListBox } from "@/components/ui/list-box";
 import {
   ActionBar,
@@ -56,28 +56,48 @@ import {
   ActionBarContent,
   ActionBarSeparator,
 } from "@/components/action-bar";
-import { IssueListItem } from "./issue-list-item";
-import { DragInfoBar } from "./drag-info-bar";
 
-interface IssueListProps extends StrictOmit<React.ComponentProps<"div">, "children"> {
+import { DragInfoBar } from "./drag-info-bar";
+import { GroupCreateIssueButton } from "./group-create-issue-button";
+import { IssueEmptyState } from "./issue-empty-state";
+import { IssueListItem } from "./issue-list-item";
+import { IssuesHiddenBar } from "./issues-hidden-bar";
+
+interface IssueListProps extends StrictOmit<
+  React.ComponentProps<"div">,
+  "children"
+> {
   issues?: Issue[];
+  hiddenCount?: number;
 }
 
 export function IssueList({
   className,
   issues = [],
+  hiddenCount = 0,
   ...props
 }: IssueListProps) {
   const { organization, team } = useParams({
     from: "/_app/$organization/team/$team/_issues",
   });
-  const config = useActiveIssueDisplayOptions(team);
+  const tabKey = useIssueTabKey(team);
+  const config = useActiveIssueDisplayOptions(tabKey);
   const teamId = useTeamId(organization, team);
   const workflowStates = usePowerSyncWorkflowStates(teamId);
   const orgMembers = usePowerSyncOrgMembers(organization);
   const teamProjects = usePowerSyncTeamProjects(teamId);
   const teamLabels = usePowerSyncTeamLabels(teamId);
-  const { filters, clearFilters } = useIssueFilters(team);
+  // Both scopes narrow the list, so both have to count towards "are there
+  // filters" and both have to go when the user clears — clearing only the
+  // toolbar's would leave issues hidden with the bar still claiming so.
+  const { filters, clearFilters } = useIssueFilters(tabKey);
+  const { filters: panelFilters, clearFilters: clearPanelFilters } =
+    useIssuePanelFilters(tabKey);
+  const hasFilters = filters.length + panelFilters.length > 0;
+  const clearAllFilters = () => {
+    clearFilters();
+    clearPanelFilters();
+  };
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
@@ -124,91 +144,98 @@ export function IssueList({
     >
       <div className="h-full min-h-0 overflow-y-auto">
         <div className="h-full" {...props}>
-          {flattenedIssues.length === 0 && filters.length > 0 && (
-            <Empty className="h-full border-none">
-              <EmptyHeader>
-                <div className="border-border mb-1 rounded-xl border border-dashed p-6">
-                  <HugeiconsIcon
-                    icon={FilterIcon}
-                    size={26}
-                    strokeWidth={1.5}
-                    className="text-muted-foreground"
-                  />
-                </div>
-                <EmptyTitle>No issues matching the filters</EmptyTitle>
-                <EmptyDescription>
-                  Try adjusting or clearing your filters.
-                </EmptyDescription>
-              </EmptyHeader>
-              <Button variant="outline" size="sm" onClick={() => clearFilters()}>
-                Clear filters
-              </Button>
-            </Empty>
+          {flattenedIssues.length === 0 && (
+            <IssueEmptyState
+              hasFilters={hasFilters}
+              onClearFilters={clearAllFilters}
+              teamId={teamId}
+            />
           )}
           <ListBox items={flattenedIssues}>
             {groupedIssues.map((group, groupIndex) => (
               <Collapsible key={group.id} defaultOpen>
                 {grouping !== "none" && (
-                  <CollapsibleTrigger
-                    style={{ "--bg-color": group.color } as React.CSSProperties}
-                    className={cn(
-                      "group/trigger border-border/50 before:from-muted-foreground/2 relative h-9 w-full border-b outline-none before:absolute before:inset-0 before:bg-linear-to-l before:to-transparent before:content-['']",
-                      "to-muted-foreground/2 bg-linear-to-r from-(--bg-color)/5"
-                    )}
-                  >
-                    {(() => {
-                      const selectedCount = group.issues.filter((i) =>
-                        selectedIds.has(i.id)
-                      ).length;
-                      return (
-                        <div className="flex items-center gap-2.5 px-2 py-2">
-                          <HugeiconsIcon
-                            icon={ArrowRight01Icon}
-                            className="text-muted-foreground size-3.5 transition-transform duration-200 group-data-panel-open/trigger:rotate-90"
-                          />
-                          {grouping === "label" && group.id !== "no-label" ? (
-                            <div
-                              className="size-2.5 rounded-full flex-shrink-0"
-                              style={{ backgroundColor: group.color }}
+                  // The create trigger is a sibling of the collapsible trigger,
+                  // not a child: nesting a button inside a button is invalid and
+                  // the click would toggle the group.
+                  <div className="group/header relative">
+                    <CollapsibleTrigger
+                      style={
+                        { "--bg-color": group.color } as React.CSSProperties
+                      }
+                      className={cn(
+                        "group/trigger border-border/50 before:from-muted-foreground/2 relative h-9 w-full border-b outline-none before:absolute before:inset-0 before:bg-linear-to-l before:to-transparent before:content-['']",
+                        "to-muted-foreground/2 bg-linear-to-r from-(--bg-color)/5"
+                      )}
+                    >
+                      {(() => {
+                        const selectedCount = group.issues.filter((i) =>
+                          selectedIds.has(i.id)
+                        ).length;
+                        return (
+                          <div className="flex items-center gap-2.5 px-2 py-2">
+                            <HugeiconsIcon
+                              icon={ArrowRight01Icon}
+                              className="text-muted-foreground size-3.5 transition-transform duration-200 group-data-panel-open/trigger:rotate-90"
                             />
-                          ) : group.icon &&
-                            (typeof group.icon === "string" ? (
-                              <Avatar className="size-4.5!">
-                                <AvatarImage src={group.icon} />
-                                <AvatarFallback>
-                                  <HugeiconsIcon icon={User02Icon} size={12} />
-                                </AvatarFallback>
-                              </Avatar>
-                            ) : (
-                              <Icon
-                                icon={group.icon}
-                                className="text-muted-foreground size-4"
-                                color={group.color}
+                            {grouping === "label" &&
+                            group.id !== GROUP_ID_NO_LABEL ? (
+                              <div
+                                className="size-2.5 flex-shrink-0 rounded-full"
+                                style={{ backgroundColor: group.color }}
                               />
-                            ))}
-                          <span className="text-xs-plus text-foreground font-normal">
-                            {group.label}
-                          </span>
-                          <span className="text-muted-foreground text-xs-plus leading-none tabular-nums">
-                            {group.issues.length}
-                          </span>
-                          {selectedCount > 0 && (
-                            <span className="bg-primary text-primary-foreground text-xs-plus rounded-sm px-1 py-0.5 leading-none tabular-nums opacity-100 group-data-panel-open/trigger:opacity-0">
-                              {selectedCount}
+                            ) : (
+                              group.icon &&
+                              (typeof group.icon === "string" ? (
+                                <Avatar className="size-4.5!">
+                                  <AvatarImage src={group.icon} />
+                                  <AvatarFallback>
+                                    <HugeiconsIcon
+                                      icon={User02Icon}
+                                      size={12}
+                                    />
+                                  </AvatarFallback>
+                                </Avatar>
+                              ) : (
+                                <Icon
+                                  icon={group.icon}
+                                  className="text-muted-foreground size-4"
+                                  color={group.color}
+                                />
+                              ))
+                            )}
+                            <span className="text-xs-plus text-foreground font-normal">
+                              {group.label}
                             </span>
-                          )}
-                        </div>
-                      );
-                    })()}
-                  </CollapsibleTrigger>
+                            <span className="text-muted-foreground text-xs-plus leading-none tabular-nums">
+                              {group.issues.length}
+                            </span>
+                            {selectedCount > 0 && (
+                              <span className="bg-primary text-primary-foreground text-xs-plus rounded-sm px-1 py-0.5 leading-none tabular-nums opacity-100 group-data-panel-open/trigger:opacity-0">
+                                {selectedCount}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
+                    </CollapsibleTrigger>
+                    <GroupCreateIssueButton
+                      grouping={grouping}
+                      groupId={group.id}
+                      teamId={teamId}
+                      className="absolute top-1/2 right-2 -translate-y-1/2"
+                    />
+                  </div>
                 )}
                 <CollapsibleContent>
                   <div
                     className={cn(
                       "border-border/50 flex flex-col border-b transition-shadow",
                       groupIndex === groupedIssues.length - 1 && "border-b-0!",
-                      isDraggingToOtherGroup && !ctrlHeld && overGroupId === group.id &&
-                        "ring-1 ring-inset ring-primary/50"
+                      isDraggingToOtherGroup &&
+                        !ctrlHeld &&
+                        overGroupId === group.id &&
+                        "ring-primary/50 ring-1 ring-inset"
                     )}
                   >
                     {group.issues.map((issue) => {
@@ -216,7 +243,14 @@ export function IssueList({
                       const isSelected = selectedIds.has(issue.id);
                       const noOpSameGroup =
                         !isDraggingToOtherGroup &&
-                        ["title", "created", "updated", "status", "assignee", "project"].includes(ordering ?? "");
+                        [
+                          "title",
+                          "created",
+                          "updated",
+                          "status",
+                          "assignee",
+                          "project",
+                        ].includes(ordering ?? "");
                       const showIndicator =
                         activeIssue !== null &&
                         overId === issue.id &&
@@ -242,6 +276,14 @@ export function IssueList({
               </Collapsible>
             ))}
           </ListBox>
+          {/* The empty state already explains the filters and offers its own
+              Clear, so the bar would only repeat it under a blank list. */}
+          {flattenedIssues.length > 0 && (
+            <IssuesHiddenBar
+              hiddenCount={hiddenCount}
+              onClear={clearAllFilters}
+            />
+          )}
         </div>
         <ActionBar
           open={selectedIds.size > 0}
@@ -270,7 +312,9 @@ export function IssueList({
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
-      onDragOver={({ over }: DragOverEvent) => handleDragOver((over?.id as string) ?? null)}
+      onDragOver={({ over }: DragOverEvent) =>
+        handleDragOver((over?.id as string) ?? null)
+      }
       onDragEnd={handleDragEnd}
     >
       <SortableContext
@@ -286,7 +330,10 @@ export function IssueList({
         document.body
       )}
       <DragInfoBar
-        open={activeIssue !== null && ((ordering && ordering !== "manual") || !!isDraggingToOtherGroup)}
+        open={
+          activeIssue !== null &&
+          ((ordering && ordering !== "manual") || !!isDraggingToOtherGroup)
+        }
         ordering={ordering ?? ""}
         grouping={grouping}
         container={container}
@@ -308,7 +355,7 @@ function DropIndicator() {
 function IssueListItemDragClone({ issue }: { issue: Issue }) {
   return (
     <div className="bg-background border-border flex h-11 items-center gap-2 rounded-md border px-2 py-1.5 text-sm opacity-90 shadow-lg">
-      <span className="text-xs-plus min-w-0 truncate font-medium leading-none tracking-wide">
+      <span className="text-xs-plus min-w-0 truncate leading-none font-medium tracking-wide">
         {issue.title}
       </span>
     </div>
