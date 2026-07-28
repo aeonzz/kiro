@@ -161,7 +161,7 @@ export function IssueBoard({
         <div className="flex h-full min-w-0 flex-1 flex-col">
           <div
             className={cn(
-              "flex min-h-0 flex-1 gap-2 overflow-x-auto p-5.5",
+              "flex min-h-0 flex-1 gap-2 overflow-x-auto p-2",
               className
             )}
           >
@@ -242,7 +242,7 @@ function BoardColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        "border-border/50 flex w-84 shrink-0 flex-col gap-2 rounded-xl bg-[color-mix(in_oklab,var(--background),var(--sidebar)_70%)]"
+        "border-border/50 flex w-84 shrink-0 flex-col gap-2 rounded-md bg-[color-mix(in_oklab,var(--background),var(--sidebar)_70%)]"
       )}
     >
       <div

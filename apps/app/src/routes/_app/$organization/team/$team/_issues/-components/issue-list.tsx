@@ -140,7 +140,7 @@ export function IssueList({
   const listContent = (
     <div
       ref={setContainer}
-      className={cn("relative h-full min-w-0 flex-1", className)}
+      className={cn("relative mx-2 h-full min-w-0 flex-1", className)}
     >
       <div className="h-full min-h-0 overflow-y-auto">
         <div className="h-full" {...props}>
@@ -158,13 +158,13 @@ export function IssueList({
                   // The create trigger is a sibling of the collapsible trigger,
                   // not a child: nesting a button inside a button is invalid and
                   // the click would toggle the group.
-                  <div className="group/header relative">
+                  <div className="group/header relative my-0.5">
                     <CollapsibleTrigger
                       style={
                         { "--bg-color": group.color } as React.CSSProperties
                       }
                       className={cn(
-                        "group/trigger border-border/50 before:from-muted-foreground/2 relative h-9 w-full border-b outline-none before:absolute before:inset-0 before:bg-linear-to-l before:to-transparent before:content-['']",
+                        "group/trigger before:from-muted-foreground/2 relative h-9 w-full rounded-md outline-none before:absolute before:inset-0 before:bg-linear-to-l before:to-transparent before:content-['']",
                         "to-muted-foreground/2 bg-linear-to-r from-(--bg-color)/5"
                       )}
                     >
@@ -230,8 +230,7 @@ export function IssueList({
                 <CollapsibleContent>
                   <div
                     className={cn(
-                      "border-border/50 flex flex-col border-b transition-shadow",
-                      groupIndex === groupedIssues.length - 1 && "border-b-0!",
+                      "flex flex-col transition-shadow",
                       isDraggingToOtherGroup &&
                         !ctrlHeld &&
                         overGroupId === group.id &&

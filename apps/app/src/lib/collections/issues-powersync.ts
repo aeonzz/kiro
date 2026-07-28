@@ -1,5 +1,6 @@
+import * as React from "react";
 import { powerSyncCollectionOptions } from "@tanstack/powersync-db-collection";
-import { createCollection } from "@tanstack/react-db";
+import { createCollection, useLiveQuery } from "@tanstack/react-db";
 
 import type { Issue } from "@/types/issue";
 import { getPowerSyncDb } from "@/lib/powersync/db";
@@ -31,6 +32,40 @@ export function getIssuesPowerSyncCollection() {
   }
 
   return collection;
+}
+
+/**
+ * Resolve one issue by the `(teamId, number)` pair the DB keys issues on — the
+ * same pair an identifier like `AEO-13` decodes to. Local-first: reads the
+ * synced SQLite table, no network.
+ *
+ * Returns `isLoading` so callers can tell "still hydrating" from "no such
+ * issue" rather than flashing a missing title.
+ */
+export function usePowerSyncIssueByNumber(
+  teamId: string | undefined,
+  number: number | undefined
+): { issue: { id: string; title: string } | null; isLoading: boolean } {
+  const collection = React.useMemo(() => getIssuesPowerSyncCollection(), []);
+
+  const { data: issues = [], isLoading } = useLiveQuery(
+    (q) => q.from({ issue: collection }),
+    [collection]
+  );
+
+  const issue = React.useMemo(() => {
+    if (!teamId || number === undefined) return null;
+    const match = issues.find(
+      (row) => row.teamId === teamId && row.number === number
+    );
+    if (!match) return null;
+    return {
+      id: match.id as string,
+      title: (match.title as string) ?? "",
+    };
+  }, [issues, teamId, number]);
+
+  return { issue, isLoading };
 }
 
 /**

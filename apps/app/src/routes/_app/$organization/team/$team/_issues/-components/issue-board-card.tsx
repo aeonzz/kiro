@@ -6,11 +6,15 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { User02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useParams } from "@tanstack/react-router";
+import { Link, useParams } from "@tanstack/react-router";
 
 import type { Issue } from "@/types/issue";
 import { issueFilterOptions } from "@/config/team";
 import { getIssuesPowerSyncCollection } from "@/lib/collections/issues-powersync";
+import {
+  formatIssueIdentifier,
+  slugifyIssueTitle,
+} from "@/lib/issue-identifier";
 import {
   usePowerSyncOrgMembers,
   usePowerSyncTeamLabels,
@@ -95,6 +99,10 @@ export function IssueBoardCard({ issue, isDragOverlay }: IssueBoardCardProps) {
     [allLabels, issue.labelIds]
   );
 
+  const issueIdentifier = issue.number
+    ? formatIssueIdentifier(team, issue.number)
+    : null;
+
   const currentState = workflowStates.find((s) => s.id === issue.stateId);
   const currentAssignee = orgMembers.find((m) => m.value === issue.assigneeId);
 
@@ -104,30 +112,49 @@ export function IssueBoardCard({ issue, isDragOverlay }: IssueBoardCardProps) {
     });
   };
 
+  const cardProps = {
+    ref: setNodeRef,
+    style,
+    ...attributes,
+    ...listeners,
+    className: cn(
+      "bg-card hover:bg-[color-mix(in_oklab,var(--card),var(--card-foreground)_3%)] group flex cursor-default flex-col rounded-lg px-3 py-2 pr-1 shadow-xs transition-colors",
+      isDragging && "opacity-40",
+      isDragOverlay && "shadow-lg"
+    ),
+  };
+
+  // The drag overlay is a floating clone, not a target — only the real card
+  // links. Issues without a number have no identifier to build a URL from, so
+  // those stay plain divs rather than linking to a 404.
+  //
+  // Safe to nest the drag listeners on an anchor: the PointerSensor has a 5px
+  // activation distance, so a click never starts a drag. `draggable={false}`
+  // stops the browser's native link-drag from competing with it.
+  const card =
+    issueIdentifier && !isDragOverlay ? (
+      <Link
+        to="/$organization/issue/$issue/$title"
+        params={{
+          organization,
+          issue: issueIdentifier,
+          title: slugifyIssueTitle(issue.title),
+        }}
+        {...cardProps}
+        draggable={false}
+      />
+    ) : (
+      <div {...cardProps} />
+    );
+
   return (
     <ContextMenu>
-      <ContextMenuTrigger
-        render={
-          <div
-            ref={setNodeRef}
-            style={style}
-            {...attributes}
-            {...listeners}
-            className={cn(
-              "bg-card hover:bg-[color-mix(in_oklab,var(--card),var(--card-foreground)_3%)] group flex cursor-default flex-col rounded-lg px-3 py-2 pr-1 shadow-xs transition-colors",
-              isDragging && "opacity-40",
-              isDragOverlay && "shadow-lg"
-            )}
-          />
-        }
-      >
+      <ContextMenuTrigger render={card}>
         <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 flex-col">
           {displayProperties.includes("id") && (
             <span className="text-muted-foreground text-xs tabular-nums">
-              {issue.number
-                ? `${team.toUpperCase()}-${issue.number}`
-                : issue.id.slice(0, 6)}
+              {issueIdentifier ?? issue.id.slice(0, 6)}
             </span>
           )}
 

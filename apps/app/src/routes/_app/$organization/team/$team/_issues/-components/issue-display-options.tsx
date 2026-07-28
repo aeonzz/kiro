@@ -78,7 +78,7 @@ export function IssueDisplayOptions({
     <Popover {...props}>
       <Button
         variant="outline"
-        size="xs"
+        size="icon-xs"
         tooltip={{
           content: "Show display options",
           kbd: ["⇧", "V"],
@@ -89,7 +89,6 @@ export function IssueDisplayOptions({
         render={(triggerProps) => <PopoverTrigger {...triggerProps} />}
       >
         <HugeiconsIcon icon={SlidersHorizontalIcon} strokeWidth={2} />
-        <span>Display</span>
       </Button>
       <PopoverContent align="end" flush>
         <div className="border-border space-y-5 border-b px-4 py-3">

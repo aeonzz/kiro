@@ -100,7 +100,10 @@ export function NotificationCard({
               <Link
                 to={notification.link}
                 params={{ organization }}
-                search={{ viewMode: "split" }}
+                // Keeps the inbox list alongside the issue. Lives in history
+                // state rather than the URL so the link stays clean and a
+                // shared copy opens the standalone issue page.
+                state={{ fromInbox: true }}
               />
             }
             onClick={onClick}

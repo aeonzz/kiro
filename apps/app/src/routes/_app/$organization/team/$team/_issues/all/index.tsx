@@ -56,32 +56,15 @@ function RouteComponent() {
         ) : (
           <IssueList issues={[]} />
         )}
-        <TeamDetailsPanel
-          organization={organization}
-          team={team}
-          isOpen={isOpen}
-        />
+        <TeamDetailsPanel isOpen={isOpen} />
       </ContainerContent>
     </IssueTabProvider>
   );
 }
 
-function TeamDetailsPanel({
-  organization,
-  team,
-  isOpen,
-}: {
-  organization: string;
-  team: string;
-  isOpen: boolean;
-}) {
-  const { team: teamData } = usePowerSyncTeam(organization, team);
+function TeamDetailsPanel({ isOpen }: { isOpen: boolean }) {
   return (
-    <DetailsSidePanel
-      title="All issues"
-      team={teamData?.name ?? ""}
-      isOpen={isOpen}
-    >
+    <DetailsSidePanel isOpen={isOpen}>
       <FilterTabs />
     </DetailsSidePanel>
   );

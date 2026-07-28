@@ -28,4 +28,17 @@ declare module "@tanstack/react-router" {
   interface Register {
     router: ReturnType<typeof getRouter>;
   }
+
+  /**
+   * Location state is global rather than per-route, so app-wide keys live here.
+   *
+   * `fromInbox` marks a navigation that originated from an inbox notification.
+   * The issue URL is identical either way (Linear keeps it clean), so the inbox
+   * layout reads this to decide between the split view and the standalone page.
+   * It deliberately lives in history state, not search params — a shared link
+   * should open the standalone issue, not drop a stranger into someone's inbox.
+   */
+  interface HistoryState {
+    fromInbox?: boolean;
+  }
 }

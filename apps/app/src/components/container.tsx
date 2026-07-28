@@ -35,7 +35,7 @@ function ContainerHeader({
       <div
         ref={setContainer}
         className={cn(
-          "mx-2 flex w-full items-center gap-1 py-1.5 group-data-inset/header:mx-8",
+          "mx-2 flex w-full items-center gap-1 py-1.5 group-data-inset/header:mx-3",
           className
         )}
       >
@@ -53,7 +53,7 @@ function ContainerContent({
   return (
     <div
       data-slot="content"
-      className={cn("h-full overflow-y-auto", className)}
+      className={cn("h-full overflow-y-auto pb-2", className)}
       {...props}
     >
       {children}
