@@ -9,10 +9,12 @@ export type Issue = {
   stateId?: string;
   status: WorkflowGroupType;
   priority: IssuePriority;
+  position?: number;
   createdAt: string;
   updatedAt: string;
   assigneeId?: string;
   creatorId?: string;
   projectId?: string;
+  parentId?: string;
   labelIds: string[];
 };

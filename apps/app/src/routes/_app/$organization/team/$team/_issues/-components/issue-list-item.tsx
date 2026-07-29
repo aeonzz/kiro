@@ -1,4 +1,5 @@
 import * as React from "react";
+import { getWorkflowIcon } from "@/config";
 import { formatDate } from "@/utils/format-date";
 import { Icon } from "@/utils/icon";
 import {
@@ -11,17 +12,25 @@ import { Link, useParams } from "@tanstack/react-router";
 import { format } from "date-fns";
 
 import type { Issue } from "@/types/issue";
-import { getWorkflowIcon } from "@/config";
 import { issueFilterOptions } from "@/config/team";
 import { getIssuesPowerSyncCollection } from "@/lib/collections/issues-powersync";
+import {
+  usePowerSyncOrgMembers,
+  usePowerSyncTeamLabels,
+  usePowerSyncTeamProjects,
+  usePowerSyncWorkflowStates,
+  useTeamId,
+} from "@/lib/collections/team-metadata-powersync";
+import {
+  formatIssueIdentifier,
+  slugifyIssueTitle,
+} from "@/lib/issue-identifier";
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
+import { useIssueTabKey } from "@/hooks/use-issue-tab-key";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  ContextMenu,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
+import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { ListBoxItem } from "@/components/ui/list-box";
 import {
@@ -32,12 +41,6 @@ import {
 import { InProgressIcon } from "@/components/icons";
 import { ItemsCombobox } from "@/components/items-combobox";
 
-import {
-  usePowerSyncOrgMembers,
-  usePowerSyncTeamLabels,
-  usePowerSyncWorkflowStates,
-  useTeamId,
-} from "@/lib/collections/team-metadata-powersync";
 import { IssueContextMenu } from "./issue-context-menu";
 import { LabelCombobox } from "./label-combobox";
 
@@ -66,7 +69,7 @@ export function IssueListItem({
     showSubIssues,
     showEmptyGroups,
     displayProperties,
-  } = useActiveIssueDisplayOptions(team);
+  } = useActiveIssueDisplayOptions(useIssueTabKey(team));
 
   const issuesCollection = getIssuesPowerSyncCollection();
 
@@ -79,6 +82,10 @@ export function IssueListItem({
   const priorityOptions =
     issueFilterOptions.find((option) => option.id === "priority")?.options ??
     [];
+
+  const issueIdentifier = issue.number
+    ? formatIssueIdentifier(team, issue.number)
+    : null;
 
   const teamId = useTeamId(organization, team);
   const workflowStates = usePowerSyncWorkflowStates(teamId);
@@ -95,16 +102,34 @@ export function IssueListItem({
 
   const allLabelOptions = usePowerSyncTeamLabels(teamId);
   const orgMembers = usePowerSyncOrgMembers(organization);
+  const teamProjects = usePowerSyncTeamProjects(teamId);
+
+  const issueProject = React.useMemo(
+    () => teamProjects.find((p) => p.value === issue.projectId),
+    [teamProjects, issue.projectId]
+  );
 
   const issueLabels = React.useMemo(
-    () => allLabelOptions.filter((option) => issue?.labelIds?.includes(option.value)),
+    () =>
+      allLabelOptions.filter((option) =>
+        issue?.labelIds?.includes(option.value)
+      ),
     [allLabelOptions, issue?.labelIds]
   );
 
   const assigneesOptions = React.useMemo(
     () => [
-      { value: "unassigned", label: "No assignee", icon: User02Icon, color: "text-muted-foreground" },
-      ...orgMembers.map((m) => ({ value: m.value, label: m.label, avatarUrl: m.avatarUrl })),
+      {
+        value: "unassigned",
+        label: "No assignee",
+        icon: User02Icon,
+        color: "text-muted-foreground",
+      },
+      ...orgMembers.map((m) => ({
+        value: m.value,
+        label: m.label,
+        avatarUrl: m.avatarUrl,
+      })),
     ],
     [orgMembers]
   );
@@ -117,15 +142,22 @@ export function IssueListItem({
             index={index}
             isSelected={isSelected}
             className={cn(
-              "data-active:not-data-selected:bg-muted dark:data-active:not-data-selected:bg-muted/50 data-active:text-foreground data-[kb-visible=true]:ring-ring/50 [&_svg]:text-muted-foreground data-selected:bg-muted dark:not-data-selected:data-popup-open:bg-muted/50 not-data-selected:data-popup-open:bg-muted flex h-11 items-center gap-2 px-2 py-1.5 text-sm outline-none select-none data-[kb-visible=true]:ring-1 data-[kb-visible=true]:ring-inset [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+              "data-active:not-data-selected:bg-muted dark:data-active:not-data-selected:bg-muted/50 data-active:text-foreground data-[kb-visible=true]:ring-ring/50 [&_svg]:text-muted-foreground data-selected:bg-muted dark:not-data-selected:data-popup-open:bg-muted/50 not-data-selected:data-popup-open:bg-muted my-0.5 flex h-11 items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none select-none data-[kb-visible=true]:ring-1 data-[kb-visible=true]:ring-inset [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
             )}
-            // render={
-            //   <Link
-            //     to="/$organization/issue/$id"
-            //     params={{ organization, id: issue.id }}
-            //     state={(prev: any) => ({ ...prev, viewMode: "full" })}
-            //   />
-            // }
+            // Issues without a number have no identifier to build a URL from,
+            // so they stay non-navigable rather than linking to a 404.
+            render={
+              issueIdentifier ? (
+                <Link
+                  to="/$organization/issue/$issue/$title"
+                  params={{
+                    organization,
+                    issue: issueIdentifier,
+                    title: slugifyIssueTitle(issue.title),
+                  }}
+                />
+              ) : undefined
+            }
           />
         }
       >
@@ -198,7 +230,7 @@ export function IssueListItem({
         <div className="flex items-center gap-1.5">
           {displayProperties.includes("id") && (
             <span className="text-xs-plus text-muted-foreground w-13 justify-self-start leading-none tracking-wide">
-              {issue.number ? `${team.toUpperCase()}-${issue.number}` : issue.id}
+              {issueIdentifier ?? issue.id}
             </span>
           )}
           {displayProperties.includes("status") && (
@@ -246,13 +278,28 @@ export function IssueListItem({
           {issue.title}
         </span>
         <div className="ml-auto flex items-center gap-1">
+          {displayProperties.includes("project") && issueProject && (
+            <span className="text-muted-foreground flex items-center gap-1 text-xs">
+              {issueProject.color && (
+                <span
+                  className="size-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: issueProject.color }}
+                />
+              )}
+              <span className="max-w-24 truncate">{issueProject.label}</span>
+            </span>
+          )}
           {displayProperties.includes("labels") && (
             <div
               onClick={(e) => e.stopPropagation()}
               onPointerDown={(e) => e.stopPropagation()}
               className="flex items-center"
             >
-              <LabelCombobox issueId={issue.id} issueLabels={issueLabels} allLabelOptions={allLabelOptions} />
+              <LabelCombobox
+                issueId={issue.id}
+                issueLabels={issueLabels}
+                allLabelOptions={allLabelOptions}
+              />
             </div>
           )}
           {displayProperties.includes("assignee") && (
@@ -271,7 +318,10 @@ export function IssueListItem({
                 onValueChange={(value) => {
                   if (value) {
                     handleUpdateIssue({
-                      assigneeId: value.value === "unassigned" ? undefined : (value.value as Issue["assigneeId"]),
+                      assigneeId:
+                        value.value === "unassigned"
+                          ? undefined
+                          : (value.value as Issue["assigneeId"]),
                     });
                   }
                 }}

@@ -18,6 +18,7 @@ import {
 } from "@/config/team";
 import { cn } from "@/lib/utils";
 import { useActiveIssueDisplayOptions } from "@/hooks/use-issue-display-store";
+import { useIssueTabKey } from "@/hooks/use-issue-tab-key";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -65,7 +66,7 @@ export function IssueDisplayOptions({
     isDefault,
     layout,
     setLayout,
-  } = useActiveIssueDisplayOptions(team);
+  } = useActiveIssueDisplayOptions(useIssueTabKey(team));
 
   const selectedGrouping = issueGroupOptions.find((f) => f.value === grouping);
   const selectedOrdering = issueOrderOptions.find((f) => f.value === ordering);
@@ -77,7 +78,7 @@ export function IssueDisplayOptions({
     <Popover {...props}>
       <Button
         variant="outline"
-        size="xs"
+        size="icon-xs"
         tooltip={{
           content: "Show display options",
           kbd: ["⇧", "V"],
@@ -88,7 +89,6 @@ export function IssueDisplayOptions({
         render={(triggerProps) => <PopoverTrigger {...triggerProps} />}
       >
         <HugeiconsIcon icon={SlidersHorizontalIcon} strokeWidth={2} />
-        <span>Display</span>
       </Button>
       <PopoverContent align="end" flush>
         <div className="border-border space-y-5 border-b px-4 py-3">
@@ -140,21 +140,23 @@ export function IssueDisplayOptions({
                 setOrdering(value.value);
               }}
             >
-              <Button
-                variant="outline"
-                size="icon-xs"
-                className="[&>svg]:text-foreground"
-                onClick={() =>
-                  setDirection(direction === "asc" ? "desc" : "asc")
-                }
-                tooltip={direction === "asc" ? "Ascending" : "Descending"}
-              >
-                <HugeiconsIcon
-                  icon={Sorting01Icon}
-                  strokeWidth={2}
-                  className={cn(direction === "asc" && "scale-y-[-1]")}
-                />
-              </Button>
+              {ordering !== "manual" && (
+                <Button
+                  variant="outline"
+                  size="icon-xs"
+                  className="[&>svg]:text-foreground"
+                  onClick={() =>
+                    setDirection(direction === "asc" ? "desc" : "asc")
+                  }
+                  tooltip={direction === "asc" ? "Ascending" : "Descending"}
+                >
+                  <HugeiconsIcon
+                    icon={Sorting01Icon}
+                    strokeWidth={2}
+                    className={cn(direction === "asc" && "scale-y-[-1]")}
+                  />
+                </Button>
+              )}
             </OptionControlSelect>
           </div>
         </div>

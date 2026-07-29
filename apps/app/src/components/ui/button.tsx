@@ -16,7 +16,7 @@ const buttonVariants = cva(
         default:
           "shadow-border-sm bg-primary text-primary-foreground [a]:hover:bg-primary/80",
         outline:
-          "shadow-border-sm bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:dark:bg-input/50 aria-expanded:text-foreground",
+          "shadow-border-sm bg-background hover:bg-muted hover:text-foreground dark:bg-input/10 dark:hover:bg-input/30 aria-expanded:bg-muted aria-expanded:dark:bg-input/30 aria-expanded:text-foreground data-activable:text-muted-foreground data-activable:hover:text-foreground data-activable:data-active:bg-muted data-activable:data-active:dark:bg-input/30 data-activable:data-active:text-foreground data-activable:data-active:[&_svg]:text-foreground",
         flatOutline:
           "bg-transparent border border-border hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground data-activable:text-muted-foreground data-activable:data-active:dark:bg-input/30 data-activable:data-active:text-foreground data-activable:data-active:[&_svg]:text-foreground data-activable:hover:text-foreground",
         secondary:
@@ -27,6 +27,8 @@ const buttonVariants = cva(
           "hover:shadow-[0_0_0_1px_var(--accent)] hover:bg-accent hover:text-foreground dark:hover:bg-accent/70 dark:hover:shadow-[0_0_0_1px_var(--accent)]/70 aria-expanded:bg-accent dark:aria-expanded:bg-accent/70 aria-expanded:text-foreground aria-expanded:shadow-[0_0_0_1px_var(--accent)] dark:aria-expanded:shadow-[0_0_0_1px_var(--accent)]/70",
         ghostPopup:
           "hover:shadow-[0_0_0_1px_var(--accent)] hover:bg-accent hover:text-foreground dark:hover:bg-[color-mix(in_oklab,var(--accent)98%,var(--accent-foreground))] aria-expanded:bg-accent dark:aria-expanded:bg-[color-mix(in_oklab,var(--accent)98%,var(--accent-foreground))] aria-expanded:text-foreground aria-expanded:shadow-[0_0_0_1px_var(--accent)]",
+        ghostText:
+          "text-muted-foreground hover:text-foreground aria-expanded:text-foreground",
         destructive:
           "shadow-[0_0_0_1px_var(--destructive)]/25 bg-destructive/10 hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30",
         ghostDestructive:

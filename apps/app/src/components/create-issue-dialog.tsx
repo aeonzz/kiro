@@ -31,6 +31,7 @@ import { getIssuesPowerSyncCollection } from "@/lib/collections/issues-powersync
 import { createIssueSchema } from "@/services/issue/schema";
 import { deleteIssueDraftFn } from "@/services/issue/server-fn";
 import { useIssueDraftStore } from "@/hooks/use-issue-draft-store";
+import { useCreateIssueStore } from "@/hooks/use-create-issue-store";
 import { useAuthenticatedSession } from "@/hooks/use-session";
 import {
   AlertDialog,
@@ -66,7 +67,9 @@ import { TooltipContent } from "@/components/ui/tooltip";
 import { EditorKit } from "@/components/editor/editor-kit";
 import { Editor, EditorContainer } from "@/components/editor/ui/editor";
 import { ItemsCombobox, MultiItemsCombobox } from "@/components/items-combobox";
+import { useRouterState } from "@tanstack/react-router";
 import { useOrganization } from "@/components/organization-context";
+import { usePowerSyncOrgMembers } from "@/lib/collections/team-metadata-powersync";
 
 const formSchema = z.object({
   title: z.string().max(512),
@@ -76,6 +79,7 @@ const formSchema = z.object({
   description: z.custom<Value>(),
   projectId: z.string().nullable(),
   teamId: z.string(),
+  assigneeId: z.string().nullable(),
 });
 
 export const createIssueDialogHandle = DialogPrimitive.createHandle();
@@ -131,6 +135,19 @@ export function CreateIssueDialog() {
   const setTriggerDraftId = useIssueDraftStore(
     (state) => state.setTriggerDraftId
   );
+  const triggerContext = useCreateIssueStore((state) => state.triggerContext);
+  const setTriggerContext = useCreateIssueStore(
+    (state) => state.setTriggerContext
+  );
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const contextTeam = React.useMemo(() => {
+    const match = pathname.match(/\/[^/]+\/team\/([^/]+)/);
+    const slug = match?.[1];
+    if (!slug || !activeOrganization) return null;
+    return activeOrganization.teams.find((t) => t.slug === slug) ?? null;
+  }, [pathname, activeOrganization]);
+
   const drafts = activeOrganization?.issueDrafts ?? [];
 
   const triggerDraft = React.useMemo(
@@ -173,6 +190,7 @@ export function CreateIssueDialog() {
       labels: (triggerDraft?.labels as string[]) ?? ([] as Array<string>),
       teamId: triggerDraft?.teamId ?? activeOrganization?.teams[0]?.id ?? "",
       projectId: triggerDraft?.projectId ?? null,
+      assigneeId: null as string | null,
     },
     validators: {
       onSubmit: formSchema,
@@ -230,7 +248,7 @@ export function CreateIssueDialog() {
         priority: data.priority,
         teamId: data.teamId,
         creatorId: user.id,
-        assigneeId: null,
+        assigneeId: value.assigneeId ?? null,
         stateId: data.status,
         parentId: null,
         projectId: data.projectId ?? null,
@@ -274,6 +292,24 @@ export function CreateIssueDialog() {
 
   const labelOptions = useTeamLabels(selectedTeam?.slug ?? "");
 
+  const orgMembers = usePowerSyncOrgMembers(activeOrganization?.slug ?? "");
+  const assigneeOptions = React.useMemo(
+    () => [
+      {
+        value: "unassigned",
+        label: "No assignee",
+        icon: User02FreeIcons,
+        color: "text-muted-foreground",
+      },
+      ...orgMembers.map((m) => ({
+        value: m.value,
+        label: m.label,
+        avatarUrl: m.avatarUrl,
+      })),
+    ],
+    [orgMembers]
+  );
+
   const projectOptions = React.useMemo(() => {
     const options =
       selectedTeam?.projects?.map((p) => ({
@@ -296,6 +332,7 @@ export function CreateIssueDialog() {
         labels: (triggerDraft.labels as string[]) ?? [],
         teamId: triggerDraft.teamId ?? activeOrganization?.teams[0]?.id ?? "",
         projectId: triggerDraft.projectId ?? null,
+        assigneeId: null,
       });
 
       if (parsedDescription) {
@@ -325,6 +362,40 @@ export function CreateIssueDialog() {
   );
 
   function handleOpenChange(open: boolean) {
+    if (open && !triggerDraftId) {
+      const ctx = useCreateIssueStore.getState().triggerContext;
+
+      const resolvedTeam = ctx?.teamId
+        ? (activeOrganization?.teams.find((t) => t.id === ctx.teamId) ?? contextTeam)
+        : contextTeam;
+
+      if (resolvedTeam) {
+        form.setFieldValue("teamId", resolvedTeam.id);
+        const currentStatus = ctx?.status ?? form.getFieldValue("status");
+        const isValidStatus = resolvedTeam.workflowStates.some(
+          (s) => s.id === currentStatus
+        );
+        form.setFieldValue(
+          "status",
+          isValidStatus ? currentStatus : getDefaultWorkflowStateId(resolvedTeam.workflowStates)
+        );
+      } else if (ctx?.status) {
+        form.setFieldValue("status", ctx.status);
+      }
+
+      if (ctx?.projectId !== undefined) {
+        form.setFieldValue("projectId", ctx.projectId ?? null);
+      }
+
+      if (ctx?.priority) {
+        form.setFieldValue("priority", ctx.priority as IssuePriority);
+      }
+
+      if (ctx?.assigneeId !== undefined) {
+        form.setFieldValue("assigneeId", ctx.assigneeId ?? null);
+      }
+    }
+
     const hasTitle = form.state.values.title.trim().length > 0;
     const description = form.state.values.description;
     const isDefaultDescription =
@@ -417,9 +488,21 @@ export function CreateIssueDialog() {
       onOpenChangeComplete={(open) => {
         if (!open) {
           setExpand(false);
-          form.reset();
+          const defaultTeam =
+            contextTeam ?? activeOrganization?.teams[0];
+          form.reset({
+            title: "",
+            description: editor.children,
+            status: getDefaultWorkflowStateId(defaultTeam?.workflowStates),
+            priority: priorityOptions[0].value,
+            labels: [],
+            teamId: defaultTeam?.id ?? "",
+            projectId: null,
+            assigneeId: null,
+          });
           editor.tf.reset();
           setTriggerDraftId(null);
+          setTriggerContext(null);
         }
       }}
       onOpenChange={handleOpenChange}
@@ -721,6 +804,37 @@ export function CreateIssueDialog() {
                   kbd="L"
                   label="Labels"
                   icon={LabelIcon}
+                />
+              )}
+            />
+            <form.Field
+              name="assigneeId"
+              children={(field) => (
+                <ItemsCombobox
+                  id={field.name}
+                  name={field.name}
+                  items={assigneeOptions}
+                  value={
+                    assigneeOptions.find(
+                      (o) => o.value === (field.state.value ?? "unassigned")
+                    ) ?? assigneeOptions[0]
+                  }
+                  onValueChange={(value) =>
+                    field.handleChange(
+                      !value || value.value === "unassigned" ? null : value.value
+                    )
+                  }
+                  placeholder="Assign to..."
+                  triggerProps={{
+                    tooltip: {
+                      content: "Assign to",
+                      kbd: ["A"],
+                      tooltipProps: {
+                        collisionAvoidance: { side: "flip" },
+                      },
+                    },
+                  }}
+                  kbd="A"
                 />
               )}
             />
