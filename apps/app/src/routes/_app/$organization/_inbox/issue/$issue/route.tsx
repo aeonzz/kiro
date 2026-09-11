@@ -55,6 +55,7 @@ function RouteComponent() {
         teamSlug={parsed.teamSlug}
         identifier={formatIssueIdentifier(parsed.teamSlug, parsed.number)}
         title={issueData?.title ?? ""}
+        issueId={issueData?.id}
       />
       <Outlet />
     </Container>

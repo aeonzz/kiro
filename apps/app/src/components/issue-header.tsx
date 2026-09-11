@@ -1,8 +1,5 @@
 import * as React from "react";
-import {
-  Notification01Icon,
-  User02FreeIcons,
-} from "@hugeicons/core-free-icons";
+import { User02FreeIcons } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, useMatchRoute } from "@tanstack/react-router";
 
@@ -12,7 +9,7 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -157,11 +154,13 @@ export function IssueCrumb({
 
 export function IssueHeaderShell({
   children,
+  actions,
   inset = true,
   className,
   ...props
-}: React.ComponentProps<typeof ContainerHeader>) {
-
+}: React.ComponentProps<typeof ContainerHeader> & {
+  actions?: React.ReactNode;
+}) {
   return (
     <ContainerHeader
       inset={inset}
@@ -169,11 +168,7 @@ export function IssueHeaderShell({
       {...props}
     >
       <div className="flex items-center gap-2.5">{children}</div>
-      <div className="flex items-center gap-2.5">
-        <Button size="icon-xs" variant="ghost">
-          <HugeiconsIcon icon={Notification01Icon} strokeWidth={2} />
-        </Button>
-      </div>
+      {actions}
     </ContainerHeader>
   );
 }

@@ -6,18 +6,21 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import {
   IssueCrumb,
   IssueHeaderShell,
   IssuesCrumb,
   TeamCrumb,
 } from "@/components/issue-header";
+import { IssueNavigation } from "@/components/issue-navigation";
 
 export function Header({
   teamName,
   teamSlug: team,
   identifier,
   title,
+  issueId,
   ...props
 }: React.ComponentProps<typeof IssueHeaderShell> & {
   teamName: string;
@@ -30,13 +33,22 @@ export function Header({
   identifier: string;
   /** Resolved from the local issue row by the parent route; empty while loading. */
   title?: string;
+  /** Resolved from the local issue row; undefined while loading. */
+  issueId?: string;
 }) {
   const { organization } = useParams({
     from: "/_app/$organization/_inbox/issue/$issue",
   });
 
   return (
-    <IssueHeaderShell {...props}>
+    <IssueHeaderShell
+      actions={
+        <div className="flex items-center gap-2.5">
+          <IssueNavigation organization={organization} issueId={issueId} />
+        </div>
+      }
+      {...props}
+    >
       <Breadcrumb>
         <BreadcrumbList>
           <TeamCrumb

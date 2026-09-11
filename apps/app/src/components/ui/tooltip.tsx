@@ -65,7 +65,7 @@ function TooltipContent({
         collisionBoundary={collisionBoundary}
         collisionPadding={collisionBoundary ? 0 : collisionPadding}
         collisionAvoidance={collisionAvoidance}
-        className="ease-out-expo isolate z-40 h-(--positioner-height) max-h-[--available-height] w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-400"
+        className="ease-out-expo isolate h-(--positioner-height) max-h-[--available-height] w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] duration-400"
       >
         <TooltipPrimitive.Popup
           data-slot="tooltip-content"

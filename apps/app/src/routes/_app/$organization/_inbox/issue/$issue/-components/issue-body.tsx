@@ -1,5 +1,6 @@
 import * as React from "react";
 import type { Value } from "platejs";
+import { useNavigate } from "@tanstack/react-router";
 import { Plate, usePlateEditor } from "platejs/react";
 
 import {
@@ -7,6 +8,7 @@ import {
   type PowerSyncIssueDetail,
 } from "@/lib/collections/issues-powersync";
 import { useDebounceCallback } from "@/hooks/use-debounce-callback";
+import { slugifyIssueTitle } from "@/lib/issue-identifier";
 import { Textarea } from "@/components/ui/textarea";
 import { EditorKit } from "@/components/editor/editor-kit";
 import { Editor, EditorContainer } from "@/components/editor/ui/editor";
@@ -23,12 +25,21 @@ function parseDescription(description: string | null): Value | undefined {
   }
 }
 
-export function IssueBody({ issue }: { issue: PowerSyncIssueDetail }) {
+export function IssueBody({
+  issue,
+  organization,
+  issueIdentifier,
+}: {
+  issue: PowerSyncIssueDetail;
+  organization: string;
+  issueIdentifier: string;
+}) {
   const issuesCollection = React.useMemo(
     () => getIssuesPowerSyncCollection(),
     []
   );
   const issueId = issue.id;
+  const navigate = useNavigate();
 
   const [title, setTitle] = React.useState(issue.title);
 
@@ -53,6 +64,21 @@ export function IssueBody({ issue }: { issue: PowerSyncIssueDetail }) {
     (next: string) => persist({ title: next }),
     [persist]
   );
+
+  // Keep the URL's cosmetic title slug in sync, mirroring Linear - only once
+  // the user is done editing, not on every keystroke.
+  const syncTitleSlug = React.useCallback(() => {
+    void navigate({
+      to: "/$organization/issue/$issue/$title",
+      params: {
+        organization,
+        issue: issueIdentifier,
+        title: slugifyIssueTitle(title),
+      },
+      replace: true,
+      resetScroll: false,
+    });
+  }, [navigate, organization, issueIdentifier, title]);
 
   const persistDescription = React.useCallback(
     (next: string) => {
@@ -84,7 +110,10 @@ export function IssueBody({ issue }: { issue: PowerSyncIssueDetail }) {
           setTitle(event.target.value);
           debouncedTitle(event.target.value);
         }}
-        onBlur={() => debouncedTitle.flush()}
+        onBlur={() => {
+          debouncedTitle.flush();
+          syncTitleSlug();
+        }}
         className="placeholder:text-muted-foreground/60 min-h-0 shrink-0 py-0 pr-0 pl-7 text-2xl! leading-8 font-semibold shadow-none focus-visible:ring-0"
         autoComplete="off"
         autoCorrect="off"

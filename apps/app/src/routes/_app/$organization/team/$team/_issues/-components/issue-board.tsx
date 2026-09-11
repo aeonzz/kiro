@@ -37,6 +37,7 @@ import {
   useIssueFilters,
   useIssuePanelFilters,
 } from "@/hooks/use-issue-filter-store";
+import { useRegisterIssueNavigation } from "@/hooks/use-issue-navigation";
 import { useIssueTabKey } from "@/hooks/use-issue-tab-key";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -94,6 +95,8 @@ export function IssueBoard({
     () => groupedIssues.flatMap((g) => g.issues),
     [groupedIssues]
   );
+
+  useRegisterIssueNavigation(flattenedIssues, team);
 
   // Resolve the drop target by pointer position, not by nearest center: empty
   // tall columns have far-off centers that `closestCenter` wrongly picks. Find
