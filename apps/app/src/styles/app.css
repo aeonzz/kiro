@@ -3,6 +3,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
 @plugin "tailwind-scrollbar-hide";
 
 @custom-variant dark (&:is(.dark *));
@@ -115,6 +116,9 @@
   --text-2xl-plus--line-height: calc(2 / 1.5);
 
   --font-sans: "Inter Variable", sans-serif;
+  --font-mono:
+    "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
 
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);

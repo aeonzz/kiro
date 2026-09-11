@@ -2,6 +2,7 @@ import * as React from "react";
 import type { StrictOmit } from "@/types";
 import { Copy01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,11 +15,12 @@ export function CopyButton({
   value,
   size = "icon-xs",
   variant = "ghost",
+  toastMessage,
   ...props
-}: { value: (() => string) | string } & StrictOmit<
-  React.ComponentProps<typeof Button>,
-  "value"
->) {
+}: {
+  value: (() => string) | string;
+  toastMessage?: string;
+} & StrictOmit<React.ComponentProps<typeof Button>, "value">) {
   const [hasCopied, setHasCopied] = React.useState(false);
 
   React.useEffect(() => {
@@ -39,6 +41,9 @@ export function CopyButton({
                 typeof value === "function" ? value() : value
               );
               setHasCopied(true);
+              if (toastMessage) {
+                toast.info(toastMessage);
+              }
             }}
             {...props}
           />

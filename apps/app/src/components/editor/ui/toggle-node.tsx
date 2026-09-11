@@ -6,17 +6,25 @@ import { PlateElement } from "platejs/react";
 
 import { Button } from "@/components/ui/button";
 
+import { getToggleHeading } from "../utils/toggle";
+import { toggleVariants } from "./toggle-node-variants";
+
 export function ToggleElement(props: PlateElementProps) {
   const element = props.element;
   const state = useToggleButtonState(element.id as string);
   const { buttonProps, open } = useToggleButton(state);
+  const heading = getToggleHeading(element);
 
   return (
-    <PlateElement {...props} className="relative h-6.5 pl-6">
+    <PlateElement
+      {...props}
+      as={heading ?? "div"}
+      className={toggleVariants({ heading, className: "slate-selectable" })}
+    >
       <Button
         size="icon-xs"
         variant="ghost"
-        className="absolute top-px -left-0.5 size-5"
+        className="absolute top-1/2 -left-0.5 size-5 -translate-y-1/2"
         contentEditable={false}
         {...buttonProps}
       >

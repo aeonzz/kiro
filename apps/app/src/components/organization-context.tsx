@@ -6,7 +6,10 @@ import { useLocation, useNavigate } from "@tanstack/react-router";
 import type { IssueDraft, Member, Organization, Team } from "@/types/schema-types";
 import { HomeViewValue } from "@/config/preferences";
 import { usePowerSyncOrganizations } from "@/lib/collections/organizations-powersync";
-import { usePowerSyncReady } from "@/lib/collections/powersync-bootstrap";
+import {
+  usePowerSyncHasSynced,
+  usePowerSyncReady,
+} from "@/lib/collections/powersync-bootstrap";
 import { issueDraftQueries } from "@/lib/query-factory";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { usePreferencesStore } from "@/hooks/use-preference-store";
@@ -80,14 +83,15 @@ function OrganizationProviderClient({
   const session = useSession();
   const currentUserId = session?.user?.id;
 
-  const { organizations } = usePowerSyncOrganizations();
+  const { organizations, isLoading: orgsLoading } = usePowerSyncOrganizations();
   const ready = usePowerSyncReady();
+  const hasSynced = usePowerSyncHasSynced();
 
   // Cast the local org shape (string dates, empty issueDrafts) to the context
   // org type at this single boundary; downstream consumers read these fields
   // loosely. `issueDrafts` is injected below from the server draft query.
   const userOrganizations = organizations as unknown as ContextOrganization[];
-  const userOrganizationsPending = !ready;
+  const userOrganizationsPending = !ready || orgsLoading;
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -145,7 +149,14 @@ function OrganizationProviderClient({
         };
         const route = homeViewRoutes[homeView] || "inbox";
         navigate({ to: `/${effectiveSlug}/${route}` });
-      } else if (userOrganizations && userOrganizations.length === 0) {
+      } else if (
+        hasSynced &&
+        userOrganizations &&
+        userOrganizations.length === 0
+      ) {
+        // Only bounce to /join once the server sync has confirmed the user
+        // genuinely has no orgs. Before first sync the local DB is empty, so
+        // an unguarded check here redirects members away from their own app.
         navigate({ to: "/join" });
       }
     }
@@ -159,6 +170,7 @@ function OrganizationProviderClient({
     pathSegments.length,
     effectiveSlug,
     homeView,
+    hasSynced,
   ]);
 
   const value = React.useMemo(() => {

@@ -8,7 +8,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { KEYS } from "platejs";
-import { useEditorReadOnly } from "platejs/react";
+import { useEditorReadOnly, useEditorSelector } from "platejs/react";
 
 import { ListToolbarButton } from "./list-toolbar-button";
 import { MarkToolbarButton } from "./mark-toolbar-button";
@@ -17,6 +17,10 @@ import { TurnIntoToolbarButton } from "./turn-into-toolbar-button";
 
 export function FloatingToolbarButtons() {
   const readOnly = useEditorReadOnly();
+  const hasToggleTitle = useEditorSelector(
+    (editor) => editor.api.some({ match: { type: KEYS.toggle } }),
+    []
+  );
 
   return (
     <React.Fragment>
@@ -58,7 +62,7 @@ export function FloatingToolbarButtons() {
           >
             <HugeiconsIcon icon={SourceCodeIcon} strokeWidth={2} />
           </MarkToolbarButton>
-          <ListToolbarButton />
+          {!hasToggleTitle && <ListToolbarButton />}
         </ToolbarGroup>
       )}
     </React.Fragment>

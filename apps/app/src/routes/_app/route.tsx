@@ -13,6 +13,7 @@ import { usePreferencesStore } from "@/hooks/use-preference-store";
 type Preferences = Awaited<ReturnType<typeof getUserPreferencesFn>>;
 
 export const Route = createFileRoute("/_app")({
+  ssr: "data-only",
   beforeLoad: async ({ context, serverContext }) => {
     if (!context.session?.user) {
       throw redirect({ to: "/login" });
