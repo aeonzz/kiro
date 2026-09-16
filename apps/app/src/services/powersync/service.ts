@@ -49,6 +49,39 @@ function toIssueWriteData(
   return out;
 }
 
+// Issue columns that get an IssueHistory entry when changed via a PATCH op.
+const TRACKED_HISTORY_FIELDS = [
+  "title",
+  "stateId",
+  "priority",
+  "assigneeId",
+  "projectId",
+  "parentId",
+] as const;
+type TrackedHistoryField = (typeof TRACKED_HISTORY_FIELDS)[number];
+
+function diffTrackedFields(
+  existing: Record<string, unknown>,
+  changes: Record<string, unknown>
+): Array<{ field: TrackedHistoryField; oldValue: string | null; newValue: string | null }> {
+  const diffs: Array<{
+    field: TrackedHistoryField;
+    oldValue: string | null;
+    newValue: string | null;
+  }> = [];
+
+  for (const field of TRACKED_HISTORY_FIELDS) {
+    if (!(field in changes)) continue;
+    const oldValue = (existing[field] as string | null) ?? null;
+    const newValue = (changes[field] as string | null) ?? null;
+    if (oldValue !== newValue) {
+      diffs.push({ field, oldValue, newValue });
+    }
+  }
+
+  return diffs;
+}
+
 /**
  * Applies a batch of PowerSync CRUD operations for the `issue` table, enforcing
  * that the acting user can access the target team. Runs in a single transaction
@@ -65,17 +98,36 @@ export async function applyIssueCrud({
   ops: CrudOp[];
 }): Promise<void> {
   await prisma.$transaction(async (tx) => {
+    // Shared across every history row created by this batch so edits landing
+    // together (e.g. a priority change alongside a label add) group into one
+    // activity entry client-side instead of several with near-identical times.
+    const createdAt = new Date();
+
     for (const op of ops) {
       if (op.table === "issue_label_link") {
         if (op.op === "DELETE") {
-          await tx.issueLabelLink.deleteMany({
+          const existingLink = await tx.issueLabelLink.findFirst({
             where: {
               id: op.id,
               issue: {
                 team: { organization: { members: { some: { userId } } } },
               },
             },
+            select: { issueId: true, labelId: true },
           });
+          if (existingLink) {
+            await tx.issueLabelLink.delete({ where: { id: op.id } });
+            await tx.issueHistory.create({
+              data: {
+                issueId: existingLink.issueId,
+                actorId: userId,
+                field: "label",
+                oldValue: existingLink.labelId,
+                newValue: null,
+                createdAt,
+              },
+            });
+          }
           continue;
         }
 
@@ -97,11 +149,31 @@ export async function applyIssueCrud({
           throw new Error("Forbidden: no access to issue");
         }
 
+        // Check first so a retried/idempotent upsert doesn't record a second
+        // "added" entry for a link that was already there.
+        const existingLink = await tx.issueLabelLink.findFirst({
+          where: { id: op.id },
+          select: { id: true },
+        });
+
         await tx.issueLabelLink.upsert({
           where: { id: op.id },
           create: { id: op.id, issueId, labelId },
           update: {},
         });
+
+        if (!existingLink) {
+          await tx.issueHistory.create({
+            data: {
+              issueId,
+              actorId: userId,
+              field: "label",
+              oldValue: null,
+              newValue: labelId,
+              createdAt,
+            },
+          });
+        }
         continue;
       }
 
@@ -158,6 +230,20 @@ export async function applyIssueCrud({
           },
           update: toIssueWriteData(op.data),
         });
+
+        // PowerSync only emits a PUT for a locally-created row, so this always
+        // represents a genuine creation (a retried PUT would just duplicate the
+        // entry, matching the retry semantics the upsert above already has).
+        await tx.issueHistory.create({
+          data: {
+            issueId: op.id,
+            actorId: userId,
+            field: "created",
+            oldValue: null,
+            newValue: null,
+            createdAt,
+          },
+        });
         continue;
       }
 
@@ -167,16 +253,40 @@ export async function applyIssueCrud({
           id: op.id,
           team: { organization: { members: { some: { userId } } } },
         },
-        select: { id: true },
+        select: {
+          id: true,
+          title: true,
+          stateId: true,
+          priority: true,
+          assigneeId: true,
+          projectId: true,
+          parentId: true,
+        },
       });
       if (!existing) {
         throw new Error("Forbidden: no access to issue");
       }
 
+      const writeData = toIssueWriteData(op.data);
+
       await tx.issue.update({
         where: { id: op.id },
-        data: toIssueWriteData(op.data),
+        data: writeData,
       });
+
+      const historyDiffs = diffTrackedFields(existing, writeData);
+      if (historyDiffs.length > 0) {
+        await tx.issueHistory.createMany({
+          data: historyDiffs.map((diff) => ({
+            issueId: op.id,
+            actorId: userId,
+            field: diff.field,
+            oldValue: diff.oldValue,
+            newValue: diff.newValue,
+            createdAt,
+          })),
+        });
+      }
     }
   });
 }

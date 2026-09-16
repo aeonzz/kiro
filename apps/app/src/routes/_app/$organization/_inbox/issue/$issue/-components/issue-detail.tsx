@@ -6,6 +6,7 @@ import { formatIssueIdentifier } from "@/lib/issue-identifier";
 import { IssueActionsToolbar } from "@/components/issue-actions-toolbar";
 import { DotmSquare18 } from "@/components/ui/dotm-square-18";
 
+import { IssueActivity } from "./issue-activity";
 import { IssueBody } from "./issue-body";
 import { IssueProperties } from "./issue-properties";
 
@@ -34,13 +35,18 @@ export function IssueDetail({
       <div className="absolute top-2 right-2">
         <IssueActionsToolbar identifier={identifier} />
       </div>
-      <div className="grid grid-cols-[1fr_minmax(0,75ch)_minmax(0,clamp(280px,26vw,400px))_1fr] items-start gap-x-4 py-16 md:gap-x-14">
-        <div className="relative col-start-2 min-w-0">
+      <div className="grid grid-cols-[1fr_minmax(0,85ch)_minmax(0,clamp(280px,26vw,400px))_1fr] items-start gap-x-4 py-16 md:gap-x-14">
+        <div className="relative col-start-2 flex min-w-0 flex-col gap-6">
           <IssueBody
             key={issue.id}
             issue={issue}
             organization={organization}
             issueIdentifier={identifier}
+          />
+          <IssueActivity
+            issueId={issue.id}
+            teamId={issue.teamId}
+            organization={organization}
           />
         </div>
         <div className="sticky top-14 col-start-3 min-w-0">

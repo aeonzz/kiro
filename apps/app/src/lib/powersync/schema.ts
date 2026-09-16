@@ -79,6 +79,21 @@ const issue_label_link = new Table(
   { indexes: { issue: ["issueId"], label: ["labelId"] } }
 );
 
+// Mirrors Postgres `issue_history` (@@map("issue_history")). Sync-down only —
+// rows are created exclusively by applyIssueCrud server-side, never written
+// from the client.
+const issue_history = new Table(
+  {
+    issueId: column.text,
+    actorId: column.text,
+    field: column.text,
+    oldValue: column.text,
+    newValue: column.text,
+    createdAt: column.text,
+  },
+  { indexes: { issue: ["issueId"] } }
+);
+
 // Mirrors Postgres `team` (@@map("team")). Synced so team metadata (name,
 // slug -> id resolution) is available locally/offline.
 const team = new Table(
@@ -155,6 +170,7 @@ export const AppSchema = new Schema({
   workflow_state,
   issue_label,
   issue_label_link,
+  issue_history,
   team,
   organization,
   member,
@@ -168,6 +184,7 @@ export type IssueRecord = Database["issue"];
 export type WorkflowStateRecord = Database["workflow_state"];
 export type IssueLabelRecord = Database["issue_label"];
 export type IssueLabelLinkRecord = Database["issue_label_link"];
+export type IssueHistoryRecord = Database["issue_history"];
 export type TeamRecord = Database["team"];
 export type OrganizationRecord = Database["organization"];
 export type MemberRecord = Database["member"];

@@ -133,7 +133,7 @@ export function IssueBody({
           className="flex-1"
           onBlur={() => debouncedDescription.flush()}
         >
-          <Editor variant="document" placeholder="Add description..." />
+          <Editor variant="document" placeholder="Add description..." autoComplete="off" />
         </EditorContainer>
       </Plate>
     </div>
