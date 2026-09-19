@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export type IssueNavEntry = {
   id: string;
@@ -11,16 +12,15 @@ interface IssueNavigationState {
   setEntries: (entries: IssueNavEntry[]) => void;
 }
 
-/**
- * Holds the ordered list of issues from whichever list/board view the user
- * was most recently looking at, so the issue detail page can offer
- * Linear-style previous/next navigation through that same set. Deliberately
- * in-memory only (not persisted) — it reflects "what you were just looking
- * at" for this tab, not a durable preference.
- */
-export const useIssueNavigationStore = create<IssueNavigationState>(
-  (set) => ({
-    entries: [],
-    setEntries: (entries) => set({ entries }),
-  })
+export const useIssueNavigationStore = create<IssueNavigationState>()(
+  persist(
+    (set) => ({
+      entries: [],
+      setEntries: (entries) => set({ entries }),
+    }),
+    {
+      name: "issue-navigation-storage",
+      storage: createJSONStorage(() => sessionStorage),
+    }
+  )
 );

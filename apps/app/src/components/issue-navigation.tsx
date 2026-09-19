@@ -35,7 +35,7 @@ export function IssueNavigation({
       <ButtonGroup>
         <NavButton
           organization={organization}
-          entry={nav.previous}
+          entry={nav.next}
           icon={ArrowDown01Icon}
           tooltip={{
             content: "Navigate down",
@@ -44,7 +44,7 @@ export function IssueNavigation({
         />
         <NavButton
           organization={organization}
-          entry={nav.next}
+          entry={nav.previous}
           icon={ArrowUp01Icon}
           tooltip={{
             content: "Navigate up",

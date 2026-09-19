@@ -33,7 +33,7 @@ export function IssueDetail({
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <div className="absolute top-2 right-2">
+      <div className="sticky top-2 mr-2 -mb-6 ml-auto w-fit">
         <IssueActionsToolbar identifier={identifier} />
       </div>
       <div className="grid grid-cols-[1fr_minmax(0,85ch)_minmax(0,clamp(280px,26vw,400px))_1fr] items-start gap-x-4 py-16 md:gap-x-14">
@@ -51,7 +51,7 @@ export function IssueDetail({
           />
           <IssueComments issueId={issue.id} organization={organization} />
         </div>
-        <div className="sticky top-14 col-start-3 min-w-0">
+        <div className="sticky top-16 col-start-3 min-w-0">
           <IssueProperties issue={issue} organization={organization} />
         </div>
       </div>
