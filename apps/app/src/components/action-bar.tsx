@@ -113,7 +113,7 @@ export function ActionBarContent({
         }}
         className={cn(
           "bg-popover shadow-border absolute bottom-6 left-1/2 flex w-fit -translate-x-1/2 items-center gap-2 rounded-md p-2",
-          "ease-out-expo transition-all duration-450",
+          "ease-out-expo transition-all duration-300",
           "data-starting-style:translate-y-2 data-starting-style:opacity-0",
           "data-open:translate-y-0 data-open:opacity-100",
           "data-ending-style:translate-y-2 data-ending-style:opacity-0",

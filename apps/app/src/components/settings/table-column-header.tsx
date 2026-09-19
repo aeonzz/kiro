@@ -48,7 +48,7 @@ export function TableColumnHeader<TData>({
         }
         strokeWidth={2}
         className={cn(
-          "ease-out-expo transition-opacity duration-450",
+          "ease-out-expo transition-opacity duration-300",
           showDefaultArrow
             ? "opacity-100"
             : "opacity-0 group-hover/settings-table-column-header:opacity-100"

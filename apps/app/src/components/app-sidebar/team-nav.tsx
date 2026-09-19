@@ -64,7 +64,7 @@ export function TeamNav({
   const expandedTeams = usePreferencesStore((state) => state.expandedTeams);
   const setTeamExpanded = usePreferencesStore((state) => state.setTeamExpanded);
 
-  const transitionDuration = `${Math.max(150, Math.min(500, 150 + teams.length * 30))}ms`;
+  const transitionDuration = `${Math.max(150, Math.min(300, 150 + teams.length * 30))}ms`;
   const style = {
     "--transition-duration": transitionDuration,
   } as React.CSSProperties;
@@ -175,7 +175,7 @@ export function TeamNav({
                             </DropdownMenuGroup>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                        <CollapsibleContent className="duration-450">
+                        <CollapsibleContent className="duration-300">
                           <SidebarMenuSub className="translate-x-1 pb-2 transition-opacity duration-300 ease-out group-data-ending-style:opacity-0 group-data-starting-style:opacity-0">
                             {sidebarTeamItems.map((item) => {
                               const lastTab = useLastVisitedStore

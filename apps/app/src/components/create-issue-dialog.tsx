@@ -513,7 +513,7 @@ export function CreateIssueDialog() {
         style={
           {
             transition:
-              "opacity 450ms var(--ease-out-expo), transform 450ms var(--ease-out-expo), scale 450ms var(--ease-out-expo), top 450ms var(--ease-out-expo), height, width",
+              "opacity 300ms var(--ease-out-expo), transform 300ms var(--ease-out-expo), scale 300ms var(--ease-out-expo), top 300ms var(--ease-out-expo), height, width",
           } as React.CSSProperties
         }
         className="top-[16%] mt-6 flex max-h-[calc(100%-4rem)] min-w-3xl translate-y-[-16%] flex-col overflow-hidden data-ending-style:top-[16%] data-starting-style:top-[16%] sm:max-w-none"
