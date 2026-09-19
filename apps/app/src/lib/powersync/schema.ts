@@ -94,6 +94,33 @@ const issue_history = new Table(
   { indexes: { issue: ["issueId"] } }
 );
 
+// Mirrors Postgres `issue_comment` (@@map("issue_comment")).
+const issue_comment = new Table(
+  {
+    body: column.text,
+    issueId: column.text,
+    userId: column.text,
+    parentId: column.text,
+    resolvedAt: column.text,
+    resolvedById: column.text,
+    createdAt: column.text,
+    updatedAt: column.text,
+  },
+  { indexes: { issue: ["issueId"], parent: ["parentId"] } }
+);
+
+// Mirrors Postgres `issue_comment_reaction` (@@map("issue_comment_reaction")).
+const issue_comment_reaction = new Table(
+  {
+    commentId: column.text,
+    issueId: column.text,
+    userId: column.text,
+    emoji: column.text,
+    createdAt: column.text,
+  },
+  { indexes: { comment: ["commentId"], issue: ["issueId"] } }
+);
+
 // Mirrors Postgres `team` (@@map("team")). Synced so team metadata (name,
 // slug -> id resolution) is available locally/offline.
 const team = new Table(
@@ -171,6 +198,8 @@ export const AppSchema = new Schema({
   issue_label,
   issue_label_link,
   issue_history,
+  issue_comment,
+  issue_comment_reaction,
   team,
   organization,
   member,
@@ -185,6 +214,8 @@ export type WorkflowStateRecord = Database["workflow_state"];
 export type IssueLabelRecord = Database["issue_label"];
 export type IssueLabelLinkRecord = Database["issue_label_link"];
 export type IssueHistoryRecord = Database["issue_history"];
+export type IssueCommentRecord = Database["issue_comment"];
+export type IssueCommentReactionRecord = Database["issue_comment_reaction"];
 export type TeamRecord = Database["team"];
 export type OrganizationRecord = Database["organization"];
 export type MemberRecord = Database["member"];

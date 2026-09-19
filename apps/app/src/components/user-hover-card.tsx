@@ -1,4 +1,5 @@
 import * as React from "react";
+import { getInitials } from "@/utils/get-initials";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -12,16 +13,6 @@ export type UserHoverCardUser = {
   avatarUrl?: string;
   email?: string;
 };
-
-function getInitials(name?: string): string {
-  if (!name) return "?";
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-}
 
 /** Wraps `children` (a name, avatar, mention — anything identifying a user)
  * with a hover card showing that user's avatar, name, and email. */

@@ -17,10 +17,12 @@ model User {
   notifications          Notification[] @relation("NotificationRecipient")
   triggeredNotifications Notification[] @relation("NotificationActor")
 
-  assignedIssues Issue[]         @relation("IssueAssignee")
-  createdIssues  Issue[]         @relation("IssueCreator")
-  issueComments  IssueComment[]
-  issueHistory   IssueHistory[]
+  assignedIssues    Issue[]                @relation("IssueAssignee")
+  createdIssues     Issue[]                @relation("IssueCreator")
+  issueComments     IssueComment[]
+  resolvedComments  IssueComment[]         @relation("CommentResolvedBy")
+  commentReactions  IssueCommentReaction[]
+  issueHistory      IssueHistory[]
   ledProjects    Project[]
   projectUpdates ProjectUpdate[]
   issueDrafts    IssueDraft[]

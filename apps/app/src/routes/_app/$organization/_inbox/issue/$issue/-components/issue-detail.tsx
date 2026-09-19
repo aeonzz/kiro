@@ -3,10 +3,11 @@ import { useParams } from "@tanstack/react-router";
 import { usePowerSyncIssueByNumber } from "@/lib/collections/issues-powersync";
 import { usePowerSyncTeam } from "@/lib/collections/team-metadata-powersync";
 import { formatIssueIdentifier } from "@/lib/issue-identifier";
-import { IssueActionsToolbar } from "@/components/issue-actions-toolbar";
 import { DotmSquare18 } from "@/components/ui/dotm-square-18";
+import { IssueActionsToolbar } from "@/components/issue-actions-toolbar";
 
-import { IssueActivity } from "./issue-activity";
+import { IssueComments } from "./issue-activity/issue-comments";
+import { IssueHistory } from "./issue-activity/issue-history";
 import { IssueBody } from "./issue-body";
 import { IssueProperties } from "./issue-properties";
 
@@ -43,11 +44,12 @@ export function IssueDetail({
             organization={organization}
             issueIdentifier={identifier}
           />
-          <IssueActivity
+          <IssueHistory
             issueId={issue.id}
             teamId={issue.teamId}
             organization={organization}
           />
+          <IssueComments issueId={issue.id} organization={organization} />
         </div>
         <div className="sticky top-14 col-start-3 min-w-0">
           <IssueProperties issue={issue} organization={organization} />

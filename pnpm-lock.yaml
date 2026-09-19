@@ -6,9 +6,6 @@ settings:
 
 catalogs:
   default:
-    dotenv:
-      specifier: ^17.2.3
-      version: 17.2.3
     zod:
       specifier: ^4.4.3
       version: 4.1.13
@@ -48,11 +45,11 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@hugeicons/core-free-icons':
-        specifier: ^3.3.0
-        version: 3.3.0
+        specifier: ^4.3.3
+        version: 4.3.3
       '@hugeicons/react':
-        specifier: ^1.1.9
-        version: 1.1.9(react@19.2.7)
+        specifier: ^1.1.10
+        version: 1.1.10(react@19.2.7)
       '@journeyapps/wa-sqlite':
         specifier: ^1.7.2
         version: 1.7.2
@@ -188,6 +185,9 @@ importers:
       fractional-indexing:
         specifier: ^4.0.0
         version: 4.0.0
+      frimousse:
+        specifier: ^0.3.0
+        version: 0.3.0(react@19.2.7)(typescript@5.9.3)
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
@@ -1067,11 +1067,11 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hugeicons/core-free-icons@3.3.0':
-    resolution: {integrity: sha512-qYyr4JQ2eQIHTSTbITvnJvs6ERNK64D9gpwZnf2IyuG0exzqfyABLO/oTB71FB3RZPfu1GbwycdiGSo46apjMQ==}
+  '@hugeicons/core-free-icons@4.3.3':
+    resolution: {integrity: sha512-rpCPwJXhIjEKhMYb2AbNU6nS1HD2vXjeT65LL8SOaEHoN0cI57UTgnroU8q/TlocQQfnxeGz9C3KiyIausfzxg==}
 
-  '@hugeicons/react@1.1.9':
-    resolution: {integrity: sha512-O+lWSWjbijoAvMCxn4K2bQWCGN5+mP1y5j+X99j23mXMj+s0X25fs71T6t9YJLaBodwmZdaewD27dzS/PiboQw==}
+  '@hugeicons/react@1.1.10':
+    resolution: {integrity: sha512-9tAsd92yMVVGP+E+d8cM+wc0VnXuYZHNbWQi7TOe8k2neawmhiaFmVFbzyruejhOMa197/LbgvSED32ayUo3ZA==}
     peerDependencies:
       react: '>=16.0.0'
 
@@ -3669,9 +3669,6 @@ packages:
     resolution: {integrity: sha512-hIS4idWWai69NezIdRt2xFVofaF4j+6INOpJlVOLDO8zXGpUVEVzIYk12UUi2JzjEzWL3IOAxcTubgz9Po0yXw==}
     engines: {node: '>= 18'}
 
-  exsolve@1.0.8:
-    resolution: {integrity: sha512-LmDxfWXwcTArk8fUEnOfSZpHOJ6zOMUJKOtFLFqJLoKJetuQG874Uc7/Kki7zFLzYybmZhp1M7+98pfMqeX8yA==}
-
   exsolve@1.1.0:
     resolution: {integrity: sha512-D+42+T12DdIlJM3uepa55qGiL3sYdLBOxIl2ifQCzCHz4c7eiolaHsi3BIqEr7JxBzxv2pYZQX9kw16ziMcEmw==}
 
@@ -3770,6 +3767,15 @@ packages:
   fresh@2.0.0:
     resolution: {integrity: sha512-Rx/WycZ60HOaqLKAi6cHRKKI7zxWbJ31MhntmtwMoaTeF7XFH9hhBp8vITaMidfljRQ6eYWCKkaTK+ykVJHP2A==}
     engines: {node: '>= 0.8'}
+
+  frimousse@0.3.0:
+    resolution: {integrity: sha512-kO6LMoKY/cLAYEhXXtqLRaLIE6L/DagpFPrUZaLv3LsUa1/8Iza3HhwZcgN8eZ+weXnhv69eoclNUPohcCa/IQ==}
+    peerDependencies:
+      react: ^18 || ^19
+      typescript: '>=5.1.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   fs-extra@11.3.6:
     resolution: {integrity: sha512-w8ZNZr2mKIc7qeNaQ9AVPT1+iFaI+Avd4xudVOvdDJ8VytREi1Ft5Ih7hd9jjehod8vAM5GMsfQ/TpPf4EyoEA==}
@@ -3956,10 +3962,6 @@ packages:
 
   iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
-    engines: {node: '>=0.10.0'}
-
-  iconv-lite@0.7.1:
-    resolution: {integrity: sha512-2Tth85cXwGFHfvRgZWszZSvdo+0Xsqmw8k8ZwxScfcBneNUraK+dxRxRm24nszx80Y0TVio8kKLt5sLE7ZCLlw==}
     engines: {node: '>=0.10.0'}
 
   iconv-lite@0.7.3:
@@ -6739,9 +6741,9 @@ snapshots:
     dependencies:
       hono: 4.10.6
 
-  '@hugeicons/core-free-icons@3.3.0': {}
+  '@hugeicons/core-free-icons@4.3.3': {}
 
-  '@hugeicons/react@1.1.9(react@19.2.7)':
+  '@hugeicons/react@1.1.10(react@19.2.7)':
     dependencies:
       react: 19.2.7
 
@@ -8595,7 +8597,7 @@ snapshots:
       confbox: 0.2.2
       defu: 6.1.7
       dotenv: 16.6.1
-      exsolve: 1.0.8
+      exsolve: 1.1.0
       giget: 2.0.0
       jiti: 2.7.0
       ohash: 2.0.11
@@ -9274,8 +9276,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  exsolve@1.0.8: {}
-
   exsolve@1.1.0: {}
 
   fast-check@3.23.2:
@@ -9367,6 +9367,12 @@ snapshots:
       react-dom: 19.2.7(react@19.2.7)
 
   fresh@2.0.0: {}
+
+  frimousse@0.3.0(react@19.2.7)(typescript@5.9.3):
+    dependencies:
+      react: 19.2.7
+    optionalDependencies:
+      typescript: 5.9.3
 
   fs-extra@11.3.6:
     dependencies:
@@ -9530,10 +9536,6 @@ snapshots:
   human-signals@8.0.1: {}
 
   iconv-lite@0.6.3:
-    dependencies:
-      safer-buffer: 2.1.2
-
-  iconv-lite@0.7.1:
     dependencies:
       safer-buffer: 2.1.2
 
@@ -10084,7 +10086,7 @@ snapshots:
       aws-ssl-profiles: 1.1.2
       denque: 2.1.0
       generate-function: 2.3.1
-      iconv-lite: 0.7.1
+      iconv-lite: 0.7.3
       long: 5.3.2
       lru.min: 1.1.3
       named-placeholders: 1.1.4
@@ -10373,7 +10375,7 @@ snapshots:
   pkg-types@2.3.0:
     dependencies:
       confbox: 0.2.2
-      exsolve: 1.0.8
+      exsolve: 1.1.0
       pathe: 2.0.3
 
   pkg-up@3.1.0:
