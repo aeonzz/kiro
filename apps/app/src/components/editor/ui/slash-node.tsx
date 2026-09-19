@@ -21,6 +21,7 @@ import {
   PlateElement,
   useComposedRef,
   useEditorRef,
+  useEditorSelector,
   type PlateElementProps,
 } from "platejs/react";
 
@@ -36,6 +37,7 @@ import {
 } from "@/components/ui/combobox";
 
 import { insertBlock } from "../transforms";
+import { isToggleHeading } from "../utils/toggle";
 
 type Group = {
   value: string;
@@ -156,6 +158,28 @@ export function SlashInputElement(
   const { editor, element } = props;
 
   const editorRef = useEditorRef();
+  const isToggleTitle = useEditorSelector(
+    (editor) => {
+      const path = editor.api.findPath(element);
+      return (
+        !!path &&
+        editor.api.block({ at: path, highest: true })?.[0].type === KEYS.toggle
+      );
+    },
+    [element]
+  );
+  const availableGroups = React.useMemo(
+    () =>
+      isToggleTitle
+        ? groups
+            .map((group) => ({
+              ...group,
+              items: group.items.filter((item) => isToggleHeading(item.value)),
+            }))
+            .filter((group) => group.items.length > 0)
+        : groups,
+    [isToggleTitle]
+  );
   const inputRef = React.useRef<HTMLInputElement>(null);
   const cursorState = useHTMLInputCursorState(inputRef);
 
@@ -211,9 +235,9 @@ export function SlashInputElement(
 
   const filteredGroups = React.useMemo(() => {
     const search = value.toLowerCase().trim();
-    if (!search) return groups;
+    if (!search) return availableGroups;
 
-    return groups
+    return availableGroups
       .map((group) => ({
         ...group,
         items: group.items.filter((item) => {
@@ -227,7 +251,7 @@ export function SlashInputElement(
         }),
       }))
       .filter((group) => group.items.length > 0);
-  }, [value]);
+  }, [availableGroups, value]);
 
   const [open, setOpen] = React.useState(false);
 
@@ -241,7 +265,7 @@ export function SlashInputElement(
     <PlateElement {...props} as="span">
       <Combobox
         open={open}
-        items={groups}
+        items={availableGroups}
         filteredItems={filteredGroups}
         autoHighlight
       >

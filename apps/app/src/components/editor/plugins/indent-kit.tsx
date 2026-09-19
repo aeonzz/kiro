@@ -17,5 +17,11 @@ export const IndentKit = [
     options: {
       offset: 24,
     },
-  }),
+  }).overrideEditor(() => ({
+    transforms: {
+      // Swallow Tab/Shift+Tab entirely: no indenting, and no moving focus
+      // out of the editor to the next focusable element.
+      tab: () => true,
+    },
+  })),
 ];

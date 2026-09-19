@@ -1,5 +1,10 @@
-import * as React from "react";
-import { Copy01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
+﻿import * as React from "react";
+import {
+  ArrowDown01Icon,
+  ArrowUp01Icon,
+  Copy01Icon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { NodeApi, type TCodeBlockElement, type TCodeSyntaxLeaf } from "platejs";
 import {
@@ -28,26 +33,72 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import { CopyButton } from "@/components/copy-button";
+
+const COLLAPSE_LINE_THRESHOLD = 20;
 
 export function CodeBlockElement(props: PlateElementProps<TCodeBlockElement>) {
   const { element } = props;
 
+  const [expanded, setExpanded] = React.useState(false);
+
+  const lineCount = element.children.length;
+  const isCollapsible = lineCount > COLLAPSE_LINE_THRESHOLD;
+  const isCollapsed = isCollapsible && !expanded;
+
   return (
     <PlateElement
-      className="group/code-block py-1 **:[.hljs-addition]:bg-[#f0fff4] **:[.hljs-addition]:text-[#22863a] dark:**:[.hljs-addition]:bg-[#3c5743] dark:**:[.hljs-addition]:text-[#ceead5] **:[.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable]:text-[#005cc5] dark:**:[.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable]:text-[#6596cf] **:[.hljs-built\\\\_in,.hljs-symbol]:text-[#e36209] dark:**:[.hljs-built\\\\_in,.hljs-symbol]:text-[#c3854e] **:[.hljs-bullet]:text-[#735c0f] **:[.hljs-comment,.hljs-code,.hljs-formula]:text-[#6a737d] dark:**:[.hljs-comment,.hljs-code,.hljs-formula]:text-[#6a737d] **:[.hljs-deletion]:bg-[#ffeef0] **:[.hljs-deletion]:text-[#b31d28] dark:**:[.hljs-deletion]:bg-[#473235] dark:**:[.hljs-deletion]:text-[#e7c7cb] **:[.hljs-emphasis]:italic **:[.hljs-keyword,.hljs-doctag,.hljs-template-tag,.hljs-template-variable,.hljs-type,.hljs-variable.language\\\\_]:text-[#d73a49] dark:**:[.hljs-keyword,.hljs-doctag,.hljs-template-tag,.hljs-template-variable,.hljs-type,.hljs-variable.language\\\\_]:text-[#ee6960] **:[.hljs-name,.hljs-quote,.hljs-selector-tag,.hljs-selector-pseudo]:text-[#22863a] dark:**:[.hljs-name,.hljs-quote,.hljs-selector-tag,.hljs-selector-pseudo]:text-[#36a84f] **:[.hljs-regexp,.hljs-string,.hljs-meta_.hljs-string]:text-[#032f62] dark:**:[.hljs-regexp,.hljs-string,.hljs-meta_.hljs-string]:text-[#3593ff] **:[.hljs-section]:font-bold **:[.hljs-section]:text-[#005cc5] dark:**:[.hljs-section]:text-[#61a5f2] **:[.hljs-strong]:font-bold **:[.hljs-title,.hljs-title.class\\\\_,.hljs-title.class\\\\_.inherited\\\\_\\\\_,.hljs-title.function\\\\_]:text-[#6f42c1] dark:**:[.hljs-title,.hljs-title.class\\\\_,.hljs-title.class\\\\_.inherited\\\\_\\\\_,.hljs-title.function\\\\_]:text-[#a77bfa]"
+      className="slate-selectable group/code-block py-2 **:[.hljs-addition]:bg-[#f0fff4] **:[.hljs-addition]:text-[#22863a] dark:**:[.hljs-addition]:bg-[#1b4721] dark:**:[.hljs-addition]:text-[#b4f1b4] **:[.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable]:text-[#005cc5] dark:**:[.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable]:text-[#6cb6ff] **:[.hljs-built\\\\_in,.hljs-symbol]:text-[#e36209] dark:**:[.hljs-built\\\\_in,.hljs-symbol]:text-[#f69d50] **:[.hljs-bullet]:text-[#735c0f] **:[.hljs-comment,.hljs-code,.hljs-formula]:text-[#6a737d] dark:**:[.hljs-comment,.hljs-code,.hljs-formula]:text-[#768390] **:[.hljs-deletion]:bg-[#ffeef0] **:[.hljs-deletion]:text-[#b31d28] dark:**:[.hljs-deletion]:bg-[#78191b] dark:**:[.hljs-deletion]:text-[#ffd8d3] **:[.hljs-emphasis]:italic **:[.hljs-keyword,.hljs-doctag,.hljs-template-tag,.hljs-template-variable,.hljs-type,.hljs-variable.language\\\\_]:text-[#d73a49] dark:**:[.hljs-keyword,.hljs-doctag,.hljs-template-tag,.hljs-template-variable,.hljs-type,.hljs-variable.language\\\\_]:text-[#f47067] **:[.hljs-name,.hljs-quote,.hljs-selector-tag,.hljs-selector-pseudo]:text-[#22863a] dark:**:[.hljs-name,.hljs-quote,.hljs-selector-tag,.hljs-selector-pseudo]:text-[#8ddb8c] **:[.hljs-regexp,.hljs-string,.hljs-meta_.hljs-string]:text-[#032f62] dark:**:[.hljs-regexp,.hljs-string,.hljs-meta_.hljs-string]:text-[#96d0ff] **:[.hljs-section]:font-bold **:[.hljs-section]:text-[#005cc5] dark:**:[.hljs-section]:text-[#316dca] **:[.hljs-strong]:font-bold **:[.hljs-title,.hljs-title.class\\\\_,.hljs-title.class\\\\_.inherited\\\\_\\\\_,.hljs-title.function\\\\_]:text-[#6f42c1] dark:**:[.hljs-title,.hljs-title.class\\\\_,.hljs-title.class\\\\_.inherited\\\\_\\\\_,.hljs-title.function\\\\_]:text-[#dcbdfb]"
       {...props}
     >
       <div className="shadow-border-sm bg-sidebar/60 relative rounded-md">
-        <pre className="overflow-x-auto font-mono text-sm leading-[normal] [tab-size:2] print:break-inside-avoid">
-          <code className="block w-fit min-w-full p-4">{props.children}</code>
+        <pre
+          contentEditable={isCollapsed ? false : undefined}
+          onClick={isCollapsed ? () => setExpanded(true) : undefined}
+          className={cn(
+            "overflow-x-auto font-mono text-[12px] leading-[21px] [tab-size:2] print:break-inside-avoid",
+            isCollapsed &&
+              "max-h-80 cursor-default overflow-y-hidden [mask-image:linear-gradient(to_bottom,black_65%,transparent)]"
+          )}
+        >
+          <code
+            className={cn(
+              "block w-fit min-w-full p-4",
+              isCollapsible && expanded && "pb-14"
+            )}
+          >
+            {props.children}
+          </code>
         </pre>
+        {isCollapsible && (
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center pb-3"
+            contentEditable={false}
+          >
+            <Button
+              variant="outline"
+              size="xs"
+              className="pointer-events-auto text-muted-foreground select-none"
+              onClick={() => setExpanded(!expanded)}
+            >
+              <HugeiconsIcon
+                icon={expanded ? ArrowUp01Icon : ArrowDown01Icon}
+                strokeWidth={2}
+              />
+              {expanded ? "Collapse" : `Expand (${lineCount} lines)`}
+            </Button>
+          </div>
+        )}
         <div
           className="absolute top-3 right-3 flex gap-0.5 select-none group-hover/code-block:opacity-100"
           contentEditable={false}
         >
           <CodeBlockCombobox />
-          <CopyButton value={() => NodeApi.string(element)} />
+          <CopyButton
+            value={() => NodeApi.string(element)}
+            toastMessage="Code contents copied to clipboard"
+          />
         </div>
       </div>
     </PlateElement>

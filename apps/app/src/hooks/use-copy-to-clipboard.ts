@@ -4,7 +4,7 @@ import { toast } from "sonner";
 export function useCopyToClipboard() {
   const [copiedText, setCopiedText] = React.useState<string | null>(null);
 
-  const copy = React.useCallback(async (text: string) => {
+  const copy = React.useCallback(async (text: string, toastMessage?: string) => {
     if (!navigator?.clipboard) {
       console.warn("Clipboard not supported");
       return false;
@@ -13,7 +13,7 @@ export function useCopyToClipboard() {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedText(text);
-      toast.success("Copied to clipboard");
+      toast.success(toastMessage ?? "Copied to clipboard");
       return true;
     } catch (error) {
       console.warn("Copy failed", error);

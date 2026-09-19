@@ -2,6 +2,7 @@ import * as React from "react";
 import { powerSyncCollectionOptions } from "@tanstack/powersync-db-collection";
 import { createCollection, useLiveQuery } from "@tanstack/react-db";
 
+import type { IssuePriority } from "@/types/enums";
 import type { Issue } from "@/types/issue";
 import { getPowerSyncDb } from "@/lib/powersync/db";
 import { AppSchema } from "@/lib/powersync/schema";
@@ -34,6 +35,22 @@ export function getIssuesPowerSyncCollection() {
   return collection;
 }
 
+export type PowerSyncIssueDetail = {
+  id: string;
+  number?: number;
+  title: string;
+  description: string | null;
+  stateId?: string;
+  priority: IssuePriority;
+  assigneeId?: string;
+  creatorId?: string;
+  projectId?: string;
+  parentId?: string;
+  teamId?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 /**
  * Resolve one issue by the `(teamId, number)` pair the DB keys issues on — the
  * same pair an identifier like `AEO-13` decodes to. Local-first: reads the
@@ -45,7 +62,7 @@ export function getIssuesPowerSyncCollection() {
 export function usePowerSyncIssueByNumber(
   teamId: string | undefined,
   number: number | undefined
-): { issue: { id: string; title: string } | null; isLoading: boolean } {
+): { issue: PowerSyncIssueDetail | null; isLoading: boolean } {
   const collection = React.useMemo(() => getIssuesPowerSyncCollection(), []);
 
   const { data: issues = [], isLoading } = useLiveQuery(
@@ -61,7 +78,19 @@ export function usePowerSyncIssueByNumber(
     if (!match) return null;
     return {
       id: match.id as string,
+      number: (match.number as number | null) ?? undefined,
       title: (match.title as string) ?? "",
+      description: (match.description as string | null) ?? null,
+      stateId: (match.stateId as string | null) ?? undefined,
+      priority: ((match.priority as string | null) ??
+        "NO_PRIORITY") as IssuePriority,
+      assigneeId: (match.assigneeId as string | null) ?? undefined,
+      creatorId: (match.creatorId as string | null) ?? undefined,
+      projectId: (match.projectId as string | null) ?? undefined,
+      parentId: (match.parentId as string | null) ?? undefined,
+      teamId: (match.teamId as string | null) ?? undefined,
+      createdAt: (match.createdAt as string | null) ?? "",
+      updatedAt: (match.updatedAt as string | null) ?? "",
     };
   }, [issues, teamId, number]);
 

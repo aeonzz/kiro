@@ -40,6 +40,7 @@ import {
   useIssueFilters,
   useIssuePanelFilters,
 } from "@/hooks/use-issue-filter-store";
+import { useRegisterIssueNavigation } from "@/hooks/use-issue-navigation";
 import { useIssueTabKey } from "@/hooks/use-issue-tab-key";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -111,6 +112,8 @@ export function IssueList({
     teamProjects,
     teamLabels,
   });
+
+  useRegisterIssueNavigation(flattenedIssues, team);
 
   const {
     sensors,

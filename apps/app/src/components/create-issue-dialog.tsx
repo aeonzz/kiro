@@ -170,6 +170,7 @@ export function CreateIssueDialog() {
 
   const editor = usePlateEditor({
     plugins: EditorKit,
+    nodeId: { normalizeInitialValue: true },
   });
 
   const height = expand ? "100%" : "auto";

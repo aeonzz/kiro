@@ -27,9 +27,10 @@ model Issue {
     cycleId String?
     cycle   Cycle?  @relation(fields: [cycleId], references: [id])
 
-    labels   IssueLabelLink[]
-    comments IssueComment[]
-    history  IssueHistory[]
+    labels            IssueLabelLink[]
+    comments          IssueComment[]
+    history           IssueHistory[]
+    commentReactions  IssueCommentReaction[]
 
     position  Float?
 
@@ -56,12 +57,51 @@ model IssueComment {
     userId String
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+    parentId String?
+    parent   IssueComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+    replies  IssueComment[] @relation("CommentReplies")
+
+    // Any comment (root or reply) can be independently marked resolved —
+    // resolving the root resolves the whole thread; resolving a reply marks
+    // it as the thread's resolution/answer without resolving the others.
+    resolvedAt   DateTime?
+    resolvedById String?
+    resolvedBy   User?   @relation("CommentResolvedBy", fields: [resolvedById], references: [id])
+
+    reactions IssueCommentReaction[]
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     @@index([issueId])
     @@index([userId])
+    @@index([parentId])
     @@map("issue_comment")
+}
+
+model IssueCommentReaction {
+    id    String @id @default(uuid())
+    emoji String
+
+    commentId String
+    comment   IssueComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+    // Denormalized from the comment so sync rules can filter this table by
+    // issueId directly, matching every other issue-scoped table, instead of
+    // needing a join through issue_comment.
+    issueId String
+    issue   Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+
+    // A user can react to a comment with a given emoji at most once.
+    @@unique([commentId, userId, emoji])
+    @@index([commentId])
+    @@index([issueId])
+    @@map("issue_comment_reaction")
 }
 
 model IssueLabel {

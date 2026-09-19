@@ -209,6 +209,8 @@ export type PowerSyncMemberOption = {
   value: string;
   label: string;
   avatarUrl?: string;
+  email?: string;
+  role?: string;
 };
 
 /**
@@ -247,6 +249,8 @@ export function usePowerSyncOrgMembers(
           value: m.userId as string,
           label: (user?.name as string) ?? (user?.email as string) ?? "Unknown",
           avatarUrl: (user?.image as string) ?? undefined,
+          email: (user?.email as string) ?? undefined,
+          role: (m.role as string) ?? undefined,
         };
       });
   }, [orgs, members, users, orgSlug]);

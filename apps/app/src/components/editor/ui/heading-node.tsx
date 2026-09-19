@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { PlateElementProps } from "platejs/react";
 import { PlateElement } from "platejs/react";
 
-const headingVariants = cva("relative", {
+const headingVariants = cva("slate-selectable relative", {
   variants: {
     variant: {
       h1: "not-first:mt-8 mb-4 font-bold text-2xl",

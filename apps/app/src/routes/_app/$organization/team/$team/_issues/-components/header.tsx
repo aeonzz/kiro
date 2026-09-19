@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Notification01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useParams } from "@tanstack/react-router";
 
 import {
@@ -6,6 +8,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import {
   IssueHeaderShell,
   IssuesCrumb,
@@ -23,7 +26,16 @@ export function Header({
   });
 
   return (
-    <IssueHeaderShell {...props}>
+    <IssueHeaderShell
+      actions={
+        <div className="flex items-center gap-2.5">
+          <Button size="icon-xs" variant="ghost">
+            <HugeiconsIcon icon={Notification01Icon} strokeWidth={2} />
+          </Button>
+        </div>
+      }
+      {...props}
+    >
       <Breadcrumb>
         <BreadcrumbList>
           <TeamCrumb
