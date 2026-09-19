@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useForm } from "@tanstack/react-form";
+import { useLocation } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import type { PowerSyncCommentReaction } from "@/lib/collections/issue-comment-reactions-powersync";
@@ -183,6 +184,20 @@ export function CommentCard({
   const isOwnComment = comment.userId === currentUserId;
   const edited = comment.updatedAt !== comment.createdAt;
 
+  const { hash } = useLocation();
+  const isLinked = hash === `comment-${comment.id}`;
+  const linkedRef = React.useRef<HTMLDivElement>(null);
+  const [highlighted, setHighlighted] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isLinked) return;
+
+    linkedRef.current?.scrollIntoView({ block: "center" });
+    setHighlighted(true);
+    const timeout = setTimeout(() => setHighlighted(false), 7000);
+    return () => clearTimeout(timeout);
+  }, [isLinked]);
+
   const menuProps = {
     comment,
     replies,
@@ -200,9 +215,11 @@ export function CommentCard({
   const cardContent = (
     <div
       id={`comment-${comment.id}`}
+      ref={linkedRef}
       className={cn(
-        "bg-card group/comment relative flex flex-col gap-2 p-4",
+        "bg-card group/comment relative flex flex-col gap-2 p-4 transition-shadow duration-700",
         muted && "pointer-events-none",
+        highlighted && "ring-primary ring-1 ring-inset first:rounded-t-lg",
         className
       )}
     >
